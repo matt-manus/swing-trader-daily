@@ -167,7 +167,8 @@
         </table>
       </div>
       <div>
-        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663437893849/ySvbWYMlNnaOuERf.webp" class="screenshot-img" alt="Fullstack Investor Market Model">
+        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663437893849/WlbMlzvhunefaqSj.png" class="screenshot-img" alt="Fullstack Investor Market Model — Full Page">
+        <div class="source-label">Source: <a href="https://fullstackinvestor.com" style="color:#58a6ff">FullstackInvestor.com</a></div>
       </div>
     </div>
     <div class="flag">⚠ 注意: Market Exposure 箭頭指向 NEUTRAL 區間 (60–40%)。Long-Term Signal 仍為 Positive，但 Short/Mid-Term 均為 Neutral，Broad Market 為 Negative。整體偏防守。</div>
@@ -215,26 +216,115 @@
       <tr><td>MDY (Mid Cap)</td><td>621.00</td><td class="green">+0.91%</td><td class="red">-2.87%</td><td class="red">-2.74%</td><td class="green">+3.80%</td><td><span class="badge badge-bear">WEAK — BELOW 20/50</span></td></tr>
     </table>
 
-    <h3 class="sub">4A-ii. SPX Daily Chart (TradingView — 1Y)</h3>
+    <h3 class="sub">4A-ii. SPX Daily Chart (Yahoo Finance — 1Y)</h3>
     <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663437893849/CAeKAmTdWoUtpdcu.png" class="chart-img" alt="SPX Daily Chart">
-    <div class="source-label">Source: <a href="https://www.tradingview.com/chart/?symbol=SPX" style="color:#58a6ff">TradingView.com</a></div>
+    <div class="source-label">Source: Yahoo Finance via Python/matplotlib</div>
 
-    <h3 class="sub">4B. Sector ETF vs Moving Averages (Sorted by 1D%, incl. SPX)</h3>
+    <h3 class="sub">4B. Sector ETF Performance — Sorted by 1D% (incl. SPY Benchmark)</h3>
+    <p style="color:#8b949e; font-size:12px; margin-bottom:8px">
+      Source: Yahoo Finance (live close prices) | RS = Return vs SPY for same period | Sorted by 1D% descending
+    </p>
     <table>
-      <tr><th>ETF</th><th>Sector</th><th>Price</th><th>1D %</th><th>vs 20MA</th><th>vs 50MA</th><th>vs 200MA</th><th>RS vs SPY 1W</th><th>RS vs SPY 1M</th><th>Signal</th></tr>
-      <tr><td><strong>SPY</strong></td><td><strong>S&amp;P 500</strong></td><td><strong>670.79</strong></td><td class="green"><strong>+0.26%</strong></td><td class="red">-1.38%</td><td class="red">-2.20%</td><td class="green">+2.06%</td><td class="gray">—</td><td class="gray">—</td><td><span class="badge badge-warn">BENCHMARK</span></td></tr>
-      <tr><td>XLE</td><td>Energy</td><td>58.51</td><td class="green">+1.05%</td><td class="green">+4.27%</td><td class="green">+8.94%</td><td class="green">+24.09%</td><td class="green">+6.17%</td><td class="green">+9.26%</td><td><span class="badge badge-bull">BULL — ABOVE ALL</span></td></tr>
-      <tr><td>XLK</td><td>Technology</td><td>139.54</td><td class="green">+0.55%</td><td class="gray">0.00%</td><td class="red">-1.83%</td><td class="green">+1.62%</td><td class="green">+0.78%</td><td class="green">+1.60%</td><td><span class="badge badge-neutral">AT 20MA</span></td></tr>
-      <tr><td>XLF</td><td>Financials</td><td>49.56</td><td class="green">+0.53%</td><td class="red">-2.56%</td><td class="red">-5.92%</td><td class="red">-5.78%</td><td class="red">-0.06%</td><td class="red">-2.44%</td><td><span class="badge badge-bear">BELOW ALL MAs</span></td></tr>
-      <tr><td>XLC</td><td>Comm. Svcs</td><td>115.37</td><td class="green">+0.03%</td><td class="red">-1.06%</td><td class="red">-1.16%</td><td class="green">+2.41%</td><td class="red">-0.77%</td><td class="green">+2.30%</td><td><span class="badge badge-warn">BELOW 20/50</span></td></tr>
-      <tr><td>XLRE</td><td>Real Estate</td><td>42.72</td><td class="red">-0.47%</td><td class="red">-1.11%</td><td class="green">+1.28%</td><td class="green">+3.64%</td><td class="green">+0.47%</td><td class="red">-0.18%</td><td><span class="badge badge-neutral">MIXED</span></td></tr>
-      <tr><td>XLB</td><td>Materials</td><td>49.52</td><td class="red">-0.72%</td><td class="red">-3.84%</td><td class="red">-2.06%</td><td class="green">+8.08%</td><td class="green">+0.22%</td><td class="red">-5.50%</td><td><span class="badge badge-warn">BELOW 20/50</span></td></tr>
-      <tr><td>XLY</td><td>Cons. Disc.</td><td>113.18</td><td class="red">-1.10%</td><td class="red">-1.65%</td><td class="red">-4.46%</td><td class="red">-2.21%</td><td class="red">-0.16%</td><td class="red">-0.97%</td><td><span class="badge badge-bear">BELOW ALL MAs</span></td></tr>
-      <tr><td>XLI</td><td>Industrials</td><td>166.50</td><td class="red">-2.07%</td><td class="red">-3.62%</td><td class="red">-1.58%</td><td class="green">+7.23%</td><td class="red">-1.13%</td><td class="red">-2.79%</td><td><span class="badge badge-warn">BELOW 20/50</span></td></tr>
-      <tr><td>XLV</td><td>Healthcare</td><td>149.64</td><td class="red">-2.29%</td><td class="red">-3.56%</td><td class="red">-4.07%</td><td class="green">+3.65%</td><td class="red">-1.35%</td><td class="red">-3.48%</td><td><span class="badge badge-warn">BELOW 20/50</span></td></tr>
-      <tr><td>XLP</td><td>Cons. Staples</td><td>84.70</td><td class="red">-1.19%</td><td class="red">-2.64%</td><td class="red">-0.19%</td><td class="green">+5.52%</td><td class="red">-0.25%</td><td class="red">-3.76%</td><td><span class="badge badge-warn">BELOW 20MA</span></td></tr>
-      <tr><td>XLU</td><td>Utilities</td><td>47.13</td><td class="red">-0.28%</td><td class="green">+0.60%</td><td class="green">+5.29%</td><td class="green">+9.55%</td><td class="green">+2.16%</td><td class="green">+2.96%</td><td><span class="badge badge-bull">BULL — ABOVE ALL</span></td></tr>
+      <tr>
+        <th>ETF</th><th>Sector</th><th>Price</th><th>1D %</th>
+        <th>vs 20MA</th><th>vs 50MA</th><th>vs 200MA</th>
+        <th>RS 1W</th><th>RS 1M</th><th>Signal</th>
+      </tr>
+      
+      <!-- SPY Benchmark row (always shown first, highlighted) -->
+      <tr style="background:#1c2128; border-left:3px solid #58a6ff;">
+        <td><strong>SPY</strong></td>
+        <td><strong>S&amp;P 500 (Benchmark)</strong></td>
+        <td><strong>670.79</strong></td>
+        <td class="green"><strong>+0.26%</strong></td>
+        <td class="red">-1.38%</td>
+        <td class="red">-2.20%</td>
+        <td class="green">+2.06%</td>
+        <td class="gray">—</td>
+        <td class="gray">—</td>
+        <td><span class="badge badge-info">BENCHMARK</span></td>
+      </tr>
+      <!-- Sector ETFs sorted by 1D% descending -->
+      <tr>
+        <td>XLE</td><td>Energy</td><td>58.51</td>
+        <td class="green">+1.05%</td>
+        <td class="green">+4.09%</td><td class="green">+11.61%</td><td class="green">+28.21%</td>
+        <td class="green">+5.23%</td><td class="green">+7.65%</td>
+        <td><span class="badge badge-bull">BULL — ABOVE ALL MAs</span></td>
+      </tr>
+      <tr>
+        <td>XLY</td><td>Consumer Discret.</td><td>113.18</td>
+        <td class="green">+0.87%</td>
+        <td class="red">-1.65%</td><td class="red">-4.46%</td><td class="red">-2.21%</td>
+        <td class="red">-1.10%</td><td class="red">-2.58%</td>
+        <td><span class="badge badge-bear">BELOW ALL MAs</span></td>
+      </tr>
+      <tr>
+        <td>XLK</td><td>Technology</td><td>139.54</td>
+        <td class="green">+0.55%</td>
+        <td class="gray">0.00%</td><td class="red">-1.83%</td><td class="green">+1.62%</td>
+        <td class="red">-0.16%</td><td class="gray">-0.01%</td>
+        <td><span class="badge badge-neutral">AT 20MA</span></td>
+      </tr>
+      <tr>
+        <td>XLF</td><td>Financials</td><td>49.56</td>
+        <td class="green">+0.53%</td>
+        <td class="red">-2.55%</td><td class="red">-5.93%</td><td class="red">-5.77%</td>
+        <td class="red">-1.00%</td><td class="red">-4.05%</td>
+        <td><span class="badge badge-bear">BELOW ALL MAs</span></td>
+      </tr>
+      <tr>
+        <td>XLRE</td><td>Real Estate</td><td>42.72</td>
+        <td class="green">+0.33%</td>
+        <td class="red">-1.11%</td><td class="green">+1.27%</td><td class="green">+3.64%</td>
+        <td class="red">-0.47%</td><td class="red">-1.79%</td>
+        <td><span class="badge badge-neutral">MIXED — BELOW 20MA</span></td>
+      </tr>
+      <tr>
+        <td>XLI</td><td>Industrials</td><td>166.50</td>
+        <td class="green">+0.26%</td>
+        <td class="red">-3.62%</td><td class="red">-1.58%</td><td class="green">+7.22%</td>
+        <td class="red">-2.07%</td><td class="red">-4.40%</td>
+        <td><span class="badge badge-warn">BELOW 20/50MA</span></td>
+      </tr>
+      <tr>
+        <td>XLB</td><td>Materials</td><td>49.52</td>
+        <td class="green">+0.24%</td>
+        <td class="red">-3.84%</td><td class="red">-2.06%</td><td class="green">+8.08%</td>
+        <td class="red">-0.72%</td><td class="red">-7.11%</td>
+        <td><span class="badge badge-warn">BELOW 20/50MA</span></td>
+      </tr>
+      <tr>
+        <td>XLC</td><td>Comm. Services</td><td>115.37</td>
+        <td class="green">+0.03%</td>
+        <td class="red">-1.06%</td><td class="red">-1.15%</td><td class="green">+2.41%</td>
+        <td class="red">-1.71%</td><td class="green">+0.69%</td>
+        <td><span class="badge badge-warn">BELOW 20/50MA</span></td>
+      </tr>
+      <tr>
+        <td>XLU</td><td>Utilities</td><td>47.13</td>
+        <td class="red">-0.28%</td>
+        <td class="green">+0.60%</td><td class="green">+5.30%</td><td class="green">+9.56%</td>
+        <td class="green">+1.22%</td><td class="green">+1.35%</td>
+        <td><span class="badge badge-bull">BULL — ABOVE ALL MAs</span></td>
+      </tr>
+      <tr>
+        <td>XLP</td><td>Consumer Staples</td><td>84.70</td>
+        <td class="red">-0.33%</td>
+        <td class="red">-2.64%</td><td class="red">-0.19%</td><td class="green">+5.51%</td>
+        <td class="red">-1.19%</td><td class="red">-5.37%</td>
+        <td><span class="badge badge-warn">BELOW 20/50MA</span></td>
+      </tr>
+      <tr>
+        <td>XLV</td><td>Health Care</td><td>149.64</td>
+        <td class="red">-0.91%</td>
+        <td class="red">-3.56%</td><td class="red">-4.07%</td><td class="green">+3.65%</td>
+        <td class="red">-2.29%</td><td class="red">-5.09%</td>
+        <td><span class="badge badge-warn">BELOW 20/50MA</span></td>
+      </tr>
+
     </table>
+    <div class="note">📌 板塊 ETF 總結: XLE (Energy) 今日領漲 +1.05%，且在所有移動平均線之上，是唯一具結構性強勢的板塊。XLU (Utilities) 雖今日微跌 -0.28%，但同樣在所有 MA 之上，屬防守性強勢。其餘板塊均在 20MA 及/或 50MA 以下，結構偏弱。XLV (Healthcare) 今日最弱 -0.91%。</div>
     <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663437893849/lRYVRxyvQVHhTqjK.png" class="chart-img" alt="Sector ETF vs MA Chart">
 
     <h3 class="sub">4C. % of Stocks Above Moving Averages</h3>
