@@ -29,7 +29,25 @@
 
 ---
 
-## 2. 報告觸發與發佈流程 (Workflow & Publishing)
+## 2. MARKET_HISTORY.md 自動更新規則 (Auto-Update Rule)
+
+每次完成 Daily Market Summary 並推送至 GitHub 後，**必須立即更新 `MARKET_HISTORY.md`**：
+
+1. 在 `## 📈 Trend Evolution Log` 部分的**最頂端**插入當日新記錄（最新日期在最上方）。
+2. 每條記錄必須包含以下欄位（格式參考現有條目）：
+   - 日期、Regime 等級、Action Guidance
+   - VIX、Fear & Greed、T2108
+   - SPX 收市價及與各 MA 的關係
+   - $SPXA20R 廣度值
+   - A/D Ratio (SPX)
+   - 板塊領漲/領跌
+   - 當日最重要的一句市場觀察（Key Observation）
+3. 更新後將 `MARKET_HISTORY.md` 一同推送至 GitHub。
+4. 同時將更新後的 `MARKET_HISTORY.md` 複製到 Manus 項目共享目錄（若可訪問）。
+
+---
+
+## 3. 報告觸發與發佈流程 (Workflow & Publishing)
 
 - **觸發時間：** 美股收市後（美東時間下午 4:00 = 香港時間凌晨 4:00）。
 - **自動執行時間：** 香港時間早上 **6:45 AM HKT**（即美東時間前一晚 6:45 PM ET），周一至周五，美股非假日。
