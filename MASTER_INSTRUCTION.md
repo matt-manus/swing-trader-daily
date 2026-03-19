@@ -32,7 +32,8 @@
 ## 2. 報告觸發與發佈流程 (Workflow & Publishing)
 
 - **觸發時間：** 美股收市後（美東時間下午 4:00 = 香港時間凌晨 4:00）。
-- **發佈目標時間：** 香港時間早上 7:00（7:00 AM HKT）。
+- **自動執行時間：** 香港時間早上 **6:45 AM HKT**（即美東時間前一晚 6:45 PM ET），周一至周五，美股非假日。
+- **發佈目標時間：** 香港時間早上 **6:45 AM HKT**。
 - **觸發方式：** 用戶會在新對話中發送 "Clone the swing-trader-daily repo and read WORKFLOW.md, then make today's report" 或 "開始"。
 - **發佈平台：** GitHub Pages (https://matt-manus.github.io/swing-trader-daily/)。
 - **Git 操作：** 報告生成後，必須將新的 `index.html` 和歸檔文件（如 `2026-03-20.html`）推送到 `main` 分支。
