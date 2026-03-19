@@ -45,6 +45,8 @@
 
 ### 總覽與關鍵水平 (Verdict Box & Key Levels)
 - **要求：** 總結當日市場環境（Regime）。
+- **標題格式：** 必須使用 "Market Summary — [Date] | Generated [Time] HKT / [Time] ET"。
+- **時間戳：** 數據時間必須精確到具體時間（例如 4:00 PM ET），不能只寫 "EOD close"。
 - **MA 數值：** SPX 的 20MA、50MA、200MA 必須通過 `yfinance` 精確計算，不能使用約數。
 
 ### Step 1: 宏觀環境 (Macro Environment)
@@ -54,7 +56,8 @@
 
 ### Step 2: Fullstack Investor
 - **正確 URL：** **https://fullstackinvestor.co/market-model** （注意是 `.co`，不是 `.com`）。
-- **要求：** **只放截圖，不作任何解讀**。不需要提取數據表，不需要寫 "Positive" 或 "Neutral" 的文字總結。截圖必須是包含上下兩部分的完整長圖。
+- **要求：** **只放截圖，不作任何解讀**。不需要提取數據表，不需要寫 "Positive" 或 "Neutral" 的文字總結。
+- **截圖技術：** 必須使用 Playwright/Selenium 等工具進行整頁截圖（Full-page screenshot），並加入滾動等待（Scroll-and-wait）以觸發懶加載（Lazy loading），**絕對不能出現黑色空隙（Black gap）**。
 
 ### Step 3: 市場情緒 (Market Sentiment)
 - **要求：** 包含 VIX、Fear & Greed 和 T2108 的計分卡（Scorecard）。
@@ -68,12 +71,17 @@
   - **排序規則：** 必須按 **RSI 14 由高至低排序**（不是按 1D% 排序）。SPY 需按照其 RSI 數值插入到正確的排名位置。
 - **4C % of Stocks Above MAs：**
   - **正確來源：** **StockCharts.com**。絕對不能使用 TradingView 或 MarketInOut。
-  - **所需截圖：** $SPXA20R (20MA)、$SPXA50R (50MA)、$SPXA200R (200MA)。
-  - **要求：** 必須顯示 StockCharts 的精確數值和截圖，不能有任何 "estimated" 標籤。
+  - **所需截圖（共 9 張）：** 
+    - S&P 500: $SPXA20R, $SPXA50R, $SPXA200R
+    - Nasdaq 100: $NDXA20R, $NDXA50R, $NDXA200R
+    - NYSE: $NYA20R, $NYA50R, $NYA200R
+  - **要求：** 必須顯示這 9 個指標的精確數值和截圖，不能有任何 "estimated" 標籤。
 
 ### Step 5: 板塊與行業強度 (Sector & Industry Strength)
 - **5A Sector Performance：** 來源為 Finviz (https://finviz.com/groups.ashx?g=sector&o=-change) 的數據與截圖。
-- **5B Industry Leaders & Laggards：** 來源為 Finviz (https://finviz.com/groups.ashx?g=industry&o=-change)。必須列出當日表現最好（Top 5）和最差（Bottom 5）的行業精確數據。
+- **5B Industry Leaders：** 來源為 Finviz (https://finviz.com/groups.ashx?g=industry&o=-change)。
+  - **要求：** 必須列出當日表現最好的 **Top 10** 行業，並且**必須包含其所屬的母板塊（Parent Sector）**。
+  - **刪除：** 不需要列出表現最差的 Laggards（Bottom 5）。
 
 ### Step 6: 市場廣度 (Market Breadth)
 - **6A Advance/Decline Ratio：** 
@@ -81,7 +89,9 @@
   - **要求：** 必須提供一張包含所有主要指數（S&P 500, Dow, NYSE, Nasdaq）的完整 MarketInOut 截圖。
 - **6B Stockbee Market Monitor：**
   - **正確 URL：** **https://stockbee.blogspot.com/p/mm.html** （不需要登入，不是 `.biz`）。
-  - **要求：** 截圖**必須包含 T2108 欄位**。同時需讀取 Up/Down 4%+ 和 5-day/10-day ratio 的精確數據填入報告。
+  - **要求：** 截圖**必須包含 T2108 欄位**。
+  - **截圖技術：** 由於 T2108 在 iframe 中，截圖時必須確保滾動到 iframe 內部或直接訪問 Google Sheets 來源 URL 進行截圖，確保 T2108 數據清晰可見。
+  - **數據：** 需讀取 Up/Down 4%+ 和 5-day/10-day ratio 的精確數據填入報告。
 
 ### 已刪除的內容 (Removed Content)
 以下內容在之前的版本中存在，但**已被明確要求刪除，絕不能出現在未來的報告中**：
