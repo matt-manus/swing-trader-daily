@@ -34,11 +34,13 @@ The report is built using `scripts/build_daily_report.py`, which takes the previ
 ### Data Collection Order
 1. Yahoo Finance (automated via yfinance)
 2. Fear & Greed Index (feargreedmeter.com)
-3. Fullstack Investor screenshot
-4. StockCharts breadth screenshots
-5. MarketInOut A/D ratio screenshot
-6. Stockbee data + screenshot
-7. Finviz sector and industry data
+3. **NAAIM Exposure Index** (naaim.org Excel download — automated)
+4. **Step 1B: Finviz ticker news scrape + AI filter** (automated)
+5. Fullstack Investor screenshot
+6. StockCharts breadth screenshots
+7. MarketInOut A/D ratio screenshot
+8. Stockbee data + screenshot
+9. Finviz sector and industry data
 
 ### Building the Report
 1. Copy the most recent archive HTML as the base template
@@ -55,6 +57,8 @@ The report is built using `scripts/build_daily_report.py`, which takes the previ
 | Step 1 — Prices, MAs, RSI | Yahoo Finance | yfinance library | Automated |
 | Step 1 — Fear & Greed | feargreedmeter.com | https://feargreedmeter.com | Scrape/screenshot |
 | Step 1 — Economic Calendar | forex.tradingcharts.com | https://forex.tradingcharts.com/economic_calendar/ | Manual check |
+| **Step 1B — Market Intelligence News** | **Finviz (ticker pages) + OpenAI** | `https://finviz.com/quote.ashx?t=TICKER` | **Auto-scrape `#news-table` for SPY,QQQ,IWM,DIA,XLE,XLK,XLF,XLV,XLB,NVDA,AAPL,MSFT,META,AMZN,TSLA,GOOGL,GLD,TLT,USO,UUP — filter today’s headlines only — then use OpenAI to select 5–7 most market-moving stories with HIGH/MEDIUM/LOW impact rating** |
+| **Step 3 — NAAIM Exposure Index** | **naaim.org** | `https://naaim.org/programs/naaim-exposure-index/` | **Download Excel file (linked as “HERE” on page), parse latest row, show value + date. Updated every Wednesday.** |
 | Step 2 — Fullstack Investor | fullstackinvestor.co | **https://fullstackinvestor.co/market-model** | Screenshot ONLY — no data extraction, no interpretation |
 | Step 3 — T2108 value | Stockbee | https://stockbee.blogspot.com/p/mm.html | Read actual value — no login needed |
 | Step 4A — Index vs MAs | Yahoo Finance | yfinance library | Automated |
@@ -69,18 +73,20 @@ The report is built using `scripts/build_daily_report.py`, which takes the previ
 
 ## User Requirements (Do Not Change Without Confirmation)
 
-1. **Accuracy over speed** — If unsure, check. If don't remember, re-read the file. Never estimate.
-2. **Step 2 Fullstack** — Screenshot ONLY. No data extraction. No interpretation. Full page (stitch top + bottom). URL: fullstackinvestor.co (NOT .com)
-3. **Step 4A** — No SPY daily chart
-4. **Step 4B** — Must include RSI 14 column. Must be sorted by RSI descending (not 1D%)
-5. **Step 4C** — Use StockCharts screenshots ($SPXA20R, $SPXA50R, $SPXA200R). No TradingView. No estimates.
-6. **Step 6A** — MarketInOut A/D ratio screenshot showing all indices. No login needed.
-7. **Step 6B** — Stockbee screenshot must include T2108. No login needed. URL: stockbee.blogspot.com/p/mm.html
-8. **Step 7 UFO Watchlist** — REMOVED. Do not include.
-9. **Report Comparison Notes** — REMOVED. Do not include.
-10. **No estimated values** — No `~` approximations for any data values. All values must be exact and cited.
-11. **All data must cite source** — Every section must have a source link/label.
-12. **Show checklist before starting** — Before collecting any data, list all sections and sources for user confirmation.
+1. **Accuracy over speed** — If unsure, check. If don’t remember, re-read the file. Never estimate.
+2. **Step 1B Market Intelligence** — Scrape Finviz `#news-table` for today’s headlines across 20 tickers. Use OpenAI to filter 5–7 most market-moving stories. Each story must have: impact level (HIGH/MEDIUM/LOW), affected sectors/tickers, one-line explanation. Only include headlines dated the same day as the report.
+3. **Step 2 Fullstack** — Screenshot ONLY. No data extraction. No interpretation. Full page (stitch top + bottom). URL: fullstackinvestor.co (NOT .com)
+4. **Step 3 NAAIM** — Download NAAIM Excel from naaim.org, parse latest row. Show value + date in Scorecard alongside VIX, Fear & Greed, T2108. Updated every Wednesday; on other days show most recent value with date label.
+5. **Step 4A** — No SPY daily chart
+6. **Step 4B** — Must include RSI 14 column. Must be sorted by RSI descending (not 1D%)
+7. **Step 4C** — Use StockCharts screenshots ($SPXA20R, $SPXA50R, $SPXA200R). No TradingView. No estimates.
+8. **Step 6A** — MarketInOut A/D ratio screenshot showing all indices. No login needed.
+9. **Step 6B** — Stockbee screenshot must include T2108. No login needed. URL: stockbee.blogspot.com/p/mm.html
+10. **Step 7 UFO Watchlist** — REMOVED. Do not include.
+11. **Report Comparison Notes** — REMOVED. Do not include.
+12. **No estimated values** — No `~` approximations for any data values. All values must be exact and cited.
+13. **All data must cite source** — Every section must have a source link/label.
+14. **Show checklist before starting** — Before collecting any data, list all sections and sources for user confirmation.
 
 ---
 
@@ -90,8 +96,9 @@ The report is built using `scripts/build_daily_report.py`, which takes the previ
 2. **Verdict Box** — Overall market verdict (Bullish/Neutral/Defensive/Bearish + level)
 3. **Key Levels** — SPX 20/50/200MA (exact values from yfinance), VIX levels, T2108
 4. **Step 1: Macro Environment** — Indices (SPY, QQQ, IWM, DIA), VIX, Gold (GLD), Oil (USO), 10Y Yield (^TNX), USD (UUP), Fear & Greed
+4b. **Step 1B: Market Intelligence News** — 5–7 AI-filtered market-moving headlines from Finviz (today only), with HIGH/MEDIUM/LOW impact rating, affected tickers, and one-line explanation
 5. **Step 2: Fullstack Investor** — Screenshot only, link to fullstackinvestor.co/market-model
-6. **Step 3: Market Sentiment** — VIX scorecard, Fear & Greed, T2108 scorecard, sentiment summary note
+6. **Step 3: Market Sentiment** — VIX scorecard, Fear & Greed, T2108, **NAAIM Exposure Index** scorecard, sentiment summary note
 7. **Step 4: Technical Analysis**
    - 4A: Index vs Moving Averages (SPY, QQQ, IWM, DIA vs 20/50/200MA)
    - 4B: Sector ETF Rotation (all 11 sectors + SPY, with RSI 14, sorted by RSI)
@@ -157,3 +164,6 @@ Returns a URL like: `https://static.manus.im/file/manuscdn.com/XXXXXXXX.png`
 | Including Step 7 UFO | Step 7 is REMOVED |
 | Including Report Comparison Notes | REMOVED |
 | Sorting Step 4B by 1D% | Sort by RSI 14 descending |
+| Skipping Step 1B news intelligence | Always scrape Finviz + AI filter for today’s headlines |
+| Omitting NAAIM from Step 3 Scorecard | Always include NAAIM value + date in Scorecard |
+| Including old/previous-day news in Step 1B | Only include headlines dated the same day as the report |

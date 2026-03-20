@@ -46,7 +46,7 @@
   .chart-card { background: #21262d; border-radius: 8px; padding: 12px; }
   .chart-card-title { font-size: 12px; color: #c9d1d9; text-align: center; margin-bottom: 8px; font-weight: bold; letter-spacing: 0.3px; }
   .chart-card img { width: 100%; border-radius: 6px; }
-  .scorecard { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 8px; }
+  .scorecard { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 8px; }
   .score-item { background: #21262d; border-radius: 8px; padding: 12px; text-align: center; }
   .score-label { font-size: 11px; color: #8b949e; margin-bottom: 4px; }
   .score-value { font-size: 18px; font-weight: bold; }
@@ -70,7 +70,7 @@
   @media (max-width: 768px) {
     .two-col { grid-template-columns: 1fr; }
     .three-col { grid-template-columns: 1fr; }
-    .scorecard { grid-template-columns: repeat(2, 1fr); }
+    .scorecard { grid-template-columns: repeat(2, 1fr); } /* 5-col on desktop, 2-col on mobile */
     .verdict-grid { grid-template-columns: 1fr; }
   }
 </style>
@@ -144,6 +144,57 @@
     <div class="note">📌 宏觀總結: VIX 從昨日 25.09 回落至 24.06 (-4.11%)，略有改善但仍在危險區間。Fear &amp; Greed 維持 17 (極度恐懼)。黃金 (GLD) 大跌 -4.12%，油價 (USO) 亦回落 -3.54%。10 年期國債收益率升至 4.28%，滯脹風險持續。今日 Philly Fed Prices Paid 急升至 44.7 (前值 38.9)，通脹壓力加劇。Initial Jobless Claims 205K 優於預期 (215K)，就業市場仍具韌性。</div>
   </div>
 
+  <!-- STEP 1B: MARKET INTELLIGENCE NEWS -->
+  <div class="section">
+    <div class="section-title"><span class="step-badge">STEP 1B</span> &#x5E02;&#x5834;&#x60C5;&#x5831; Market Intelligence News <span class="live-badge">&#x2705; Mar 19 Headlines</span></div>
+    <table>
+      <tr><th>Impact</th><th>Tickers / Sector</th><th>Headline</th><th>Why It Matters</th></tr>
+      <tr>
+        <td><span class="badge badge-bear">HIGH</span></td>
+        <td class="yellow">AMZN, NVDA</td>
+        <td>Nvidia to supply 1 million GPUs to Amazon through 2027 in landmark AI cloud deal</td>
+        <td>Massive AI infrastructure contract accelerates cloud AI demand; bullish for both NVDA and AMZN growth prospects.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-bear">HIGH</span></td>
+        <td class="yellow">XLE, ENERGY</td>
+        <td>Berkshire&#x2019;s Energy Stocks Are Rallying. But an ETF Would&#x2019;ve Done Better.</td>
+        <td>Confirms Energy sector structural leadership amid geopolitical tensions; XLE remains the only sector with RSI &gt;70.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-bear">HIGH</span></td>
+        <td class="yellow">MSFT, XLK</td>
+        <td>Microsoft Slips Below $400 on OpenAI Deal Concerns</td>
+        <td>Investor concerns over costly AI partnerships weigh on MSFT; adds to tech sector headwinds already visible in RSI data.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-bear">HIGH</span></td>
+        <td class="yellow">AAPL</td>
+        <td>Apple China Sales Jump 23% Despite Market Slump</td>
+        <td>Resilience in China counters broader tech weakness; potential relative strength candidate if market stabilises.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-warn">MEDIUM</span></td>
+        <td class="gray">XLF, FINANCIALS</td>
+        <td>Financial stocks on pace for worst first quarter since 2020 as private credit cracks flash &#x2018;yellow warning&#x2019;</td>
+        <td>XLF weakness + private credit stress signals broader risk-off; watch for contagion into broader market sentiment.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-warn">MEDIUM</span></td>
+        <td class="gray">SPY, BROAD MARKET</td>
+        <td>These charts suggest the bears aren&#x2019;t done with the stock market yet</td>
+        <td>Technical analysis confirms continued downside risk; aligns with SPX breaking below 200MA for first time.</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-warn">MEDIUM</span></td>
+        <td class="gray">TSLA</td>
+        <td>Exclusive &#x2014; Tesla in talks with Chinese firms to buy $2.9 billion worth of solar equipment</td>
+        <td>Large solar procurement signals Tesla&#x2019;s China energy ambitions; watch for regulatory response given geopolitical backdrop.</td>
+      </tr>
+    </table>
+    <div class="source-label">Source: <a href="https://finviz.com" style="color:#58a6ff">Finviz</a> (ticker news pages &#x2014; #news-table) + AI filter (OpenAI gpt-4.1-mini) | Headlines dated Mar 19, 2026 only</div>
+  </div>
+
   <!-- STEP 2: FULLSTACK (SCREENSHOT ONLY) -->
   <div class="section">
     <div class="section-title"><span class="step-badge">STEP 2</span> Fullstack Investor Market Model <span class="live-badge">✅ LIVE — Mar 19</span></div>
@@ -175,8 +226,13 @@
         <div class="score-value red">-5.45%</div>
         <div class="gray" style="font-size:11px">Off highs ($697.84)</div>
       </div>
+      <div class="score-item">
+        <div class="score-label">NAAIM Exposure</div>
+        <div class="score-value yellow">60.24</div>
+        <div class="gray" style="font-size:11px">&#x2193; from 79.29 (Mar 4) | as of Mar 18</div>
+      </div>
     </div>
-    <div class="note">📌 情緒總結: VIX 24.06 略有回落但仍偏高 (&gt;20)，Fear &amp; Greed 維持 17 (極度恐懼)。T2108 22.35%，屬超賣區間，接近極度超賣 (&lt;20%)。SPY 距 52 週高位 -5.45%。情緒面全面偏空，但極度超賣水平有時預示短期技術性反彈。</div>
+    <div class="note">📌 情緒總結: VIX 24.06 略有回落但仍偏高 (&gt;20)，Fear &amp; Greed 維持 17 (極度恐懼)。T2108 22.35%，屬超賣區間，接近極度超賣 (&lt;20%)。SPY 距 52 週高位 -5.45%。NAAIM Exposure Index 60.24 (Mar 18)，由 3 月初 79.29 大幅回落，機構主動管理人已明顯減倉至中性偏空水平。情緒面全面偏空，但極度超賣水平有時預示短期技術性反彈。</div>
   </div>
 
   <!-- STEP 4: TECHNICAL -->

@@ -78,9 +78,30 @@
 - **要求：** **只放截圖，不作任何解讀**。不需要提取數據表，不需要寫 "Positive" 或 "Neutral" 的文字總結。
 - **截圖技術：** 必須使用 Playwright/Selenium 等工具進行整頁截圖（Full-page screenshot），並加入滾動等待（Scroll-and-wait）以觸發懶加載（Lazy loading），**絕對不能出現黑色空隙（Black gap）**。
 
+### Step 1B: 市場情報 (Market Intelligence News)
+- **目的：** 從當日主要 tickers 的新聞標題中，篩選出對市場判斷最有價值的 5–7 條新聞，並標明影響等級。
+- **新聞來源：** Finviz ticker 頁面（`https://finviz.com/quote.ashx?t=TICKER`），免費，無需 API key，無需登入。
+- **抓取方式：** 自動抓取以下 tickers 的當日新聞標題（`#news-table` HTML 元素）：
+  - 市場 ETF：SPY, QQQ, IWM, DIA
+  - 強勢/弱勢板塊 ETF：XLE, XLK, XLF, XLV, XLB
+  - 權重股：NVDA, AAPL, MSFT, META, AMZN, TSLA, GOOGL
+  - 宏觀資產：GLD, TLT, USO, UUP
+- **AI 過濾：** 抓取所有當日標題後，使用 AI（OpenAI API）結合當日市場環境（VIX、板塊強弱、宏觀背景）自動篩選出 5–7 條最有投資判斷價值的新聞。
+- **輸出格式：** 每條新聞需標明：
+  - 影響等級：HIGH / MEDIUM / LOW
+  - 涉及板塊/tickers
+  - 一句說明：為何對投資判斷重要
+- **位置：** 放在 Step 1 宏觀環境表格之後，Step 2 Fullstack 之前。
+- **注意：** 只顯示當日（report date）的新聞標題，不顯示前日或更早的標題。
+
 ### Step 3: 市場情緒 (Market Sentiment)
-- **要求：** 包含 VIX、Fear & Greed 和 T2108 的計分卡（Scorecard）。
+- **要求：** 包含 VIX、Fear & Greed、T2108 和 **NAAIM Exposure Index** 的計分卡（Scorecard）。
 - **T2108 來源：** 必須使用 Stockbee 的實際數據，絕不能估算。
+- **NAAIM Exposure Index：**
+  - **來源：** NAAIM 官網每週三發布 Excel 文件，直接下載解析。URL 格式：`https://naaim.org/wp-content/uploads/[YYYY]/[MM]/USE_Data-since-Inception_[YYYY-MM-DD].xlsx`
+  - **更新頻率：** 每週三更新，其餘日子顯示最近一次的數值並標明日期。
+  - **解讀：** 0–100% 代表機構主動管理人的平均股票倉位；>75% 偏多，<50% 偏空，<25% 極度悲觀。
+  - **加入 Scorecard：** 在 Step 3 的 Scorecard 中加入 NAAIM 數值，與 VIX、Fear & Greed、T2108 並列顯示。
 
 ### Step 4: 技術分析 (Technical Analysis)
 - **4A Index vs MAs：** 使用 `yfinance` 數據。**特別注意：不需要 SPY 日線圖（已刪除）**。
@@ -131,5 +152,7 @@
 - [ ] Step 4C 是否使用了 StockCharts（$SPXA20R 等）的截圖？
 - [ ] Step 6B 的 Stockbee 截圖是否包含了 T2108 數據？
 - [ ] 是否已刪除 Step 7 和 Report Comparison？
+- [ ] Step 1B 市場情報是否已包含 5–7 條 AI 篩選新聞（HIGH/MEDIUM/LOW 標記）？
+- [ ] Step 3 Scorecard 是否已包含 NAAIM Exposure Index 數值（並標明數據日期）？
 
 嚴格遵守以上所有指示，確保每日報告的結構穩定和數據絕對準確。
