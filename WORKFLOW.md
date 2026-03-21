@@ -36,6 +36,7 @@ The report is built using `scripts/build_daily_report.py`, which takes the previ
 2. Fear & Greed Index (feargreedmeter.com)
 3. **NAAIM Exposure Index** (naaim.org Excel download — automated)
 4. **Step 1B: Finviz ticker news scrape + AI filter** (automated)
+   - Note: UUP replaced by DXY in ticker list
 5. Fullstack Investor screenshot
 6. StockCharts breadth screenshots
 7. MarketInOut A/D ratio screenshot
@@ -55,19 +56,20 @@ The report is built using `scripts/build_daily_report.py`, which takes the previ
 | Section | Source | URL | Method |
 |---------|--------|-----|--------|
 | Step 1 — Prices, MAs, RSI | Yahoo Finance | yfinance library | Automated |
+| Step 1 — USD Index | **DXY (not UUP)** | `DX-Y.NYB` via yfinance | Use DXY directly — UUP is an ETF with tracking error |
 | Step 1 — Fear & Greed | feargreedmeter.com | https://feargreedmeter.com | Scrape/screenshot |
 | Step 1 — Economic Calendar | forex.tradingcharts.com | https://forex.tradingcharts.com/economic_calendar/ | Manual check |
 | **Step 1B — Market Intelligence News** | **Finviz (ticker pages) + OpenAI** | `https://finviz.com/quote.ashx?t=TICKER` | **Auto-scrape `#news-table` for SPY,QQQ,IWM,DIA,XLE,XLK,XLF,XLV,XLB,NVDA,AAPL,MSFT,META,AMZN,TSLA,GOOGL,GLD,TLT,USO,UUP — filter today’s headlines only — then use OpenAI to select 5–7 most market-moving stories with HIGH/MEDIUM/LOW impact rating** |
 | **Step 3 — NAAIM Exposure Index** | **naaim.org** | `https://naaim.org/programs/naaim-exposure-index/` | **Download Excel file (linked as “HERE” on page), parse latest row, show value + date. Updated every Wednesday.** |
 | Step 2 — Fullstack Investor | fullstackinvestor.co | **https://fullstackinvestor.co/market-model** | Screenshot ONLY — no data extraction, no interpretation |
 | Step 3 — T2108 value | Stockbee | https://stockbee.blogspot.com/p/mm.html | Read actual value — no login needed |
-| Step 4A — Index vs MAs | Yahoo Finance | yfinance library | Automated |
-| Step 4B — Sector ETF RSI | Yahoo Finance | yfinance library | Automated — sorted by RSI 14, not 1D% |
+| Step 4A — Index vs MAs | Yahoo Finance | yfinance library | **SPY, QQQ, DIA, IWM only** — no SPX/NDX index. MA color: red if price < MA, green if price > MA. Signal badge must match actual position. |
+| Step 4B — Sector ETF RSI | Yahoo Finance | yfinance library | **Sorted by RSI 14 descending** — must use **Wilder's SMMA** algorithm (not simple rolling mean). Use `pandas_ta` `ta.rsi()` or manual SMMA: `smma = (prev * 13 + val) / 14`. Simple rolling mean gives incorrect (lower) values vs Yahoo Finance/TradingView. |
 | Step 4C — % Above MAs | **StockCharts** | https://stockcharts.com/h-sc/ui?s=$SPXA20R | Screenshot — use $SPXA20R, $SPXA50R, $SPXA200R |
 | Step 5A — Sector Performance | Finviz | https://finviz.com/groups.ashx?g=sector&o=-change | Data + screenshot |
 | Step 5B — Industry Performance | Finviz | https://finviz.com/groups.ashx?g=industry&o=-change | Data table — top 5 and bottom 5 |
 | Step 6A — A/D Ratio | MarketInOut | **https://www.marketinout.com/chart/market.php?breadth=advance-decline-ratio** | Screenshot — no login needed, shows all indices |
-| Step 6B — Stockbee breadth | Stockbee | **https://stockbee.blogspot.com/p/mm.html** | Screenshot — must include T2108 column — no login needed |
+| Step 6B — Stockbee breadth | Stockbee | **https://stockbee.blogspot.com/p/mm.html** | Screenshot — must include T2108 column — no login needed — **must be taken AFTER 4:00 PM ET market close, not in the morning** |
 
 ---
 
@@ -102,7 +104,7 @@ The report is built using `scripts/build_daily_report.py`, which takes the previ
 5. **Step 2: Fullstack Investor** — Screenshot only, link to fullstackinvestor.co/market-model
 6. **Step 3: Market Sentiment** — VIX scorecard, Fear & Greed, T2108, **NAAIM Exposure Index** scorecard, sentiment summary note
 7. **Step 4: Technical Analysis**
-   - 4A: Index vs Moving Averages (SPY, QQQ, IWM, DIA vs 20/50/200MA)
+   - 4A: Index vs Moving Averages (**SPY, QQQ, DIA, IWM only** — 4 tickers, no SPX/NDX index. MA color must reflect actual position: red = below MA, green = above MA)
    - 4B: Sector ETF Rotation (all 11 sectors + SPY, with RSI 14, sorted by RSI)
    - 4C: % of Stocks Above MAs (StockCharts $SPXA20R, $SPXA50R, $SPXA200R screenshots)
 8. **Step 5: Sector & Industry Strength**
@@ -172,6 +174,11 @@ Returns a URL like: `https://static.manus.im/file/manuscdn.com/XXXXXXXX.png`
 | Including Step 7 UFO | Step 7 is REMOVED |
 | Including Report Comparison Notes | REMOVED |
 | Sorting Step 4B by 1D% | Sort by RSI 14 descending |
+| Using simple rolling mean for RSI | Use Wilder's SMMA: `smma = (prev * 13 + val) / 14` — simple mean gives wrong (lower) values |
+| Using UUP for USD in Step 1 | Use DXY (`DX-Y.NYB`) — UUP is an ETF with tracking error |
+| Step 4A showing wrong MA colors from template | Always recalculate: price < MA = red, price > MA = green. Never copy colors from previous day's template |
+| Step 6B screenshot taken in morning | Must re-screenshot Stockbee AFTER 4:00 PM ET market close |
+| VIX/macro description copied from previous day | Always update all descriptive text to match today's actual data (e.g. VIX up vs down) |
 | Skipping Step 1B news intelligence | Always scrape Finviz + AI filter for today’s headlines |
 | Omitting NAAIM from Step 3 Scorecard | Always include NAAIM value + date in Scorecard |
 | Including old/previous-day news in Step 1B | Only include headlines dated the same day as the report |

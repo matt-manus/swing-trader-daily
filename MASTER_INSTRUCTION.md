@@ -76,7 +76,8 @@
 - **MA 數值：** SPX 的 20MA、50MA、200MA 必須通過 `yfinance` 精確計算，不能使用約數。
 
 ### Step 1: 宏觀環境 (Macro Environment)
-- **來源：** `yfinance` (SPY, QQQ, IWM, DIA, VIX, GLD, USO, ^TNX, UUP)。
+- **來源：** `yfinance` (SPY, QQQ, IWM, DIA, VIX, GLD, USO, ^TNX, DX-Y.NYB)。
+- **USD 指數：** 使用 **DXY（`DX-Y.NYB`）** 而非 UUP ETF。DXY 係美元指數本身，更直接、更標準；UUP 係 ETF，有追蹤誤差。
 - **Fear & Greed：** 來源為 https://feargreedmeter.com （抓取精確數值）。
 - **經濟日曆：** 來源為 https://forex.tradingcharts.com/economic_calendar/ （手動查看未來三天的重要數據）。
 
@@ -112,10 +113,13 @@
 
 ### Step 4: 技術分析 (Technical Analysis)
 - **4A Index vs MAs：** 使用 `yfinance` 數據。**特別注意：不需要 SPY 日線圖（已刪除）**。
+  - **只使用以下 4 個指數：SPY、QQQ、DIA（道瓊斯 ETF）、IWM**。不需要 SPX 或 NDX 指數本身。
+  - **MA 顏色規則（必須嚴格執行）：** 若某指數收市價低於某條 MA，該欄位必須顯示**紅色**；若高於，顯示**綠色**。絕不能因為照搬模板而顯示錯誤顏色。Signal badge 亦必須根據實際 MA 位置自動判斷（ABOVE / BELOW / BREACHED）。
 - **4B Sector ETF Rotation：** 
   - 必須包含 11 個板塊 ETF 和 SPY。
   - **必須增加 RSI 14 欄位**。
   - **排序規則：** 必須按 **RSI 14 由高至低排序**（不是按 1D% 排序）。SPY 需按照其 RSI 數值插入到正確的排名位置。
+  - **RSI 計算方法：** 必須使用 **Wilder's Smoothed Moving Average（SMMA / RMA）** 計算 RSI 14，而非簡單 rolling mean。使用 `pandas_ta` 庫的 `ta.rsi()` 或手動實現 SMMA：`smma = (prev_smma * 13 + current_value) / 14`。簡單 rolling mean 會導致 RSI 數值偏低，與 Yahoo Finance / TradingView 顯示的數值不符。
 - **4C % of Stocks Above MAs：**
   - **正確來源：** **StockCharts.com**。絕對不能使用 TradingView 或 MarketInOut。
   - **所需截圖（共 9 張）：** 
@@ -139,6 +143,7 @@
   - **要求：** 截圖**必須包含 T2108 欄位**。
   - **截圖技術：** 由於 T2108 在 iframe 中，截圖時必須確保滾動到 iframe 內部或直接訪問 Google Sheets 來源 URL 進行截圖，確保 T2108 數據清晰可見。
   - **數據：** 需讀取 Up/Down 4%+ 和 5-day/10-day ratio 的精確數據填入報告。
+  - **截圖時機：** 必須在美股**收市後**（4:00 PM ET 之後）重新截圖，確保數據係當日收市數據。不能使用早上截的圖標示為 LIVE。
 
 ### Step 7: 每日市場評論 (Daily Market Commentary — Bull vs Bear)
 - **目的：** 根據當日所有數據，從多頭（Bullish）和空頭（Bearish）兩個角度各自列出論點，幫助投資者做出更平衡的判斷。
@@ -169,9 +174,14 @@
 - [ ] Step 4B 是否已按 RSI 14 排序？
 - [ ] Step 4C 是否使用了 StockCharts（$SPXA20R 等）的截圖？
 - [ ] Step 6B 的 Stockbee 截圖是否包含了 T2108 數據？
-- [ ] 是否已刪除 Step 7 和 Report Comparison？
+- [ ] 是否已刪除 Step 7 UFO 和 Report Comparison？
 - [ ] Step 1B 市場情報是否已包含 5–7 條 AI 篩選新聞（HIGH/MEDIUM/LOW 標記）？
 - [ ] Step 3 Scorecard 是否已包含 NAAIM Exposure Index 數值（並標明數據日期）？
+- [ ] Step 1 USD 是否使用 DXY（`DX-Y.NYB`）而非 UUP？
+- [ ] Step 4A 是否只有 SPY/QQQ/DIA/IWM 四個指數？MA 顏色是否根據實際位置正確顯示（低於 MA = 紅色）？
+- [ ] Step 4B RSI 是否使用 Wilder's SMMA 算法計算？排序是否正確（由高至低）？
+- [ ] Step 6B Stockbee 截圖是否在收市後（4:00 PM ET 後）重新截取？
+- [ ] 所有描述文字（如 VIX 漲跌描述）是否根據當日實際數據更新，而非照搬昨日模板？
 - [ ] Step 7 市場評論是否包含空頭論點、多頭論點及多空對比表？所有論點是否引用報告內的具體數據？
 
 嚴格遵守以上所有指示，確保每日報告的結構穩定和數據絕對準確。
