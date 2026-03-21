@@ -73,21 +73,22 @@ The report is built using `scripts/build_daily_report.py`, which takes the previ
 
 ## User Requirements (Do Not Change Without Confirmation)
 
-1. **Accuracy over speed** — If unsure, check. If don’t remember, re-read the file. Never estimate.
-2. **Step 1B Market Intelligence** — Scrape Finviz `#news-table` for today's headlines across 20 tickers. Use OpenAI to filter 5–7 most market-moving stories. Each story must have: impact level (HIGH/MEDIUM/LOW), affected sectors/tickers, one-line explanation. Only include headlines dated the same day as the report.
-3. **Step 2 Fullstack** — Screenshot ONLY. No data extraction. No interpretation. Full page (stitch top + bottom). URL: fullstackinvestor.co (NOT .com)
-4. **Step 3 NAAIM** — Download NAAIM Excel from naaim.org, parse latest row. Show value + date in Scorecard alongside VIX, Fear & Greed, T2108. Updated every Wednesday; on other days show most recent value with date label.
-5. **Step 7 Market Commentary** — After all data is collected, write Bull vs Bear commentary using ONLY data from the current report. Must include: Bearish Case (4–6 points), Bullish Case (3–5 points), and Bull vs Bear Scorecard table with final score and trading guidance. Total length 600–900 Chinese characters.
-6. **Step 4A** — No SPY daily chart
-7. **Step 4B** — Must include RSI 14 column. Must be sorted by RSI descending (not 1D%)
-8. **Step 4C** — Use StockCharts screenshots ($SPXA20R, $SPXA50R, $SPXA200R). No TradingView. No estimates.
-9. **Step 6A** — MarketInOut A/D ratio screenshot showing all indices. No login needed.
-10. **Step 6B** — Stockbee screenshot must include T2108. No login needed. URL: stockbee.blogspot.com/p/mm.html
-11. **Step 7 UFO Watchlist** — REMOVED. Do not include.
-12. **Report Comparison Notes** — REMOVED. Do not include.
-13. **No estimated values** — No `~` approximations for any data values. All values must be exact and cited.
-14. **All data must cite source** — Every section must have a source link/label.
-15. **Show checklist before starting** — Before collecting any data, list all sections and sources for user confirmation.
+1. **Accuracy over speed** — If unsure, check. If don't remember, re-read the file. Never estimate.
+2. **Intellectual Honesty** — Always distinguish between facts (directly verified via tools/code/screenshots) and inferences (guesses, assumptions, "sounds reasonable" logic). If uncertain about something — especially system behaviour, schedules, or technical causes — say "I don't know, I can't verify this" instead of filling the gap with a plausible-sounding explanation. If a previous answer was wrong, admit it directly: "I was wrong, I was guessing, not verifying." This rule applies to ALL conversations, not just report data.
+3. **Step 1B Market Intelligence** — Scrape Finviz `#news-table` for today's headlines across 20 tickers. Use OpenAI to filter 5–7 most market-moving stories. Each story must have: impact level (HIGH/MEDIUM/LOW), affected sectors/tickers, one-line explanation. Only include headlines dated the same day as the report.
+4. **Step 2 Fullstack** — Screenshot ONLY. No data extraction. No interpretation. Full page (stitch top + bottom). URL: fullstackinvestor.co (NOT .com)
+5. **Step 3 NAAIM** — Download NAAIM Excel from naaim.org, parse latest row. Show value + date in Scorecard alongside VIX, Fear & Greed, T2108. Updated every Wednesday; on other days show most recent value with date label.
+6. **Step 7 Market Commentary** — After all data is collected, write Bull vs Bear commentary using ONLY data from the current report. Must include: Bearish Case (4–6 points), Bullish Case (3–5 points), and Bull vs Bear Scorecard table with final score and trading guidance. Total length 600–900 Chinese characters.
+7. **Step 4A** — No SPY daily chart
+8. **Step 4B** — Must include RSI 14 column. Must be sorted by RSI descending (not 1D%)
+9. **Step 4C** — Use StockCharts screenshots ($SPXA20R, $SPXA50R, $SPXA200R). No TradingView. No estimates.
+10. **Step 6A** — MarketInOut A/D ratio screenshot showing all indices. No login needed.
+11. **Step 6B** — Stockbee screenshot must include T2108. No login needed. URL: stockbee.blogspot.com/p/mm.html
+12. **Step 7 UFO Watchlist** — REMOVED. Do not include.
+13. **Report Comparison Notes** — REMOVED. Do not include.
+14. **No estimated values** — No `~` approximations for any data values. All values must be exact and cited.
+15. **All data must cite source** — Every section must have a source link/label.
+16. **Show checklist before starting** — Before collecting any data, list all sections and sources for user confirmation.
 
 ---
 
