@@ -58,3 +58,14 @@ This file tracks the evolution of key market metrics and structural trends acros
 | **T2108** | > 60% | 40% - 60% | < 20% (Extreme Oversold) |
 | **$SPXA20R** | > 50% | 30% - 50% | < 20% (Extreme Bearish) |
 | **SPX vs MAs** | Above 20/50/200 | Mixed | Below 20/50/200 |
+
+
+### Mar 20, 2026 — 全面賣壓，SPY/NDX 跌穿 200MA，股債同跌滯脹訊號
+- **Regime:** BEARISH Level 8–9/9
+- **SPX:** 6,506.48 (-1.51%) | **VIX:** 26.78 (+11.31%) | **F&G:** 15 (Extreme Fear)
+- **SPY:** $648.57 (-1.70%) | **QQQ:** $582.06 (-1.85%) | **IWM:** $242.22 (-2.18%)
+- **Key Event:** SPY/NDX 正式跌穿 200MA；TLT -1.90%，股債同跌，滯脹訊號明確
+- **Breadth:** $SPXA20R 12.60% (極端超賣) | $SPXA200R 45.20% | T2108 18.50%
+- **Sector Leader:** XLE (Energy) RSI 68.4 — 唯一強勢板塊
+- **NAAIM:** 60.24 (Mar 18) — 機構持續減倉
+- **Bull vs Bear:** 空頭 5 : 多頭 2 — 深度超賣但無見底訊號
