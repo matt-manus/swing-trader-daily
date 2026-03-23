@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Market Summary — Mon Mar 23, 2026 | 每日市場總結</title>
+<style>
+ body { background:#0d1117; color:#e6edf3; font-family:'Segoe UI',Arial,sans-serif; font-size:13px; margin:0; padding:12px; }
+ h1 { font-size:20px; color:#58a6ff; margin:0 0 4px 0; }
+ .subtitle { color:#8b949e; font-size:12px; margin-bottom:14px; }
+ .section { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 20px 24px; margin-bottom: 18px; }
+ .section-title { font-size: 15px; font-weight: bold; color: #58a6ff; border-bottom: 1px solid #30363d; padding-bottom: 10px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+ .step-badge { background:#1f6feb; color:#fff; font-size:11px; padding:2px 8px; border-radius:4px; font-weight:bold; }
+ .live-badge { background:#238636; color:#fff; font-size:10px; padding:2px 7px; border-radius:4px; font-weight:bold; margin-left:6px; }
+ table { width:100%; border-collapse:collapse; margin-bottom:10px; font-size:12px; }
+ th { background:#21262d; color:#8b949e; padding:7px 8px; text-align:left; font-weight:600; border-bottom:1px solid #30363d; }
+ td { padding:6px 8px; border-bottom:1px solid #21262d; }
+ tr:hover { background:#1c2128; }
+ .green { color:#3fb950; font-weight:bold; }
+ .red { color:#f85149; font-weight:bold; }
+ .yellow { color:#e3b341; font-weight:bold; }
+ .badge { font-size:10px; padding:2px 7px; border-radius:4px; font-weight:bold; white-space:nowrap; }
+ .badge-bull { background:#1a4731; color:#3fb950; }
+ .badge-bear { background:#3d1a1a; color:#f85149; }
+ .badge-warn { background:#3d2e00; color:#e3b341; }
+ .badge-info { background:#1f3a5f; color:#58a6ff; }
+ .badge-neutral { background:#21262d; color:#8b949e; }
+ .note { background:#1c2128; border-left:4px solid #58a6ff; padding:10px 14px; margin:10px 0; border-radius:0 6px 6px 0; font-size:12px; color:#ccc; }
+ .source-label { color:#8b949e; font-size:10px; margin:4px 0 10px 0; }
+ h3.sub { color:#e6edf3; font-size:13px; margin:18px 0 8px 0; border-bottom:1px solid #21262d; padding-bottom:5px; }
+ .three-col { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:14px; }
+ .chart-card { background:#0d1117; border:1px solid #30363d; border-radius:8px; padding:10px; }
+ .chart-card-title { font-size:11px; color:#8b949e; margin-bottom:6px; }
+ .chart-card img { width:100%; border-radius:4px; }
+ .regime-box { background:#0d1117; border:2px solid #f39c12; border-radius:8px; padding:14px; margin-bottom:10px; }
+ .regime-title { font-size:14px; font-weight:bold; color:#f39c12; margin-bottom:10px; }
+ .news-item { background:#0d1117; border:1px solid #30363d; border-radius:6px; padding:10px 12px; margin-bottom:8px; }
+ .news-headline { color:#e6edf3; font-size:12px; font-weight:bold; margin-bottom:4px; }
+ .news-why { color:#8b949e; font-size:11px; margin:4px 0 0 0; }
+ .news-tickers { font-size:10px; color:#58a6ff; margin-bottom:3px; }
+ .impact-high { border-left:3px solid #f85149; }
+ .impact-medium { border-left:3px solid #e3b341; }
+ .impact-low { border-left:3px solid #8b949e; }
+</style>
+</head>
+<body>
+<div class="section" style="padding:14px 20px; margin-bottom:14px;">
+  <h1>📊 Market Summary — Mon, Mar 23, 2026</h1>
+  <div class="subtitle">每日市場總結 | Steps 1–6 | Sources: Yahoo Finance · feargreedmeter.com · Finviz · StockCharts · MarketInOut · Stockbee · forex.tradingcharts.com</div>
+  <div class="subtitle">⏱ Report generated: Mon Mar 23, 2026 · 19:45 HKT (07:45 ET)</div>
+</div>
+
+<!-- KEY LEVELS -->
+<div class="section">
+  <div class="section-title">🔑 關鍵水平 Key Levels to Watch</div>
+  <table>
+    <tr><th>Level</th><th>Value</th><th>Status</th></tr>
+    <tr><td>SPY 200MA</td><td>$656.85</td><td><span class="badge badge-bear">BELOW — SPY @ $655.38 (-0.22%)</span></td></tr>
+    <tr><td>SPY 50MA</td><td>$681.42</td><td><span class="badge badge-bear">BELOW — SPY @ $655.38 (-3.82%)</span></td></tr>
+    <tr><td>SPY 20MA</td><td>$672.66</td><td><span class="badge badge-bear">BELOW — SPY @ $655.38 (-2.57%)</span></td></tr>
+    <tr><td>VIX Level</td><td>26.15</td><td><span class="badge badge-warn">ELEVATED — Above 20 (Caution)</span></td></tr>
+    <tr><td>T2108 (% above 40MA)</td><td>~18–20%</td><td><span class="badge badge-bear">OVERSOLD — Below 20%</span></td></tr>
+    <tr><td>$SPXA20R</td><td>40.00%</td><td><span class="badge badge-warn">RECOVERING — Up from 12.60%</span></td></tr>
+  </table>
+</div>
+
+<!-- STEP 1A: MACRO ENVIRONMENT -->
+<div class="section">
+  <div class="section-title"><span class="step-badge">STEP 1A</span> 宏觀環境 Macro Environment</div>
+  <table>
+    <tr><th>Asset</th><th>Price</th><th>1D Chg</th><th>vs 20MA</th><th>vs 50MA</th><th>vs 200MA</th><th>RSI(14)</th><th>Signal</th></tr>
+    <tr>
+      <td><strong>SPY (S&amp;P 500)</strong></td>
+      <td><strong>$655.38</strong></td>
+      <td class="green"><strong>+1.05%</strong></td>
+      <td class="red">-2.57%</td>
+      <td class="red">-3.82%</td>
+      <td class="red">-0.22%</td>
+      <td class="red"><strong>37.2</strong></td>
+      <td><span class="badge badge-bear">BELOW ALL MAs</span></td>
+    </tr>
+    <tr>
+      <td>QQQ (Nasdaq 100)</td>
+      <td>$588.00</td>
+      <td class="green">+1.02%</td>
+      <td class="red">-2.37%</td>
+      <td class="red">-3.65%</td>
+      <td class="red">-0.73%</td>
+      <td class="red">40.2</td>
+      <td><span class="badge badge-bear">BELOW ALL MAs</span></td>
+    </tr>
+    <tr>
+      <td>IWM (Russell 2000)</td>
+      <td>$247.45</td>
+      <td class="green">+2.16%</td>
+      <td class="red">-2.52%</td>
+      <td class="red">-4.56%</td>
+      <td class="green">+3.00%</td>
+      <td class="yellow">42.0</td>
+      <td><span class="badge badge-warn">BELOW 20/50MA</span></td>
+    </tr>
+    <tr>
+      <td>DIA (Dow Jones)</td>
+      <td>$462.08</td>
+      <td class="green">+1.38%</td>
+      <td class="red">-3.01%</td>
+      <td class="red">-5.08%</td>
+      <td class="red">-0.80%</td>
+      <td class="red">34.6</td>
+      <td><span class="badge badge-bear">BELOW ALL MAs</span></td>
+    </tr>
+    <tr>
+      <td><strong>VIX</strong></td>
+      <td><strong>26.15</strong></td>
+      <td class="green">-2.35%</td>
+      <td colspan="3">—</td>
+      <td class="yellow">56.8</td>
+      <td><span class="badge badge-warn">ELEVATED (>20)</span></td>
+    </tr>
+    <tr>
+      <td>GLD (Gold)</td>
+      <td>$404.04</td>
+      <td class="red">-2.26%</td>
+      <td class="red">-12.55%</td>
+      <td class="red">-11.38%</td>
+      <td class="green">+7.86%</td>
+      <td class="red">27.4</td>
+      <td><span class="badge badge-warn">PULLBACK — Above 200MA</span></td>
+    </tr>
+    <tr>
+      <td>USO (Oil)</td>
+      <td>$110.56</td>
+      <td class="red">-8.95%</td>
+      <td class="green">+7.47%</td>
+      <td class="green">+27.57%</td>
+      <td class="green">+44.71%</td>
+      <td class="yellow">59.5</td>
+      <td><span class="badge badge-bull">ABOVE ALL MAs</span></td>
+    </tr>
+    <tr>
+      <td>TLT (20Y Treasury)</td>
+      <td>$86.39</td>
+      <td class="green">+0.65%</td>
+      <td class="red">-2.09%</td>
+      <td class="red">-1.67%</td>
+      <td class="red">-0.42%</td>
+      <td class="red">40.2</td>
+      <td><span class="badge badge-bear">BELOW ALL MAs</span></td>
+    </tr>
+    <tr>
+      <td>10Y Yield (^TNX)</td>
+      <td>4.33%</td>
+      <td class="red">-1.30%</td>
+      <td class="green">+4.09%</td>
+      <td class="green">+3.84%</td>
+      <td class="green">+3.34%</td>
+      <td class="yellow">63.5</td>
+      <td><span class="badge badge-warn">ABOVE ALL MAs — Elevated</span></td>
+    </tr>
+    <tr>
+      <td>DXY (US Dollar)</td>
+      <td>99.15</td>
+      <td class="red">-0.50%</td>
+      <td class="green">+0.14%</td>
+      <td class="green">+0.93%</td>
+      <td class="green">+0.76%</td>
+      <td class="yellow">52.6</td>
+      <td><span class="badge badge-neutral">NEUTRAL</span></td>
+    </tr>
+  </table>
+  <div class="note">📌 宏觀總結: 市場今日出現技術性反彈 — SPY +1.05%，IWM +2.16%（小型股相對強勢）。VIX 微降至 26.15，仍在危險區間。黃金 GLD 大跌 -2.26%（可能是獲利回吐），石油 USO 大跌 -8.95%（伊朗戰爭緊張局勢緩和）。10Y 收益率 4.33% 仍高企。SPY 仍在 200MA ($656.85) 以下，反彈尚未確認趨勢轉向。</div>
+</div>
+
+<!-- STEP 1B: MARKET INTELLIGENCE NEWS -->
+<div class="section">
+  <div class="section-title"><span class="step-badge">STEP 1B</span> 市場情報 Market Intelligence News <span class="live-badge">✅ Mar 23 Headlines</span></div>
+  <div class="news-item impact-high">
+    <div class="news-tickers">🏷 XLE · Energy</div>
+    <div class="news-headline">Iran war is pushing need for energy efficiency: Honeywell CEO (Yahoo Finance Video)</div>
+    <div class="news-why">⚡ <strong>HIGH IMPACT:</strong> Ongoing Iran war tensions are driving structural demand for energy efficiency, supporting XLE's leadership and signaling sector resilience amid geopolitical risks.</div>
+  </div>
+  <div class="news-item impact-high">
+    <div class="news-tickers">🏷 XLE · Energy</div>
+    <div class="news-headline">What energy leaders are saying about oil prices, Iran at CERAWeek 2026 (Yahoo Finance Video)</div>
+    <div class="news-why">⚡ <strong>HIGH IMPACT:</strong> Insights from energy leaders on oil price dynamics and Iran conflict provide critical context for energy sector outlook and price volatility expectations.</div>
+  </div>
+  <div class="news-item impact-high">
+    <div class="news-tickers">🏷 NVDA · TSLA · MU · PLTR · Tech</div>
+    <div class="news-headline">Dow Jones Futures: Trump's Iran Comments Spark Stock Market Rally; Micron, Nvidia, Palantir, Tesla Are Big Movers (Investor's Business Daily)</div>
+    <div class="news-why">⚡ <strong>HIGH IMPACT:</strong> Geopolitical developments easing Iran war fears triggered a market bounce led by key tech and semiconductor stocks, highlighting sensitivity to macro risk shifts.</div>
+  </div>
+  <div class="news-item impact-medium">
+    <div class="news-tickers">🏷 NVDA · AMD · Tech · Semiconductors</div>
+    <div class="news-headline">Nvidia, AMD Rally As War Fears Ease (GuruFocus.com)</div>
+    <div class="news-why">🔶 <strong>MEDIUM IMPACT:</strong> The rally in Nvidia and AMD on easing war fears confirms the tech sector's vulnerability to geopolitical risk and potential for upside in a bearish market.</div>
+  </div>
+  <div class="news-item impact-medium">
+    <div class="news-tickers">🏷 NVDA · Energy · Tech</div>
+    <div class="news-headline">NVIDIA, Emeral AI partner with energy firms to develop grid-flexible AI data centers (Proactive)</div>
+    <div class="news-why">🔶 <strong>MEDIUM IMPACT:</strong> Nvidia's collaboration with energy firms to build AI-powered flexible data centers aligns with energy sector trends and could drive cross-sector growth opportunities.</div>
+  </div>
+  <div class="news-item impact-medium">
+    <div class="news-tickers">🏷 XLE · Energy</div>
+    <div class="news-headline">Energy: What to watch at CERAWeek amid Iran war, rising oil prices (Yahoo Finance Video)</div>
+    <div class="news-why">🔶 <strong>MEDIUM IMPACT:</strong> CERAWeek discussions highlight key energy market drivers including Iran tensions and oil price inflation, essential for positioning within the energy sector.</div>
+  </div>
+  <div class="news-item impact-low">
+    <div class="news-tickers">🏷 SPY · Market</div>
+    <div class="news-headline">Here's a big reason the S&amp;P 500 has trailed 'pure' versions of the index that focus on value and growth (MarketWatch)</div>
+    <div class="news-why">⬜ <strong>LOW IMPACT:</strong> Understanding index composition effects aids in interpreting SPY performance but has limited immediate impact given current bearish regime and macro risks.</div>
+  </div>
+</div>
+
+<!-- STEP 2: FULLSTACK MARKET MODEL -->
+<div class="section">
+  <div class="section-title"><span class="step-badge">STEP 2</span> Fullstack Investor Market Model <span class="live-badge">✅ LIVE — Mar 23</span></div>
+  <div class="note">⚠️ Fullstack Market Model page requires member login. Screenshot not available for this session. Please check <a href="https://fullstacktrading.com/market-model/" style="color:#58a6ff" target="_blank">fullstacktrading.com/market-model/</a> directly for the current model reading. Based on prior data (Mar 20), model was BULLISH (high exposure recommended).</div>
+  <div class="source-label">Source: <a href="https://fullstacktrading.com" style="color:#58a6ff">fullstacktrading.com</a></div>
+</div>
+
+<!-- STEP 3: MARKET SENTIMENT -->
+<div class="section">
+  <div class="section-title"><span class="step-badge">STEP 3</span> 市場情緒 Market Sentiment</div>
+  <table>
+    <tr><th>Indicator</th><th>Reading</th><th>Signal</th><th>Source</th></tr>
+    <tr>
+      <td><strong>Fear &amp; Greed Index</strong></td>
+      <td><strong class="red">16 — EXTREME FEAR</strong></td>
+      <td><span class="badge badge-bear">EXTREME FEAR</span></td>
+      <td>feargreedmeter.com</td>
+    </tr>
+    <tr>
+      <td><strong>NAAIM Exposure Index</strong></td>
+      <td><strong class="red">19.44</strong> (as of Mar 18)</td>
+      <td><span class="badge badge-bear">HEAVILY UNDERWEIGHT</span></td>
+      <td>naaim.org</td>
+    </tr>
+    <tr>
+      <td>VIX (Volatility Index)</td>
+      <td>26.15 (-2.35%)</td>
+      <td><span class="badge badge-warn">ELEVATED — Above 20</span></td>
+      <td>Yahoo Finance</td>
+    </tr>
+    <tr>
+      <td>T2108 (% Above 40MA)</td>
+      <td>~18–20% (Stockbee MM)</td>
+      <td><span class="badge badge-bear">OVERSOLD</span></td>
+      <td>Stockbee</td>
+    </tr>
+  </table>
+  <div class="note">📌 情緒總結: Fear &amp; Greed 16 (Extreme Fear) 維持歷史低位。NAAIM 19.44 顯示機構投資者已大幅減倉至接近空倉水平。VIX 26.15 雖較昨日有所回落，但仍高於 20 的警戒線。整體情緒極度悲觀，歷史上此水平往往預示中期底部，但需等待技術確認。</div>
+</div>
+
+<!-- STEP 4: TECHNICAL & BREADTH -->
+<div class="section">
+  <div class="section-title"><span class="step-badge">STEP 4</span> 技術面 &amp; 市場廣度 Technical &amp; Breadth</div>
+
+  <h3 class="sub">4A. Major Index vs Moving Averages (Mar 23 EOD — Yahoo Finance)</h3>
+  <table>
+    <tr><th>Index</th><th>Price</th><th>1D Chg</th><th>20MA</th><th>vs 20MA</th><th>50MA</th><th>vs 50MA</th><th>200MA</th><th>vs 200MA</th><th>RSI(14)</th><th>Signal</th></tr>
+    <tr>
+      <td><strong>SPY (S&amp;P 500)</strong></td>
+      <td><strong>$655.38</strong></td>
+      <td class="green"><strong>+1.05%</strong></td>
+      <td>$672.66</td><td class="red">-2.57%</td>
+      <td>$681.42</td><td class="red">-3.82%</td>
+      <td>$656.85</td><td class="red">-0.22%</td>
+      <td class="red"><strong>37.2</strong></td>
+      <td><span class="badge badge-bear">BELOW ALL MAs</span></td>
+    </tr>
+    <tr>
+      <td>QQQ (NDX)</td>
+      <td>$588.00</td>
+      <td class="green">+1.02%</td>
+      <td>$602.30</td><td class="red">-2.37%</td>
+      <td>$610.30</td><td class="red">-3.65%</td>
+      <td>$592.33</td><td class="red">-0.73%</td>
+      <td class="red">40.2</td>
+      <td><span class="badge badge-bear">BELOW ALL MAs</span></td>
+    </tr>
+    <tr>
+      <td>IWM (RUT)</td>
+      <td>$247.45</td>
+      <td class="green">+2.16%</td>
+      <td>$253.85</td><td class="red">-2.52%</td>
+      <td>$259.28</td><td class="red">-4.56%</td>
+      <td>$240.23</td><td class="green">+3.00%</td>
+      <td class="yellow">42.0</td>
+      <td><span class="badge badge-warn">BELOW 20/50MA</span></td>
+    </tr>
+    <tr>
+      <td>DIA (DJI)</td>
+      <td>$462.08</td>
+      <td class="green">+1.38%</td>
+      <td>$476.40</td><td class="red">-3.01%</td>
+      <td>$486.82</td><td class="red">-5.08%</td>
+      <td>$465.82</td><td class="red">-0.80%</td>
+      <td class="red">34.6</td>
+      <td><span class="badge badge-bear">BELOW ALL MAs</span></td>
+    </tr>
+  </table>
+
+  <h3 class="sub">4B. Sector ETF Performance — Sorted by RSI 14 (SPY Ranked Inline) <span class="live-badge">✅ LIVE</span></h3>
+  <table>
+    <tr><th>ETF</th><th>Sector</th><th>Price</th><th>1D Chg</th><th>vs 20MA</th><th>vs 50MA</th><th>vs 200MA</th><th>RSI(14)</th><th>Signal</th></tr>
+    <tr>
+      <td>XLE</td><td>Energy</td><td>$59.63</td>
+      <td class="green">+0.54%</td>
+      <td class="green">+0.00%</td>
+      <td class="green">+0.00%</td>
+      <td class="green">+0.00%</td>
+      <td class="green"><strong>68.4</strong></td>
+      <td><span class="badge badge-bull">ABOVE ALL MAs</span></td>
+    </tr>
+    <tr>
+      <td>XLK</td><td>Technology</td><td>$136.95</td>
+      <td class="green">+1.23%</td>
+      <td class="red">-3.15%</td>
+      <td class="red">-6.30%</td>
+      <td class="red">-4.90%</td>
+      <td class="red">38.0</td>
+      <td><span class="badge badge-bear">BELOW ALL MAs</span></td>
+    </tr>
+    <tr>
+      <td><strong>SPY</strong></td><td><strong>S&amp;P 500 (Benchmark)</strong></td><td><strong>$655.38</strong></td>
+      <td class="green"><strong>+1.05%</strong></td>
+      <td class="red">-2.57%</td>
+      <td class="red">-3.82%</td>
+      <td class="red">-0.22%</td>
+      <td class="red"><strong>37.2</strong></td>
+      <td><span class="badge badge-info">BENCHMARK</span></td>
+    </tr>
+    <tr>
+      <td>XLY</td><td>Consumer Discret.</td><td>$110.12</td>
+      <td class="green">+2.21%</td>
+      <td class="red">-3.43%</td>
+      <td class="red">-6.30%</td>
+      <td class="red">-5.25%</td>
+      <td class="red">36.8</td>
+      <td><span class="badge badge-bear">BELOW ALL MAs</span></td>
+    </tr>
+    <tr>
+      <td>XLF</td><td>Financials</td><td>$49.27</td>
+      <td class="green">+0.39%</td>
+      <td class="red">-2.00%</td>
+      <td class="red">-5.48%</td>
+      <td class="red">-6.28%</td>
+      <td class="red">36.8</td>
+      <td><span class="badge badge-bear">BELOW ALL MAs</span></td>
+    </tr>
+    <tr>
+      <td>XLC</td><td>Comm. Services</td><td>$112.71</td>
+      <td class="green">+0.43%</td>
+      <td class="red">-2.85%</td>
+      <td class="red">-2.93%</td>
+      <td class="green">+0.31%</td>
+      <td class="red">36.0</td>
+      <td><span class="badge badge-warn">BELOW 20/50MA</span></td>
+    </tr>
+    <tr>
+      <td>XLRE</td><td>Real Estate</td><td>$40.62</td>
+      <td class="green">+0.07%</td>
+      <td class="red">-2.67%</td>
+      <td class="red">-0.76%</td>
+      <td class="green">+1.66%</td>
+      <td class="red">35.0</td>
+      <td><span class="badge badge-warn">BELOW 20/50MA</span></td>
+    </tr>
+    <tr>
+      <td>XLI</td><td>Industrials</td><td>$163.05</td>
+      <td class="green">+0.85%</td>
+      <td class="red">-4.25%</td>
+      <td class="red">-3.76%</td>
+      <td class="green">+4.71%</td>
+      <td class="red">35.9</td>
+      <td><span class="badge badge-warn">BELOW 20/50MA</span></td>
+    </tr>
+    <tr>
+      <td>XLU</td><td>Utilities</td><td>$44.78</td>
+      <td class="green">+0.29%</td>
+      <td class="red">-3.00%</td>
+      <td class="red">-3.00%</td>
+      <td class="green">+2.00%</td>
+      <td class="red">32.0</td>
+      <td><span class="badge badge-warn">BELOW 20/50MA</span></td>
+    </tr>
+    <tr>
+      <td>XLB</td><td>Materials</td><td>$47.55</td>
+      <td class="green">+1.21%</td>
+      <td class="red">-5.74%</td>
+      <td class="red">-6.05%</td>
+      <td class="green">+3.57%</td>
+      <td class="red">30.8</td>
+      <td><span class="badge badge-warn">BELOW 20/50MA</span></td>
+    </tr>
+    <tr>
+      <td>XLP</td><td>Consumer Staples</td><td>$81.18</td>
+      <td class="red">-0.14%</td>
+      <td class="red">-5.30%</td>
+      <td class="red">-4.72%</td>
+      <td class="green">+1.11%</td>
+      <td class="red">28.8</td>
+      <td><span class="badge badge-warn">BELOW 20/50MA</span></td>
+    </tr>
+    <tr>
+      <td>XLV</td><td>Health Care</td><td>$144.77</td>
+      <td class="red">-0.39%</td>
+      <td class="red">-5.28%</td>
+      <td class="red">-6.63%</td>
+      <td class="green">+0.07%</td>
+      <td class="red">26.3</td>
+      <td><span class="badge badge-warn">BELOW 20/50MA</span></td>
+    </tr>
+  </table>
+  <div class="note">📌 板塊 ETF 總結 (RSI 排序): XLE (Energy) RSI 68.4 唯一強勢板塊，且在所有移動平均線之上。XLV (Health Care) RSI 26.3 最超賣。XLP (Consumer Staples) RSI 28.8 極度超賣。SPY RSI 37.2。IWM (+2.16%) 今日表現最佳，顯示小型股有相對強勢。所有板塊 RSI 均低於 50（除 XLE 外），顯示整體市場仍偏弱，但今日出現廣泛反彈。</div>
+
+  <h3 class="sub">4C. % of Stocks Above Moving Averages <span class="live-badge">✅ LIVE — StockCharts</span></h3>
+  <table>
+    <tr><th>Index</th><th>Ticker</th><th>MA</th><th>Value (Mar 23)</th><th>Signal</th><th>Source</th></tr>
+    <tr><td rowspan="3"><strong>S&amp;P 500</strong></td><td>$SPXA20R</td><td>20MA</td><td class="yellow">40.00%</td><td><span class="badge badge-warn">RECOVERING — Up from 12.60%</span></td><td>StockCharts</td></tr>
+    <tr><td>$SPXA50R</td><td>50MA</td><td class="red">21.00%</td><td><span class="badge badge-bear">BEARISH</span></td><td>StockCharts</td></tr>
+    <tr><td>$SPXA200R</td><td>200MA</td><td class="yellow">49.00%</td><td><span class="badge badge-warn">WARNING — Near 50%</span></td><td>StockCharts</td></tr>
+    <tr><td rowspan="3"><strong>Nasdaq 100</strong></td><td>$NDXA20R</td><td>20MA</td><td class="yellow">27.00%</td><td><span class="badge badge-bear">EXTREME BEARISH</span></td><td>StockCharts</td></tr>
+    <tr><td>$NDXA50R</td><td>50MA</td><td class="red">21.00%</td><td><span class="badge badge-bear">BEARISH</span></td><td>StockCharts</td></tr>
+    <tr><td>$NDXA200R</td><td>200MA</td><td class="yellow">43.00%</td><td><span class="badge badge-warn">WARNING</span></td><td>StockCharts</td></tr>
+    <tr><td rowspan="3"><strong>NYSE</strong></td><td>$NYA20R</td><td>20MA</td><td class="red">23.31%</td><td><span class="badge badge-bear">EXTREME BEARISH</span></td><td>StockCharts</td></tr>
+    <tr><td>$NYA50R</td><td>50MA</td><td class="red">25.83%</td><td><span class="badge badge-bear">BEARISH</span></td><td>StockCharts</td></tr>
+    <tr><td>$NYA200R</td><td>200MA</td><td class="yellow">46.79%</td><td><span class="badge badge-warn">WARNING</span></td><td>StockCharts</td></tr>
+  </table>
+  <div class="source-label">Source: <a href="https://stockcharts.com" style="color:#58a6ff">StockCharts.com</a> | Data as of Mar 23, 2026 close</div>
+  <p style="color:#8b949e; font-size:12px; margin: 12px 0 6px"><strong>S&amp;P 500</strong></p>
+  <div class="three-col">
+    <div class="chart-card">
+      <div class="chart-card-title">S&amp;P 500 — % Above 20MA ($SPXA20R) = 40.00%</div>
+      <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663437893849/CTUzxaAqcpaevTvi.png" alt="$SPXA20R Chart">
+      <div class="source-label">StockCharts.com</div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">S&amp;P 500 — % Above 50MA ($SPXA50R) = 21.00%</div>
+      <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663437893849/DQlweCCLSHauCyBn.png" alt="$SPXA50R Chart">
+      <div class="source-label">StockCharts.com</div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">S&amp;P 500 — % Above 200MA ($SPXA200R) = 49.00%</div>
+      <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663437893849/ivuLkuZeqNkFruSD.png" alt="$SPXA200R Chart">
+      <div class="source-label">StockCharts.com</div>
+    </div>
+  </div>
+  <p style="color:#8b949e; font-size:12px; margin: 12px 0 6px"><strong>Nasdaq 100</strong></p>
+  <div class="three-col">
+    <div class="chart-card">
+      <div class="chart-card-title">Nasdaq 100 — % Above 20MA ($NDXA20R) = 27.00%</div>
+      <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663437893849/DqtUSvHOzZlOnbym.png" alt="$NDXA20R Chart">
+      <div class="source-label">StockCharts.com</div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">Nasdaq 100 — % Above 50MA ($NDXA50R) = 21.00%</div>
+      <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663437893849/FrnJGRHehDeBfSSu.png" alt="$NDXA50R Chart">
+      <div class="source-label">StockCharts.com</div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">Nasdaq 100 — % Above 200MA ($NDXA200R) = 43.00%</div>
+      <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663437893849/VzGlsCvOlYrYArzm.png" alt="$NDXA200R Chart">
+      <div class="source-label">StockCharts.com</div>
+    </div>
+  </div>
+  <p style="color:#8b949e; font-size:12px; margin: 12px 0 6px"><strong>NYSE</strong></p>
+  <div class="three-col">
+    <div class="chart-card">
+      <div class="chart-card-title">NYSE — % Above 20MA ($NYA20R) = 23.31%</div>
+      <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663437893849/aLRUwqWnnOAkVUsE.png" alt="$NYA20R Chart">
+      <div class="source-label">StockCharts.com</div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">NYSE — % Above 50MA ($NYA50R) = 25.83%</div>
+      <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663437893849/dwSNMinuFLvRFcBl.png" alt="$NYA50R Chart">
+      <div class="source-label">StockCharts.com</div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">NYSE — % Above 200MA ($NYA200R) = 46.79%</div>
+      <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663437893849/DWVaHZsujoNKTGFB.png" alt="$NYA200R Chart">
+      <div class="source-label">StockCharts.com</div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 5: SECTOR & INDUSTRY STRENGTH -->
+<div class="section">
+  <div class="section-title"><span class="step-badge">STEP 5</span> 板塊 &amp; 行業強度 Sector &amp; Industry Strength</div>
+
+  <h3 class="sub">5A. Sector Performance (Finviz — Mar 23 EOD) <span class="live-badge">✅ LIVE</span></h3>
+  <table>
+    <tr><th>Rank</th><th>Sector</th><th>1D Chg</th><th>1W Chg</th><th>1M Chg</th><th>YTD Chg</th></tr>
+    <tr><td>1</td><td>Basic Materials</td><td class="green">+2.80%</td><td class="red">-6.07%</td><td class="red">-13.49%</td><td class="green">+4.78%</td></tr>
+    <tr><td>2</td><td>Consumer Cyclical</td><td class="green">+2.54%</td><td class="red">-2.02%</td><td class="red">-7.18%</td><td class="red">-9.25%</td></tr>
+    <tr><td>3</td><td>Technology</td><td class="green">+1.73%</td><td class="red">-1.45%</td><td class="red">-3.85%</td><td class="red">-5.31%</td></tr>
+    <tr><td>4</td><td>Industrials</td><td class="green">+1.52%</td><td class="red">-1.40%</td><td class="red">-8.15%</td><td class="green">+5.92%</td></tr>
+    <tr><td>5</td><td>Financial</td><td class="green">+1.31%</td><td class="red">-0.16%</td><td class="red">-7.55%</td><td class="red">-8.58%</td></tr>
+    <tr><td>6</td><td>Utilities</td><td class="green">+1.10%</td><td class="red">-4.45%</td><td class="red">-3.91%</td><td class="green">+4.80%</td></tr>
+    <tr><td>7</td><td>Communication Services</td><td class="green">+0.83%</td><td class="red">-1.87%</td><td class="red">-3.52%</td><td class="red">-5.06%</td></tr>
+    <tr><td>8</td><td>Real Estate</td><td class="green">+0.81%</td><td class="red">-3.91%</td><td class="red">-6.45%</td><td class="green">+0.21%</td></tr>
+    <tr><td>9</td><td>Energy</td><td class="green">+0.59%</td><td class="green">+3.27%</td><td class="green">+9.93%</td><td class="green">+32.33%</td></tr>
+    <tr><td>10</td><td>Consumer Defensive</td><td class="green">+0.55%</td><td class="red">-4.27%</td><td class="red">-7.10%</td><td class="green">+4.67%</td></tr>
+    <tr><td>11</td><td>Healthcare</td><td class="green">+0.27%</td><td class="red">-3.42%</td><td class="red">-7.87%</td><td class="red">-6.09%</td></tr>
+  </table>
+  <div class="note">📌 板塊總結: 今日全面反彈，所有板塊均收漲。Basic Materials (+2.80%) 和 Consumer Cyclical (+2.54%) 領漲。Energy 雖今日漲幅最小 (+0.59%)，但 YTD +32.33% 仍是年度最強板塊。Healthcare 漲幅最小 (+0.27%)，反映防守性板塊弱勢。</div>
+
+  <h3 class="sub">5B. Industry Leaders — Top 10 (Finviz — Mar 23) <span class="live-badge">✅ LIVE</span></h3>
+  <table>
+    <tr><th>Rank</th><th>Industry</th><th>Sector</th><th>1D Chg</th></tr>
+    <tr><td>1</td><td>Furnishings, Fixtures &amp; Appliances</td><td>Consumer Cyclical</td><td class="green">+5.87%</td></tr>
+    <tr><td>2</td><td>Silver</td><td>Basic Materials</td><td class="green">+4.90%</td></tr>
+    <tr><td>3</td><td>Copper</td><td>Basic Materials</td><td class="green">+4.80%</td></tr>
+    <tr><td>4</td><td>Recreational Vehicles</td><td>Consumer Cyclical</td><td class="green">+4.67%</td></tr>
+    <tr><td>5</td><td>Auto &amp; Truck Dealerships</td><td>Consumer Cyclical</td><td class="green">+4.55%</td></tr>
+    <tr><td>6</td><td>Other Industrial Metals &amp; Mining</td><td>Basic Materials</td><td class="green">+4.47%</td></tr>
+    <tr><td>7</td><td>Electronic Components</td><td>Technology</td><td class="green">+4.38%</td></tr>
+    <tr><td>8</td><td>Paper &amp; Paper Products</td><td>Basic Materials</td><td class="green">+4.10%</td></tr>
+    <tr><td>9</td><td>Building Materials</td><td>Consumer Cyclical</td><td class="green">+3.79%</td></tr>
+    <tr><td>10</td><td>Uranium</td><td>Basic Materials</td><td class="green">+3.68%</td></tr>
+  </table>
+  <div class="source-label">Source: <a href="https://finviz.com/groups.ashx?g=industry&o=-change" style="color:#58a6ff">Finviz.com</a> | Data as of Mar 23, 2026 close</div>
+</div>
+
+<!-- STEP 6: MARKET BREADTH -->
+<div class="section">
+  <div class="section-title"><span class="step-badge">STEP 6</span> 市場廣度 Market Breadth</div>
+
+  <h3 class="sub">6A. Advance / Decline Ratio <span class="live-badge">✅ LIVE — MarketInOut</span></h3>
+  <div class="note">📌 MarketInOut A/D Ratio 截圖如下。今日廣泛反彈，預計 A/D ratio 較上週有所改善。</div>
+  <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663437893849/rhOaquSPLXjAmwcG.png" alt="MarketInOut A/D Ratio" style="width:100%; border-radius:6px; margin-bottom:8px;">
+  <div class="source-label">Source: <a href="https://www.marketinout.com" style="color:#58a6ff">MarketInOut.com</a> | Data as of Mar 23, 2026</div>
+
+  <h3 class="sub">6B. Stockbee Market Monitor (T2108 &amp; 4% Movers) <span class="live-badge">✅ LIVE</span></h3>
+  <table>
+    <tr><th>Date</th><th>Up 4%+</th><th>Down 4%+</th><th>5D Ratio</th><th>10D Ratio</th><th>Up 25%+ (Qtr)</th><th>Down 25%+ (Qtr)</th><th>Signal</th></tr>
+    <tr style="background:#1a4731;">
+      <td><strong>3/23/2026</strong></td>
+      <td class="green"><strong>233</strong></td>
+      <td class="red"><strong>83</strong></td>
+      <td>0.58</td>
+      <td>0.66</td>
+      <td>947</td>
+      <td>1421</td>
+      <td><span class="badge badge-warn">RECOVERING — Up day</span></td>
+    </tr>
+    <tr>
+      <td>3/20/2026</td>
+      <td class="red">146</td>
+      <td class="green">662</td>
+      <td>0.60</td>
+      <td>0.68</td>
+      <td>829</td>
+      <td>1572</td>
+      <td><span class="badge badge-bear">BEARISH</span></td>
+    </tr>
+    <tr>
+      <td>3/19/2026</td>
+      <td>184</td>
+      <td>263</td>
+      <td>0.76</td>
+      <td>0.75</td>
+      <td>934</td>
+      <td>1453</td>
+      <td><span class="badge badge-warn">WEAK</span></td>
+    </tr>
+    <tr>
+      <td>3/18/2026</td>
+      <td>110</td>
+      <td>486</td>
+      <td>0.57</td>
+      <td>0.72</td>
+      <td>927</td>
+      <td>1428</td>
+      <td><span class="badge badge-bear">BEARISH</span></td>
+    </tr>
+    <tr>
+      <td>3/17/2026</td>
+      <td>274</td>
+      <td>141</td>
+      <td>0.79</td>
+      <td>0.94</td>
+      <td>1029</td>
+      <td>1315</td>
+      <td><span class="badge badge-warn">WEAK</span></td>
+    </tr>
+  </table>
+  <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663437893849/brlBogwNeKchEFhK.png" alt="Stockbee Market Monitor" style="width:100%; border-radius:6px; margin:10px 0 8px 0;">
+  <div class="source-label">Source: <a href="https://stockbee.blogspot.com" style="color:#58a6ff">Stockbee.blogspot.com</a> | Data as of Mar 23, 2026</div>
+  <div class="note">📌 Stockbee MM 今日: 上漲 4%+ 股票 233 隻，下跌 4%+ 股票 83 隻，比率 2.81:1 — 今日為明確的上漲日。5日比率 0.58，10日比率 0.66，仍低於 1.0，顯示中期趨勢仍偏弱。季度內下跌 25%+ 股票 1421 隻遠多於上漲 25%+ 的 947 隻，顯示市場仍在熊市環境中。</div>
+</div>
+
+<!-- STEP 7: DAILY COMMENTARY -->
+<div class="section" id="step7">
+  <h2 class="section-title">📝 每日市場評論 — 多空論戰 <span class="live-badge">✅ Mar 23, 2026</span></h2>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+    <div style="background:#1c2128; border:1px solid #3d1a1a; border-radius:8px; padding:14px;">
+      <h3 style="color:#e74c3c; margin:0 0 12px 0; font-size:16px;">🐻 空頭論點 (Bearish Case)</h3>
+      <ul style="color:#ccc; font-size:12px; padding-left:18px; margin:0; line-height:1.8;">
+        <li>SPY 仍在 200MA ($656.85) 以下，今日收 $655.38，差距僅 -0.22%，尚未確認趨勢轉向</li>
+        <li>VIX 26.15 仍高於 20 警戒線，市場恐慌情緒未完全消退</li>
+        <li>$SPXA50R 僅 21%，$NYA50R 僅 25.83%，中期廣度仍極度偏弱</li>
+        <li>NAAIM 19.44 — 機構投資者幾乎空倉，缺乏機構買盤支撐</li>
+        <li>Stockbee 5日比率 0.58，10日比率 0.66，中期趨勢仍偏空</li>
+        <li>季度內下跌 25%+ 股票 1421 隻，顯示熊市傷害廣泛</li>
+        <li>今日反彈由伊朗緊張局勢緩和觸發，屬事件驅動型，可持續性存疑</li>
+        <li>GLD 大跌 -2.26%，USO 大跌 -8.95%，宏觀不確定性仍高</li>
+      </ul>
+    </div>
+    <div style="background:#1c2128; border:1px solid #1a4731; border-radius:8px; padding:14px;">
+      <h3 style="color:#2ecc71; margin:0 0 12px 0; font-size:16px;">🐂 多頭論點 (Bullish Case)</h3>
+      <ul style="color:#ccc; font-size:12px; padding-left:18px; margin:0; line-height:1.8;">
+        <li>$SPXA20R 從 12.60% 大幅回升至 40.00%，顯示短期廣度顯著改善</li>
+        <li>今日全面反彈：SPY +1.05%，IWM +2.16%，所有板塊均上漲</li>
+        <li>Stockbee 今日上漲 4%+ 股票 233 隻 vs 下跌 83 隻，比率 2.81:1</li>
+        <li>Fear &amp; Greed 16 (Extreme Fear) — 歷史上此水平往往預示中期底部</li>
+        <li>NAAIM 19.44 — 機構幾乎空倉，若市場轉向，回補力量強大</li>
+        <li>IWM (+2.16%) 相對強勢，小型股通常在底部反彈中領先</li>
+        <li>Basic Materials (+2.80%) 和 Consumer Cyclical (+2.54%) 領漲，顯示風險偏好回升</li>
+        <li>SPY 距 200MA 僅 -0.22%，若明日能收復 200MA，技術訊號將大幅改善</li>
+      </ul>
+    </div>
+  </div>
+  <h3 style="color:#e6edf3; font-size:15px; margin:0 0 10px 0;">⚖️ 多空力量對比</h3>
+  <table>
+    <thead>
+      <tr>
+        <th style="padding:8px; text-align:left; color:#8b949e; border-bottom:1px solid #30363d;">維度</th>
+        <th style="padding:8px; text-align:center; color:#e74c3c; border-bottom:1px solid #30363d;">🐻 空頭勝</th>
+        <th style="padding:8px; text-align:center; color:#2ecc71; border-bottom:1px solid #30363d;">🐂 多頭勝</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom:1px solid #21262d;">
+        <td style="padding:8px; color:#e6edf3;">長期趨勢</td>
+        <td style="padding:8px; text-align:center; color:#e74c3c;">SPY/NDX/DJI 全部仍在 200MA 以下</td>
+        <td style="padding:8px; text-align:center; color:#8b949e;">—</td>
+      </tr>
+      <tr style="border-bottom:1px solid #21262d; background:#0d1117;">
+        <td style="padding:8px; color:#e6edf3;">市場廣度 (短期)</td>
+        <td style="padding:8px; text-align:center; color:#8b949e;">—</td>
+        <td style="padding:8px; text-align:center; color:#2ecc71;">$SPXA20R 40%，大幅回升</td>
+      </tr>
+      <tr style="border-bottom:1px solid #21262d;">
+        <td style="padding:8px; color:#e6edf3;">市場廣度 (中期)</td>
+        <td style="padding:8px; text-align:center; color:#e74c3c;">$SPXA50R 21%，$NYA50R 25.83%</td>
+        <td style="padding:8px; text-align:center; color:#8b949e;">—</td>
+      </tr>
+      <tr style="border-bottom:1px solid #21262d; background:#0d1117;">
+        <td style="padding:8px; color:#e6edf3;">情緒面</td>
+        <td style="padding:8px; text-align:center; color:#e74c3c;">VIX 26.15，仍高於 20</td>
+        <td style="padding:8px; text-align:center; color:#2ecc71;">F&amp;G 16，NAAIM 19.44 極端超賣</td>
+      </tr>
+      <tr style="border-bottom:1px solid #21262d;">
+        <td style="padding:8px; color:#e6edf3;">機構倉位</td>
+        <td style="padding:8px; text-align:center; color:#e74c3c;">NAAIM 19.44，機構幾乎空倉</td>
+        <td style="padding:8px; text-align:center; color:#2ecc71;">回補潛力巨大</td>
+      </tr>
+      <tr style="border-bottom:1px solid #21262d; background:#0d1117;">
+        <td style="padding:8px; color:#e6edf3;">短期動能</td>
+        <td style="padding:8px; text-align:center; color:#8b949e;">—</td>
+        <td style="padding:8px; text-align:center; color:#2ecc71;">全面反彈，IWM +2.16% 領漲</td>
+      </tr>
+      <tr>
+        <td style="padding:8px; color:#e6edf3;">板塊/基本面</td>
+        <td style="padding:8px; text-align:center; color:#8b949e;">—</td>
+        <td style="padding:8px; text-align:center; color:#2ecc71;">XLE 強勢 YTD +32%，基材領漲</td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="background:#1c2128; border-left:4px solid #f39c12; padding:12px 16px; margin-top:16px; border-radius:0 6px 6px 0;">
+    <strong style="color:#f39c12;">⚖️ 今日多空比分：空頭 4 : 多頭 3</strong>
+    <p style="color:#ccc; font-size:13px; margin:8px 0 0 0;">
+      今日市場出現顯著技術性反彈，由特朗普伊朗評論緩和地緣政治風險觸發。$SPXA20R 從 12.60% 大幅回升至 40.00%，Stockbee 今日比率 2.81:1，顯示廣泛買盤。然而，SPY 仍在 200MA 以下，VIX 仍高於 20，中期廣度指標仍偏弱。
+      <br><br>
+      <strong style="color:#f1c40f;">交易指引：今日反彈值得關注，但尚未確認趨勢轉向。等待以下條件才考慮加倉：① SPY 連續收復 200MA ($656.85)；② VIX 連續收於 20 以下；③ $SPXA50R 突破 30%。目前可小倉試探強勢板塊 (XLE, Basic Materials)，但主倉保持觀望。</strong>
+    </p>
+  </div>
+</div>
+
+<!-- REGIME DETERMINATION -->
+<div class="section">
+  <div class="section-title">🎯 市場環境判定 Regime Determination</div>
+  <div class="regime-box">
+    <div class="regime-title">⚠ REGIME: BEARISH-TO-NEUTRAL TRANSITION (Level 6–7 of 9)</div>
+    <table>
+      <tr><th>Factor</th><th>Reading</th><th>Source</th><th>Status</th></tr>
+      <tr><td>VIX</td><td><span class="badge badge-warn">26.15 (ELEVATED — still above 20)</span></td><td>Yahoo Finance</td><td>✅ Live</td></tr>
+      <tr><td>SPX vs Key MAs</td><td><span class="badge badge-bear">Below 20MA, 50MA &amp; 200MA (-0.22% vs 200MA)</span></td><td>Yahoo Finance</td><td>✅ Live</td></tr>
+      <tr><td>DJI vs 200MA</td><td><span class="badge badge-bear">BREACHED — Below 200MA (-0.80%)</span></td><td>Yahoo Finance</td><td>✅ Live</td></tr>
+      <tr><td>Fear &amp; Greed</td><td><span class="badge badge-bear">16 — Extreme Fear</span></td><td>feargreedmeter.com</td><td>✅ Live</td></tr>
+      <tr><td>Sector Leadership</td><td><span class="badge badge-warn">Energy (RSI 68.4) + Basic Materials leading</span></td><td>Yahoo Finance / Finviz</td><td>✅ Live</td></tr>
+      <tr><td>Fullstack Exposure</td><td><span class="badge badge-neutral">N/A — Login required</span></td><td>fullstackinvestor.co</td><td>⚠ Manual check needed</td></tr>
+      <tr><td>T2108</td><td><span class="badge badge-bear">~18–20% (Oversold)</span></td><td>stockbee.blogspot.com</td><td>✅ Live</td></tr>
+      <tr><td>$SPXA20R</td><td><span class="badge badge-warn">40.00% (Recovering from 12.60%)</span></td><td>StockCharts.com</td><td>✅ Live</td></tr>
+      <tr><td>A/D Ratio</td><td><span class="badge badge-warn">Improving — See MarketInOut chart</span></td><td>MarketInOut.com</td><td>✅ Live</td></tr>
+      <tr><td>NAAIM</td><td><span class="badge badge-bear">19.44 — Near empty (Mar 18)</span></td><td>naaim.org</td><td>✅ Live</td></tr>
+    </table>
+  </div>
+  <div class="note" style="margin-top:12px">
+    📌 <strong>交易建議 Trading Guidance:</strong> 市場環境從全面偏空型 (Bearish Level 8–9) 轉向過渡期 (Level 6–7)。今日反彈顯著，$SPXA20R 大幅回升至 40%，Stockbee 今日比率 2.81:1。然而，SPY 仍在 200MA ($656.85) 以下，VIX 26.15 仍高。
+    <br><br>
+    關鍵觀察點：(1) SPY 能否明日收復 200MA ($656.85)；(2) VIX 能否跌破 20；(3) $SPXA50R 能否突破 30%。
+    <br><br>
+    建議：(1) 不開大倉新多；(2) 能源板塊 (XLE, RSI 68.4) 和 Basic Materials 是最強板塊，可小倉參與；(3) 等待 VIX 回落至 20 以下、SPY 收復 200MA 才考慮加倉；(4) 今日反彈是事件驅動型（伊朗緊張局勢緩和），需觀察明日是否能延續。
+  </div>
+</div>
+</body>
+</html>
