@@ -8,6 +8,21 @@ This file tracks the evolution of key market metrics and structural trends acros
 
 ## 📈 Trend Evolution Log (趨勢演進紀錄)
 
+### Mar 24, 2026 — 能源獨領風騷，科技繼續承壓，市場廣度持續惡化
+- **Regime:** ⚠ BEARISH (Level 8–9 / 9)
+- **SPY:** $653.18 (-0.34%) | **VIX:** 26.95 (+3.06%) | **F&G:** 14 (Extreme Fear)
+- **QQQ:** $583.98 (-0.68%) | **IWM:** $248.78 (+0.54%)
+- **SPY vs MAs:** Below 20MA ($671.05), 50MA ($680.64), 200MA ($657.19) — all key MAs above current price
+- **Breadth:** $SPXA20R 19.80% | $SPXA50R 25.80% | $SPXA200R 49.20% | $NDXA20R 17.00% | $NDXA50R 22.00% | $NDXA200R 43.00%
+- **Stockbee MM:** Up 4%+ = 215, Down 4%+ = 281 — negative breadth thrust, more stocks falling sharply
+- **Sector Leader:** XLE (Energy) RSI 80.8 (+2.03%) — sole structural leader; XLB (Materials) +1.89%
+- **NAAIM:** 60.24 (as of Mar 18) — institutions still have exposure despite selloff
+- **Industry Leaders (Top 10 by 1D):** Coking Coal +9.02%, Chemicals +6.80%, Thermal Coal +5.52%, Agricultural Inputs +4.36%, Electrical Equipment & Parts +4.14%, Silver +4.12%, Solar +3.53%, Oil & Gas Refining & Marketing +3.45%, Farm Products +3.38%, Metal Fabrication +3.37%
+- **Macro:** Fear & Greed dropped to 14 (Extreme Fear); VIX elevated at 26.95; commodities/energy leading risk-off rotation
+- **Bull vs Bear:** 空頭 5 : 多頭 2 — 能源/大宗商品領漲屬防守性輪動，科技/成長股持續落後，市場廣度極度疲弱
+
+---
+
 ### Mar 23, 2026 — 技術性反彈，伊朗緊張局勢緩和觸發廣泛買盤，$SPXA20R 大幅回升至 40%
 - **Regime:** BEARISH-TO-NEUTRAL TRANSITION Level 6–7/9
 - **SPX:** ~6,555 (+1.05%) | **VIX:** 26.15 (-2.35%) | **F&G:** 16 (Extreme Fear)

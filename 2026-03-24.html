@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Market Summary — March 24, 2026 | 2026-03-25 07:10:07 HKT / 2026-03-24 19:10:07 ET</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d1117; color: #e6edf3; font-family: 'Segoe UI', Arial, sans-serif; font-size: 14px; line-height: 1.6; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+  .header { background: linear-gradient(135deg, #161b22, #21262d); border: 1px solid #30363d; border-radius: 12px; padding: 24px 30px; margin-bottom: 20px; }
+  .header h1 { font-size: 22px; color: #58a6ff; margin-bottom: 6px; }
+  .header .subtitle { color: #8b949e; font-size: 13px; }
+  .verdict-box { background: #1c1c2e; border: 2px solid #da3633; border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; }
+  .verdict-title { font-size: 16px; font-weight: bold; color: #f85149; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .verdict-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .verdict-item { background: #21262d; border-radius: 8px; padding: 12px 16px; }
+  .verdict-label { font-size: 11px; color: #8b949e; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .verdict-value { font-size: 15px; font-weight: bold; }
+  .verdict-action { background: #21262d; border-radius: 8px; padding: 12px 16px; grid-column: 1 / -1; border-left: 3px solid #da3633; }
+  .section { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 20px 24px; margin-bottom: 18px; }
+  .section-title { font-size: 15px; font-weight: bold; color: #58a6ff; border-bottom: 1px solid #30363d; padding-bottom: 10px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .step-badge { background: #1f6feb; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; }
+  .stale-badge { background: #3d2a0a; color: #e3b341; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-left: 8px; }
+  .live-badge { background: #1a4731; color: #3fb950; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-left: 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: #21262d; color: #8b949e; padding: 8px 12px; text-align: left; font-weight: 600; border-bottom: 1px solid #30363d; }
+  td { padding: 7px 12px; border-bottom: 1px solid #21262d; }
+  tr:hover td { background: #1c2128; }
+  .green { color: #3fb950; font-weight: 600; }
+  .red { color: #f85149; font-weight: 600; }
+  .yellow { color: #d29922; font-weight: 600; }
+  .blue { color: #58a6ff; }
+  .gray { color: #8b949e; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+  .badge-bull { background: #1a4731; color: #3fb950; }
+  .badge-bear { background: #3d1c1c; color: #f85149; }
+  .badge-neutral { background: #2d2a1e; color: #d29922; }
+  .badge-warn { background: #3d2a0a; color: #e3b341; }
+  .badge-info { background: #1f3a5f; color: #58a6ff; }
+  .badge-stale { background: #2d2a1e; color: #d29922; font-size: 10px; }
+  .chart-img { width: 100%; border-radius: 8px; margin-top: 12px; }
+  .screenshot-img { width: 100%; border-radius: 8px; border: 1px solid #30363d; margin-top: 12px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 14px; }
+  .chart-card { background: #21262d; border-radius: 8px; padding: 12px; }
+  .chart-card-title { font-size: 12px; color: #c9d1d9; text-align: center; margin-bottom: 8px; font-weight: bold; letter-spacing: 0.3px; }
+  .chart-card img { width: 100%; border-radius: 6px; }
+  .scorecard { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 8px; }
+  .score-item { background: #21262d; border-radius: 8px; padding: 12px; text-align: center; }
+  .score-label { font-size: 11px; color: #8b949e; margin-bottom: 4px; }
+  .score-value { font-size: 18px; font-weight: bold; }
+  .regime-box { background: #3d1c1c; border: 1px solid #da3633; border-radius: 8px; padding: 16px; margin-top: 8px; }
+  .regime-title { font-size: 16px; font-weight: bold; color: #f85149; margin-bottom: 8px; }
+  .note { background: #1c2128; border-left: 3px solid #58a6ff; padding: 10px 14px; border-radius: 0 6px 6px 0; margin-top: 10px; font-size: 13px; color: #8b949e; }
+  .flag { background: #2d2a1e; border-left: 3px solid #d29922; padding: 10px 14px; border-radius: 0 6px 6px 0; margin-top: 10px; font-size: 13px; color: #d29922; }
+  .unavailable { background: #1c1c1c; border: 1px dashed #555; border-radius: 8px; padding: 16px; text-align: center; color: #555; margin-top: 10px; }
+  .unavailable a { color: #58a6ff; }
+  .t2108-bar { position: relative; background: #21262d; height: 20px; border-radius: 6px; overflow: hidden; margin-top: 6px; }
+  .t2108-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, #f85149, #d29922); }
+  .t2108-label { position: absolute; right: 8px; top: 2px; font-size: 11px; color: white; font-weight: bold; }
+  h3.sub { color: #8b949e; font-size: 13px; margin: 16px 0 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .divider { border: none; border-top: 1px dashed #30363d; margin: 18px 0; }
+  .source-label { font-size: 11px; color: #555; margin-top: 6px; text-align: right; }
+  .cal-high { color: #f85149; font-weight: bold; }
+  .cal-med { color: #d29922; }
+  .cal-low { color: #8b949e; }
+  .watchlist-placeholder { background: #1c2128; border: 1px dashed #30363d; border-radius: 8px; padding: 20px; text-align: center; color: #555; font-size: 13px; margin-top: 8px; }
+  .spy-row { background: #1a2332 !important; border-left: 3px solid #58a6ff; }
+  @media (max-width: 768px) {
+    .two-col { grid-template-columns: 1fr; }
+    .three-col { grid-template-columns: 1fr; }
+    .scorecard { grid-template-columns: repeat(2, 1fr); } /* 5-col on desktop, 2-col on mobile */
+    .verdict-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+</head>
+<body>
+<div class="container">
+
+  <!-- ===== TODAY'S VERDICT ===== -->
+  <div class="verdict-box">
+    <div class="verdict-title">📊 Market Summary — Mar 24, 2026 | Generated 2026-03-25 07:10:07 HKT / 2026-03-24 19:10:07 ET</div>
+    <div class="verdict-grid">
+      <div class="verdict-item">
+        <div class="verdict-label">Market Regime 市場環境</div>
+        <div class="verdict-value" style="color:#f85149">⚠ BEARISH (Level 8–9 / 9)</div>
+      </div>
+      <div class="verdict-item">
+        <div class="verdict-label">Fear &amp; Greed Index</div>
+        <div class="verdict-value" style="color:#f85149">14 — EXTREME FEAR 😱</div>
+      </div>
+      <div class="verdict-item">
+        <div class="verdict-label">VIX 恐慌指數</div>
+        <div class="verdict-value" style="color:#f85149">26.95 — ELEVATED ⚠ (3.06%)</div>
+      </div>
+      <div class="verdict-item">
+        <div class="verdict-label">SPY vs Key MAs</div>
+        <div class="verdict-value" style="color:#f85149">BELOW 10MA, 20MA, 50MA, 200MA</div>
+      </div>
+      <div class="verdict-action">
+        <div style="color:#8b949e; font-size:12px; margin-bottom:4px">📋 ACTION GUIDANCE 交易指引</div>
+        <div style="color:#e6edf3; font-size:14px"><strong>No new longs.</strong> VIX remains elevated at 26.95. SPY (653.18, -0.34%) closed below all major moving averages. Energy (XLE) remains the sole structural leader with RSI at 80.8. T2108 remains washed out but breadth thrust was negative today (281 down 4%+ vs 215 up 4%+). Wait for VIX &lt;20 before adding exposure.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== KEY LEVELS ===== -->
+  <div class="section">
+    <div class="section-title">🔑 關鍵水平 Key Levels to Watch</div>
+    <table>
+      <tr><th>Level</th><th>Value</th><th>Significance</th><th>Bias</th></tr>
+      <tr><td>SPX 200MA</td><td class="red">BREACHED</td><td>SPY remains below 200MA, continuing bearish trend.</td><td><span class="badge badge-bear">BREACHED ⚠</span></td></tr>
+      <tr><td>VIX 20</td><td class="gray">Current: 26.95</td><td>Bearish → Defensive threshold. Must close below for 3+ days</td><td><span class="badge badge-warn">REGIME TRIGGER</span></td></tr>
+      <tr><td>T2108</td><td class="red">Oversold</td><td>Extreme Oversold — potential bounce zone but not signal to buy</td><td><span class="badge badge-bear">OVERSOLD</span></td></tr>
+    </table>
+  </div>
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>📊 Market Summary — March 24, 2026 | 2026-03-25 07:10:07 HKT / 2026-03-24 19:10:07 ET</h1>
+    <div class="subtitle">每日市場總結 | Steps 1–6 | Sources: Yahoo Finance · feargreedmeter.com · Finviz · StockCharts · MarketInOut · Stockbee · forex.tradingcharts.com</div>
+    <div class="subtitle" style="margin-top:4px; color:#3fb950">✅ All data as of Mar 24, 2026 | 4:00 PM ET / Mar 25, 2026 4:00 AM HKT (Market Close)</div>
+  </div>
+
+  <!-- STEP 1: MACRO -->
+  <div class="section">
+    <div class="section-title"><span class="step-badge">STEP 1</span> 宏觀環境 Macro Environment</div>
+    <table>
+      <tr><th>Indicator</th><th>Value (Mar 24 Close)</th><th>Signal</th><th>Notes</th></tr>
+      <tr><td>SPY</td><td class="red">$653.18</td><td><span class="badge badge-bear">DOWNTREND</span></td><td>-0.34% — Below all major MAs</td></tr>
+      <tr><td>VIX (Fear Index)</td><td class="yellow">26.95</td><td><span class="badge badge-warn">ELEVATED</span></td><td>3.06% — remains above 20 danger zone</td></tr>
+      <tr><td>CNN Fear &amp; Greed</td><td class="red">14</td><td><span class="badge badge-bear">EXTREME FEAR</span></td><td>Down from previous readings. Source: <a href="https://feargreedmeter.com" style="color:#58a6ff">feargreedmeter.com</a></td></tr>
+    </table>
+  </div>
+
+  <!-- STEP 1B: MARKET INTELLIGENCE NEWS -->
+  <div class="section">
+    <div class="section-title"><span class="step-badge">STEP 1B</span> 市場情報 Market Intelligence News <span class="live-badge">✅ Mar 24 Headlines</span></div>
+    <table>
+      <tr><th>Impact</th><th>Tickers / Sector</th><th>Headline</th><th>Why It Matters</th></tr>
+
+      <tr>
+        <td><span class="badge badge-bear">HIGH</span></td>
+        <td class="yellow">SPY · Broad Market · Energy · Tech</td>
+        <td>Witkoff and Kushner working on ceasefire mechanism, says report; stocks jump(Investing.com)</td>
+        <td>Renewed ceasefire hopes could ease geopolitical risk, potentially triggering a broad market rally and reducing oil price volatility.</td>
+      </tr>
+
+      <tr>
+        <td><span class="badge badge-bear">HIGH</span></td>
+        <td class="yellow">XLE · USO · Energy · Oil</td>
+        <td>Is Cheap Oil Back? Experts Say This 'Wildcard' Means Don't Count On It Just Yet(Investopedia)</td>
+        <td>Oil price uncertainty amid geopolitical tensions and infrastructure debates is critical for energy sector momentum and inflation expectations.</td>
+      </tr>
+
+      <tr>
+        <td><span class="badge badge-warn">MEDIUM</span></td>
+        <td class="yellow">XLE · Energy · Infrastructure</td>
+        <td>US needs 'more flexibility' in its gas infrastructure: Lazard vice chair(Yahoo Finance Video)</td>
+        <td>Calls for more flexible gas infrastructure signal potential long-term energy sector investments and policy shifts affecting energy supply.</td>
+      </tr>
+
+      <tr>
+        <td><span class="badge badge-bear">HIGH</span></td>
+        <td class="yellow">XLK · Tech · Software · AI</td>
+        <td>Software stocks fall as fear of AI disruption is back in full force(MarketWatch)</td>
+        <td>Renewed AI disruption fears may trigger volatility and sector rotation within tech, impacting key growth stocks and ETFs.</td>
+      </tr>
+
+      <tr>
+        <td><span class="badge badge-warn">MEDIUM</span></td>
+        <td class="yellow">XLK · Tech · AI · NVDA</td>
+        <td>Nvidia will remain the bellwether of AI, analyst explains(Yahoo Finance Video)</td>
+        <td>Nvidia’s leadership in AI remains a key market driver, influencing tech sector sentiment and investment flows ahead of earnings.</td>
+      </tr>
+
+      <tr>
+        <td><span class="badge badge-warn">MEDIUM</span></td>
+        <td class="yellow">SPY · QQQ · Tech · Macro</td>
+        <td>How 0DTE Options Can Explain Market Movement(Schaeffer's Research)</td>
+        <td>Understanding the impact of zero-day-to-expiry options can help traders anticipate short-term volatility and price swings in major indices.</td>
+      </tr>
+
+      <tr>
+        <td><span class="badge badge-warn">MEDIUM</span></td>
+        <td class="yellow">SPY · Macro · Oil · Energy</td>
+        <td>Crude Falls Below $100 As Trump Mulls Emergency Reserve Release: What's Moving Markets Monday?(Benzinga)</td>
+        <td>Potential emergency oil reserve release could cap oil prices, affecting energy stocks and inflation expectations, with knock-on effects on market sentiment.</td>
+      </tr>
+
+    </table>
+  </div>
+
+  <!-- STEP 2: FULLSTACK INVESTOR -->
+  <div class="section">
+    <div class="section-title"><span class="step-badge">STEP 2</span> Fullstack Investor Market Model</div>
+    <img src="images/fullstack_combined.png" class="screenshot-img" alt="Fullstack Investor Model">
+    <div class="note">Requires member login to view.</div>
+  </div>
+
+  <!-- STEP 3: SENTIMENT SCORECARD -->
+  <div class="section">
+    <div class="section-title"><span class="step-badge">STEP 3</span> Sentiment Scorecard</div>
+    <div class="scorecard">
+      <div class="score-item">
+        <div class="score-label">NAAIM Exposure</div>
+        <div class="score-value" style="color:#58a6ff">60.24</div>
+      </div>
+      <div class="score-item">
+        <div class="score-label">Fear & Greed</div>
+        <div class="score-value" style="color:#f85149">14</div>
+      </div>
+    </div>
+    <img src="images/fear_greed.png" class="chart-img" alt="Fear & Greed Index">
+  </div>
+
+  <!-- STEP 4: BREADTH -->
+  <div class="section">
+    <div class="section-title"><span class="step-badge">STEP 4</span> Market Breadth</div>
+    <div class="two-col">
+      <div class="chart-card">
+        <div class="chart-card-title">S&P 500 > 20MA ($SPXA20R)</div>
+        <div style="font-size:24px; font-weight:bold; color:#f85149; text-align:center; margin-bottom:8px">19.80%</div>
+        <img src="images/spxa20r.png" alt="SPXA20R">
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">S&P 500 > 50MA ($SPXA50R)</div>
+        <div style="font-size:24px; font-weight:bold; color:#f85149; text-align:center; margin-bottom:8px">25.80%</div>
+        <img src="images/spxa50r.png" alt="SPXA50R">
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">S&P 500 > 200MA ($SPXA200R)</div>
+        <div style="font-size:24px; font-weight:bold; color:#d29922; text-align:center; margin-bottom:8px">49.20%</div>
+        <img src="images/spxa200r.png" alt="SPXA200R">
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">Nasdaq 100 > 20MA ($NDXA20R)</div>
+        <div style="font-size:24px; font-weight:bold; color:#f85149; text-align:center; margin-bottom:8px">17.00%</div>
+        <img src="images/ndxa20r.png" alt="NDXA20R">
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">Nasdaq 100 > 50MA ($NDXA50R)</div>
+        <div style="font-size:24px; font-weight:bold; color:#f85149; text-align:center; margin-bottom:8px">22.00%</div>
+        <img src="images/ndxa50r.png" alt="NDXA50R">
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">Nasdaq 100 > 200MA ($NDXA200R)</div>
+        <div style="font-size:24px; font-weight:bold; color:#d29922; text-align:center; margin-bottom:8px">43.00%</div>
+        <img src="images/ndxa200r.png" alt="NDXA200R">
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4C: SECTOR RSI -->
+  <div class="section">
+    <div class="section-title"><span class="step-badge">STEP 4C</span> Sector ETF RSI</div>
+    <table>
+      <tr><th>Sector (Ticker)</th><th>Close</th><th>1D %</th><th>14-Day RSI</th></tr>
+
+      <tr>
+        <td>Energy (XLE)</td>
+        <td>$60.84</td>
+        <td>2.03%</td>
+        <td class="green">80.8</td>
+      </tr>
+
+      <tr>
+        <td>Technology (XLK)</td>
+        <td>$136.15</td>
+        <td>-0.58%</td>
+        <td class="gray">42.7</td>
+      </tr>
+
+      <tr>
+        <td>Utilities (XLU)</td>
+        <td>$45.09</td>
+        <td>0.69%</td>
+        <td class="gray">41.6</td>
+      </tr>
+
+      <tr>
+        <td>Materials (XLB)</td>
+        <td>$48.45</td>
+        <td>1.89%</td>
+        <td class="gray">39.2</td>
+      </tr>
+
+      <tr>
+        <td>Industrials (XLI)</td>
+        <td>$164.0</td>
+        <td>0.58%</td>
+        <td class="gray">38.7</td>
+      </tr>
+
+      <tr>
+        <td>Consumer Discret. (XLY)</td>
+        <td>$109.68</td>
+        <td>-0.4%</td>
+        <td class="gray">36.8</td>
+      </tr>
+
+      <tr>
+        <td>Financials (XLF)</td>
+        <td>$49.28</td>
+        <td>0.02%</td>
+        <td class="gray">36.6</td>
+      </tr>
+
+      <tr>
+        <td>Comm. Services (XLC)</td>
+        <td>$111.13</td>
+        <td>-1.4%</td>
+        <td class="red">29.4</td>
+      </tr>
+
+      <tr>
+        <td>Consumer Staples (XLP)</td>
+        <td>$81.11</td>
+        <td>-0.09%</td>
+        <td class="red">28.3</td>
+      </tr>
+
+      <tr>
+        <td>Real Estate (XLRE)</td>
+        <td>$40.29</td>
+        <td>-0.81%</td>
+        <td class="red">27.1</td>
+      </tr>
+
+      <tr>
+        <td>Healthcare (XLV)</td>
+        <td>$144.79</td>
+        <td>0.01%</td>
+        <td class="red">26.0</td>
+      </tr>
+
+    </table>
+  </div>
+
+  <!-- STEP 5: INDUSTRY LEADERS -->
+  <div class="section">
+    <div class="section-title"><span class="step-badge">STEP 5</span> Top 10 Industry Leaders (1-Day Performance)</div>
+    <table>
+      <tr><th>Rank</th><th>Industry Group</th><th>1-Day Change</th></tr>
+
+      <tr>
+        <td>120</td>
+        <td>Coking Coal</td>
+        <td class="green">+9.02%</td>
+      </tr>
+
+      <tr>
+        <td>121</td>
+        <td>Chemicals</td>
+        <td class="green">+6.80%</td>
+      </tr>
+
+      <tr>
+        <td>13</td>
+        <td>Thermal Coal</td>
+        <td class="green">+5.52%</td>
+      </tr>
+
+      <tr>
+        <td>142</td>
+        <td>Agricultural Inputs</td>
+        <td class="green">+4.36%</td>
+      </tr>
+
+      <tr>
+        <td>105</td>
+        <td>Electrical Equipment & Parts</td>
+        <td class="green">+4.14%</td>
+      </tr>
+
+      <tr>
+        <td>25</td>
+        <td>Silver</td>
+        <td class="green">+4.12%</td>
+      </tr>
+
+      <tr>
+        <td>22</td>
+        <td>Solar</td>
+        <td class="green">+3.53%</td>
+      </tr>
+
+      <tr>
+        <td>58</td>
+        <td>Oil & Gas Refining & Marketing</td>
+        <td class="green">+3.45%</td>
+      </tr>
+
+      <tr>
+        <td>98</td>
+        <td>Farm Products</td>
+        <td class="green">+3.38%</td>
+      </tr>
+
+      <tr>
+        <td>65</td>
+        <td>Metal Fabrication</td>
+        <td class="green">+3.37%</td>
+      </tr>
+
+    </table>
+  </div>
+
+  <!-- STEP 6: STOCKBEE T2108 -->
+  <div class="section">
+    <div class="section-title"><span class="step-badge">STEP 6</span> Stockbee T2108 & Breadth Thrust</div>
+    <div class="scorecard">
+      <div class="score-item">
+        <div class="score-label">Stocks Up 4%+</div>
+        <div class="score-value" style="color:#3fb950">215</div>
+      </div>
+      <div class="score-item">
+        <div class="score-label">Stocks Down 4%+</div>
+        <div class="score-value" style="color:#f85149">281</div>
+      </div>
+    </div>
+    <div class="note">Negative breadth thrust today: more stocks down 4%+ than up 4%+.</div>
+    <img src="images/stockbee_mm.png" class="screenshot-img" alt="Stockbee Market Monitor">
+  </div>
+
+  <!-- STEP 7: BULL VS BEAR -->
+  <div class="section">
+    <div class="section-title"><span class="step-badge">STEP 7</span> Bull vs Bear Commentary</div>
+    <div class="two-col">
+      <div class="regime-box" style="background:#1a4731; border-color:#3fb950">
+        <div class="regime-title" style="color:#3fb950">🐂 THE BULL CASE</div>
+        <ul style="margin-left:20px">
+          <li>Energy sector (XLE) showing extreme relative strength with RSI at 80.8, providing a pocket of leadership.</li>
+          <li>Fear & Greed Index is at 14 (Extreme Fear), which often acts as a contrarian indicator for short-term bounces.</li>
+          <li>Market breadth is extremely washed out (Nasdaq 100 > 20MA at just 17%), setting up potential mean reversion.</li>
+        </ul>
+      </div>
+      <div class="regime-box">
+        <div class="regime-title">🐻 THE BEAR CASE</div>
+        <ul style="margin-left:20px">
+          <li>SPY remains below all key moving averages (10, 20, 50, 200) with a declining trend.</li>
+          <li>VIX remains elevated at 26.95, indicating ongoing market stress and implied volatility.</li>
+          <li>Breadth thrust indicator flipped negative again with 281 stocks down 4%+ vs only 215 up 4%+.</li>
+          <li>Defensive/commodity sectors (Energy, Materials) are leading while Tech/Growth lags, a classic risk-off rotation.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
