@@ -10,7 +10,14 @@
 
 為了避免過去發生的錯誤，必須嚴格遵守以下原則：
 
-1. **Accuracy Over Speed（準確大於速度）**
+1. **強制重讀機制（Mandatory Re-read Before Building）**
+   - **CRITICAL:** 在開始構建 HTML 報告（Phase 5）之前，AI 代理**必須**重新讀取本文件（`MASTER_INSTRUCTION.md`）和 `RULES_EVOLUTION.md`。
+   - 由於上下文壓縮（Context Compression），早前讀取的規則和 URL 會丟失。絕不能依賴記憶去填寫 URL 或格式。
+
+2. **截圖數據驗證（Verify Screenshot Data）**
+   - 任何從截圖中獲取的數據（如 StockCharts 的 %、Stockbee 的 T2108），必須在截圖後使用 `file view` 工具**親眼讀取圖片上的數字**，絕不能憑空估算或使用前一日的數字。
+
+3. **Accuracy Over Speed（準確大於速度）**
    - 絕不估算（Estimate）任何數據。所有數值必須是來自指定來源的精確數字。
    - 報告中不允許出現 `~`（大約）符號來代替精確數據（時間戳除外）。
    - 如果遇到來源無法訪問或數據缺失，必須向用戶報告，而不是自行替換來源或捏造數據。

@@ -81,7 +81,18 @@ This file tracks evolving preferences, market patterns, and logic improvements d
 
 ---
 
-## 🛠 Technical Workflow Improvements
+## 🛠 Technical Workflow Improvements (Credit & Accuracy Optimization)
+
+### 🚨 Mandatory Phase: Re-read Master Instruction
+- **CRITICAL:** Before starting the "Build HTML" phase, the AI MUST explicitly re-read `MASTER_INSTRUCTION.md`.
+- Context compression causes details (like specific URLs or exact rules) to be lost. Do not rely on memory.
+- Never guess or estimate numbers for the HTML report. If a screenshot was taken, the AI must use the `file view` tool to read the exact numbers from the image before writing the HTML.
+
+### Credit-Saving Workflow (Implement Next Session)
+1. **Data Collection Consolidation:** Combine yfinance, Finviz, Fear & Greed, and NAAIM scraping into a single Python script (`daily_data_collect.py`) that outputs one comprehensive JSON file.
+2. **Finviz Scraping:** Do not use the browser tool for Finviz. Use `requests` and `BeautifulSoup` to scrape `https://finviz.com/groups.ashx?g=sector&o=-change&v=140` directly to save credits.
+3. **Automated HTML Generation:** Stop writing the 700+ line HTML file manually via the `file write` tool. Instead, create a Python script (`generate_html.py`) that reads the JSON data and injects it into the template.
+4. **Playwright Avoidance:** Playwright installation consumes massive credits and time. Default to using the built-in `browser` tool for screenshots. If programmatic screenshots are needed, use a pre-installed method or the system chromium without re-downloading dependencies.
 
 ### Screenshot Issues
 - Fullstack Market Model requires member login — cannot automate screenshot
