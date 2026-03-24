@@ -114,4 +114,12 @@ This file tracks evolving preferences, market patterns, and logic improvements d
 
 ---
 
+### Timestamp Correction (Mar 23, 2026)
+- **Error found:** Report showed "19:45 HKT (07:45 ET)" — this is backwards.
+- **Correct logic:** HKT (UTC+8) is 12 hours **ahead** of ET (UTC-4 in summer). So 07:45 HKT = 19:45 ET (previous day).
+- **Rule:** Always write HKT first, then subtract 12 hours to get ET. Report generation at 07:45 HKT = 19:45 ET (prior evening).
+- **Never write:** "19:45 HKT / 07:45 ET" — this implies HKT is behind ET, which is wrong.
+
+---
+
 *Last updated: Mar 23, 2026*

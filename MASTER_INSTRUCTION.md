@@ -80,6 +80,7 @@
 - **要求：** 總結當日市場環境（Regime）。
 - **標題格式：** 必須使用 "Market Summary — [Date] | Generated [Time] HKT / [Time] ET"。
 - **時間戳：** 數據時間必須精確到具體時間（例如 4:00 PM ET），不能只寫 "EOD close"。
+- **時區換算（重要）：** HKT = UTC+8，ET（夏令時 EDT）= UTC-4。HKT 比 ET **快 12 小時**。正確換算：07:45 HKT = 19:45 ET（前一日）。**絕不能**寫成 "19:45 HKT / 07:45 ET"（方向相反）。報告生成時間通常係香港早上 6:45–7:45 HKT，對應美東時間前一日 18:45–19:45 ET。
 - **MA 數值：** SPX 的 20MA、50MA、200MA 必須通過 `yfinance` 精確計算，不能使用約數。
 
 ### Step 1: 宏觀環境 (Macro Environment)
