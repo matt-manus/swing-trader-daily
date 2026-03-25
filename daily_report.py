@@ -416,98 +416,85 @@ for i, s in enumerate(sector_rows, 1):
 P['SECTOR_ROWS'] = SECTOR_ROWS_HTML
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# STEP 5A/5B: FINVIZ SECTOR + INDUSTRY SCREENSHOTS
 # ═══════════════════════════════════════════════════════════════════════════════
-print("\n[Step 5A/5B] Finviz screenshots...")
-
-sectors_path   = str(IMG_DIR / '5A_sectors.png')
-industry_path  = str(IMG_DIR / '5B_industry.png')
-
-UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
-
-ok, out, err = run_playwright(f"""
-import asyncio
-from playwright.async_api import async_playwright
-from PIL import Image
-
-UA = '{UA}'
-
-async def main():
-    async with async_playwright() as p:
-        browser = await p.chromium.launch()
-
-        # 5A: Sectors sorted by 1D change
-        page = await browser.new_page(
-            viewport={{'width': 1600, 'height': 900}},
-            extra_http_headers={{
-                'User-Agent': UA,
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-                'Accept-Language': 'en-US,en;q=0.9',
-                'Accept-Encoding': 'gzip, deflate, br',
-                'Referer': 'https://www.google.com/',
-                'Sec-Fetch-Dest': 'document',
-                'Sec-Fetch-Mode': 'navigate',
-                'Sec-Fetch-Site': 'cross-site',
-            }})
-        try:
-            await page.goto('https://finviz.com/groups.ashx?g=sector&o=-change&v=140',
-                            wait_until='networkidle', timeout=30000)
-            await page.wait_for_timeout(2000)
-            await page.screenshot(path='/tmp/5A_raw.png')
-            img = Image.open('/tmp/5A_raw.png')
-            w, h = img.size
-            img.crop((0, 110, w, min(h, 420))).save('{sectors_path}')
-            print('done:5A')
-        except Exception as e:
-            print(f'fail:5A:{{e}}')
-        await page.close()
-
-        # 5B: Industries sorted by 1D change
-        page = await browser.new_page(
-            viewport={{'width': 1600, 'height': 1400}},
-            extra_http_headers={{
-                'User-Agent': UA,
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-                'Accept-Language': 'en-US,en;q=0.9',
-                'Accept-Encoding': 'gzip, deflate, br',
-                'Referer': 'https://www.google.com/',
-                'Sec-Fetch-Dest': 'document',
-                'Sec-Fetch-Mode': 'navigate',
-                'Sec-Fetch-Site': 'cross-site',
-            }})
-        try:
-            await page.goto('https://finviz.com/groups.ashx?g=industry&o=-change&v=140',
-                            wait_until='networkidle', timeout=30000)
-            await page.wait_for_timeout(2000)
-            await page.screenshot(path='/tmp/5B_raw.png')
-            img = Image.open('/tmp/5B_raw.png')
-            w, h = img.size
-            img.crop((0, 110, w, min(h, 900))).save('{industry_path}')
-            print('done:5B')
-        except Exception as e:
-            print(f'fail:5B:{{e}}')
-        await page.close()
-
-        await browser.close()
-
-asyncio.run(main())
-""", timeout=90)
-
-print(out)
-
-if (IMG_DIR / '5A_sectors.png').exists():
-    P['IMG_5A_SECTORS'] = img_path('5A_sectors.png')
-else:
-    P['IMG_5A_SECTORS'] = ''
-    print("  WARNING 5A screenshot failed")
-
-if (IMG_DIR / '5B_industry.png').exists():
-    P['IMG_5B_INDUSTRY'] = img_path('5B_industry.png')
-else:
-    P['IMG_5B_INDUSTRY'] = ''
-    print("  WARNING 5B screenshot failed")
-
+# STEP 5A/5B: FINVIZ SECTOR (removed) + INDUSTRY (scraped via requests)
 # ═══════════════════════════════════════════════════════════════════════════════
+print("[Step 5A/5B] Finviz Industry data (requests)...")
+P["IMG_5A_SECTORS"] = ""  # Sector screenshot removed
+
+import requests as _req
+from bs4 import BeautifulSoup as _BS
+
+_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+_hdrs = {
+    "User-Agent": _UA,
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Referer": "https://www.google.com/",
+}
+_industry_html = ""
+try:
+    _resp = _req.get("https://finviz.com/groups.ashx?g=industry&o=-change&v=110",
+                     headers=_hdrs, timeout=15)
+    _soup = _BS(_resp.text, "html.parser")
+    _tables = _soup.find_all("table")
+    _data_table = None
+    for _t in _tables:
+        _rows = _t.find_all("tr")
+        if len(_rows) > 20:
+            _hdrow = [c.get_text(strip=True) for c in _rows[0].find_all(["td","th"])]
+            if "Name" in _hdrow and "Change" in _hdrow:
+                _data_table = _t
+                _col_names = _hdrow
+                break
+    if _data_table:
+        _chg_idx = _col_names.index("Change")
+        _name_idx = _col_names.index("Name")
+        _stocks_idx = _col_names.index("Stocks") if "Stocks" in _col_names else None
+        _rows_data = []
+        for _row in _data_table.find_all("tr")[1:]:
+            _cells = [c.get_text(strip=True) for c in _row.find_all("td")]
+            if len(_cells) > _chg_idx:
+                _rows_data.append(_cells)
+        # Top 10 gainers (already sorted desc by change)
+        _top10 = _rows_data[:10]
+        # Bottom 5 losers
+        _bot5 = [r for r in _rows_data if r[_chg_idx].startswith("-")][-5:]
+        def _row_html(cells, idx):
+            name = cells[_name_idx]
+            chg = cells[_chg_idx]
+            stocks = cells[_stocks_idx] if _stocks_idx else ""
+            color = "#2ecc71" if not chg.startswith("-") else "#e74c3c"
+            return f"""<tr>
+  <td style="color:#8b949e;padding:4px 8px;">{idx}</td>
+  <td style="color:#e6edf3;padding:4px 8px;font-weight:600;">{name}</td>
+  <td style="color:#8b949e;padding:4px 8px;">{stocks}</td>
+  <td style="color:{color};padding:4px 8px;font-weight:700;">{chg}</td>
+</tr>"""
+        _rows_html_top = "".join([_row_html(r, i+1) for i, r in enumerate(_top10)])
+        _rows_html_bot = "".join([_row_html(r, len(_rows_data)-4+i) for i, r in enumerate(_bot5)])
+        _industry_html = f"""
+<table style="width:100%;border-collapse:collapse;font-size:13px;">
+<thead><tr>
+  <th style="color:#8b949e;padding:6px 8px;text-align:left;border-bottom:1px solid #30363d;">#</th>
+  <th style="color:#8b949e;padding:6px 8px;text-align:left;border-bottom:1px solid #30363d;">Industry</th>
+  <th style="color:#8b949e;padding:6px 8px;text-align:left;border-bottom:1px solid #30363d;">Stocks</th>
+  <th style="color:#8b949e;padding:6px 8px;text-align:left;border-bottom:1px solid #30363d;">1D Change</th>
+</tr></thead>
+<tbody>
+<tr><td colspan="4" style="color:#f39c12;padding:6px 8px;font-weight:700;border-bottom:1px solid #30363d;">Top 10 Gainers</td></tr>
+{_rows_html_top}
+<tr><td colspan="4" style="color:#e74c3c;padding:6px 8px;font-weight:700;border-bottom:1px solid #30363d;">Bottom 5 Losers</td></tr>
+{_rows_html_bot}
+</tbody></table>"""
+        print(f"  ✅ Finviz Industry: {len(_rows_data)} industries scraped")
+    else:
+        print("  WARNING: Industry table not found")
+except Exception as _e:
+    print(f"  WARNING Finviz Industry: {_e}")
+
+P["IMG_5B_INDUSTRY"] = _industry_html
+
 # STEP 6A: MARKETINOUT A/D RATIO SCREENSHOT
 # ═══════════════════════════════════════════════════════════════════════════════
 print("\n[Step 6A] MarketInOut A/D Ratio screenshot...")
