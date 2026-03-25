@@ -878,26 +878,9 @@ try:
 except Exception as e:
     print(f"  WARNING MARKET_HISTORY: {e}")
 
-# ── Git push ───────────────────────────────────────────────────────────────────
-print("\n[Git] Committing and pushing...")
-os.chdir(REPO)
-subprocess.run(['git', 'config', 'user.email', 'github-actions@github.com'], check=True)
-subprocess.run(['git', 'config', 'user.name', 'GitHub Actions'], check=True)
-subprocess.run(['git', 'add', f'{DATE}.html', 'MARKET_HISTORY.md',
-                f'images/{DATE}/'], check=True)
-r = subprocess.run(['git', 'commit', '-m', f'Daily report {DATE}: {REGIME}'],
-                   capture_output=True, text=True)
-print(r.stdout.strip())
-# Pull with rebase to avoid conflicts, then push
-subprocess.run(['git', 'pull', '--rebase', 'origin', 'main'],
-               capture_output=True, text=True)
-r = subprocess.run(['git', 'push', 'origin', 'main'], capture_output=True, text=True)
-if r.returncode == 0:
-    print(f"  ✅ Pushed to GitHub")
-    print(f"\n{'='*60}")
-    print(f"🌐 https://matt-manus.github.io/swing-trader-daily/{DATE}.html")
-    print(f"{'='*60}")
-else:
-    print(f"  WARNING Push failed: {r.stderr[-200:]}")
-
+# ── Report complete — git push is handled by the GitHub Actions workflow ──────
+print(f"\n{'='*60}")
+print(f"🌐 Report ready: {DATE}.html")
+print(f"🌐 https://matt-manus.github.io/swing-trader-daily/{DATE}.html")
+print(f"{'='*60}")
 print("\n=== Done ===")
