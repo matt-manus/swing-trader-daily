@@ -242,6 +242,13 @@ else:
 # ═══════════════════════════════════════════════════════════════════════════════
 print("\n[Step 3] Fear & Greed + NAAIM...")
 
+import requests
+req_headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+    'Accept': 'application/json, text/html, */*',
+    'Accept-Language': 'en-US,en;q=0.9',
+}
+
 # Fear & Greed via CNN API
 try:
     r = requests.get('https://production.dataviz.cnn.io/index/fearandgreed/graphdata',
