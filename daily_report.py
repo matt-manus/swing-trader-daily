@@ -8,19 +8,8 @@ Usage:
     python3 daily_report.py [YYYY-MM-DD]
     If no date given, uses today (HKT).
 
-What it does:
-    Step 1   - yfinance macro data (SPY/QQQ/IWM/DIA/VIX/GLD/USO/TLT/TNX/DXY)
-    Step 1B  - Finviz news + OpenAI filter
-    Step 2   - Fullstack Investor screenshot (Playwright)
-    Step 3   - Fear & Greed (CNN API) + NAAIM (Excel download)
-    Step 4B  - Sector ETF RSI (Wilder SMMA, sorted high→low)
-    Step 4C  - 9x StockCharts breadth screenshots (Playwright, 1600px wide)
-    Step 5A  - Finviz sector performance screenshot (sorted by 1D change)
-    Step 5B  - Finviz industry leaders screenshot (sorted by 1D change)
-    Step 6A  - MarketInOut A/D Ratio screenshot (Playwright)
-    Step 6B  - Stockbee T2108 from Google Sheets CSV + screenshot (Playwright)
-    Step 7   - Bull vs Bear commentary (OpenAI, Traditional Chinese)
-    Final    - Fill TEMPLATE.html, upload CDN, push GitHub
+Screenshots are saved to images/{DATE}/ and referenced as relative paths.
+No external CDN required — works in GitHub Actions.
 """
 
 import os, sys, json, re, time, subprocess, io, csv
@@ -28,8 +17,8 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 # ── Paths ──────────────────────────────────────────────────────────────────────
-REPO = Path('/home/ubuntu/swing-trader-daily')
-EOD  = Path('/home/ubuntu/eod_data')
+REPO = Path(__file__).parent.resolve()
+EOD  = Path('/tmp/eod_data')
 EOD.mkdir(exist_ok=True)
 
 # ── Date / Time ────────────────────────────────────────────────────────────────
@@ -45,19 +34,23 @@ except ImportError:
     now_et  = datetime.now(timezone(timedelta(hours=-4)))
 
 if len(sys.argv) > 1:
-    from datetime import date as date_cls
     REPORT_DATE = datetime.strptime(sys.argv[1], '%Y-%m-%d').date()
 else:
     REPORT_DATE = now_hkt.date()
 
 DATE        = REPORT_DATE.strftime('%Y-%m-%d')
-DATE_DISP   = REPORT_DATE.strftime('%a %b %-d, %Y')   # Mon Mar 24, 2026
-DATE_SHORT  = REPORT_DATE.strftime('%b %-d, %Y')       # Mar 24, 2026
-DATE_MMDD   = REPORT_DATE.strftime('%b %-d')           # Mar 24
+DATE_DISP   = REPORT_DATE.strftime('%a %b %-d, %Y')
+DATE_SHORT  = REPORT_DATE.strftime('%b %-d, %Y')
+DATE_MMDD   = REPORT_DATE.strftime('%b %-d')
 REPORT_TIME = f"{now_hkt.strftime('%H:%M')} HKT ({now_et.strftime('%H:%M')} ET)"
+
+# Image folder for this date (relative to repo root)
+IMG_DIR = REPO / 'images' / DATE
+IMG_DIR.mkdir(parents=True, exist_ok=True)
 
 print(f"=== Daily Report: {DATE} ===")
 print(f"    Time: {REPORT_TIME}")
+print(f"    Images: images/{DATE}/")
 
 # ── Placeholder dict ───────────────────────────────────────────────────────────
 P = {
@@ -69,30 +62,17 @@ P = {
     'SCREENSHOT_DATE':     DATE_SHORT,
 }
 
+def img_path(name):
+    """Return relative path for HTML src attribute"""
+    return f"images/{DATE}/{name}"
+
 # ── Helper: run Playwright script ──────────────────────────────────────────────
 def run_playwright(script_content, timeout=120):
-    """Write script to /tmp and run it, return (success, stdout, stderr)"""
     path = '/tmp/pw_script.py'
     with open(path, 'w') as f:
         f.write(script_content)
     r = subprocess.run(['python3', path], capture_output=True, text=True, timeout=timeout)
     return r.returncode == 0, r.stdout, r.stderr
-
-# ── Helper: upload to CDN ──────────────────────────────────────────────────────
-def upload_cdn(filepath):
-    """Upload file to CDN, return public URL or None"""
-    if not Path(filepath).exists():
-        print(f"  ⚠️  File not found: {filepath}")
-        return None
-    r = subprocess.run(['manus-upload-file', str(filepath)], capture_output=True, text=True, timeout=60)
-    if r.returncode == 0:
-        for line in r.stdout.strip().split('\n'):
-            if 'https://' in line:
-                url = line.strip().split()[-1]
-                print(f"  ✅ CDN: {Path(filepath).name} → ...{url[-35:]}")
-                return url
-    print(f"  ⚠️  CDN upload failed: {r.stderr[-100:]}")
-    return None
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # STEP 1: MACRO DATA
@@ -124,17 +104,6 @@ def fmt(v, decimals=2):
     sign = '+' if v >= 0 else ''
     return f"{sign}{v:.{decimals}f}"
 
-def badge_ma(price, ma20, ma50, ma200):
-    if price < ma20 and price < ma50 and price < ma200:
-        return 'badge-bear', 'BELOW ALL MAs'
-    if price > ma20 and price > ma50 and price > ma200:
-        return 'badge-bull', 'ABOVE ALL MAs'
-    if price < ma20 and price < ma50:
-        return 'badge-warn', 'BELOW 20/50MA'
-    if price < ma200:
-        return 'badge-bear', 'BELOW 200MA'
-    return 'badge-warn', 'MIXED'
-
 MACRO_TICKERS = {
     'SPY': 'SPY', 'QQQ': 'QQQ', 'IWM': 'IWM', 'DIA': 'DIA',
     'VIX': '^VIX', 'GLD': 'GLD', 'USO': 'USO', 'TLT': 'TLT',
@@ -164,14 +133,29 @@ for key, ticker in MACRO_TICKERS.items():
         }
         print(f"  {key}: ${price:.2f} ({chg:+.2f}%) RSI={rsi}")
     except Exception as e:
-        print(f"  ⚠️  {key}: {e}")
+        print(f"  WARNING {key}: {e}")
 
 def fill_ticker_placeholders(key):
     d = macro.get(key)
     if not d:
         return
-    bc, sig = badge_ma(d['price'], d['ma20'], d['ma50'], d['ma200'])
-    P[f'{key}_PRICE']     = f"{d['price']:.2f}"
+    price = d['price']
+    # Determine MA signal badge
+    above_20  = price > d['ma20']
+    above_50  = price > d['ma50']
+    above_200 = price > d['ma200']
+    if above_20 and above_50 and above_200:
+        bc, sig = 'badge-bull', 'ABOVE ALL MAs'
+    elif not above_20 and not above_50 and not above_200:
+        bc, sig = 'badge-bear', 'BELOW ALL MAs'
+    elif not above_20 and not above_50:
+        bc, sig = 'badge-warn', 'BELOW 20/50MA'
+    elif not above_200:
+        bc, sig = 'badge-bear', 'BELOW 200MA'
+    else:
+        bc, sig = 'badge-warn', 'MIXED'
+
+    P[f'{key}_PRICE']     = f"{price:.2f}"
     P[f'{key}_CHG']       = fmt(d['chg'])
     P[f'{key}_CHG_COLOR'] = color(d['chg'])
     P[f'{key}_MA20']      = f"{d['ma20']:.2f}"
@@ -195,7 +179,7 @@ if 'VIX' in macro:
     d = macro['VIX']
     P['VIX']           = f"{d['price']:.2f}"
     P['VIX_CHG']       = fmt(d['chg'])
-    P['VIX_CHG_COLOR'] = color(-d['chg'])  # VIX up = bearish = red
+    P['VIX_CHG_COLOR'] = color(-d['chg'])  # VIX up = bearish
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # STEP 1B: NEWS
@@ -232,12 +216,12 @@ for ticker in NEWS_TICKERS:
                 if len(dt) > 8:
                     current_date = dt.split()[0]
             if current_date and ('Today' in current_date or
-                                  REPORT_DATE.strftime('%b-%d-%y').lstrip('0').replace('-0','-') in current_date):
+                                  REPORT_DATE.strftime('%b-%d-%y') in current_date):
                 link = td_news.find('a')
                 if link:
                     all_headlines.append({'ticker': ticker, 'headline': link.text.strip()})
         time.sleep(0.2)
-    except Exception as e:
+    except Exception:
         pass
 
 print(f"  Collected {len(all_headlines)} headlines")
@@ -247,9 +231,11 @@ if all_headlines:
     try:
         client = OpenAI()
         headlines_text = '\n'.join([f"[{h['ticker']}] {h['headline']}" for h in all_headlines[:80]])
+        spy_chg = macro.get('SPY', {}).get('chg', 0)
+        vix_val = macro.get('VIX', {}).get('price', 0)
         resp = client.chat.completions.create(
             model='gpt-4.1-mini',
-            messages=[{'role': 'user', 'content': f"""Today is {DATE}. SPY {macro.get('SPY',{}).get('chg',0):+.2f}%, VIX={macro.get('VIX',{}).get('price','?'):.1f}.
+            messages=[{'role': 'user', 'content': f"""Today is {DATE}. SPY {spy_chg:+.2f}%, VIX={vix_val:.1f}.
 Select 5-7 most market-moving headlines. Return JSON array:
 [{{"impact":"HIGH|MEDIUM","ticker":"...","headline":"...","reason":"one sentence"}}]
 
@@ -277,7 +263,7 @@ Headlines:
             filtered_news_html = '\n'.join(rows)
             print(f"  AI filtered to {len(items)} stories")
     except Exception as e:
-        print(f"  ⚠️  OpenAI news: {e}")
+        print(f"  WARNING OpenAI news: {e}")
 
 if not filtered_news_html:
     filtered_news_html = '<div style="color:#8b949e; padding:12px;">⚠️ News data unavailable.</div>'
@@ -288,6 +274,8 @@ P['NEWS_ITEMS'] = filtered_news_html
 # STEP 2: FULLSTACK INVESTOR SCREENSHOT
 # ═══════════════════════════════════════════════════════════════════════════════
 print("\n[Step 2] Fullstack Investor screenshot...")
+
+fullstack_path = IMG_DIR / 'fullstack.png'
 
 ok, out, err = run_playwright(f"""
 import asyncio
@@ -301,30 +289,29 @@ async def main():
         await page.goto('https://fullstackinvestor.co/market-model',
                         wait_until='networkidle', timeout=30000)
         await page.wait_for_timeout(3000)
-        await page.screenshot(path='/home/ubuntu/eod_data/{DATE}_fullstack_top.png')
+        await page.screenshot(path='/tmp/fs_top.png')
         await page.evaluate('window.scrollTo(0, document.body.scrollHeight)')
         await page.wait_for_timeout(1000)
-        await page.screenshot(path='/home/ubuntu/eod_data/{DATE}_fullstack_bot.png')
+        await page.screenshot(path='/tmp/fs_bot.png')
         await browser.close()
 
 asyncio.run(main())
 
-top = Image.open('/home/ubuntu/eod_data/{DATE}_fullstack_top.png')
-bot = Image.open('/home/ubuntu/eod_data/{DATE}_fullstack_bot.png')
+top = Image.open('/tmp/fs_top.png')
+bot = Image.open('/tmp/fs_bot.png')
 combined = Image.new('RGB', (top.width, top.height + bot.height))
 combined.paste(top, (0, 0))
 combined.paste(bot, (0, top.height))
-combined.save('/home/ubuntu/eod_data/{DATE}_fullstack.png')
+combined.save('{fullstack_path}')
 print('done')
 """, timeout=60)
 
-if ok and (EOD / f'{DATE}_fullstack.png').exists():
-    url = upload_cdn(EOD / f'{DATE}_fullstack.png')
-    P['IMG_FULLSTACK'] = url or 'MISSING'
+if fullstack_path.exists():
+    P['IMG_FULLSTACK'] = img_path('fullstack.png')
     print("  ✅ Fullstack screenshot done")
 else:
-    P['IMG_FULLSTACK'] = 'MISSING'
-    print(f"  ⚠️  Fullstack failed: {err[-200:]}")
+    P['IMG_FULLSTACK'] = ''
+    print(f"  WARNING Fullstack failed: {err[-150:]}")
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # STEP 3: FEAR & GREED + NAAIM
@@ -336,24 +323,32 @@ try:
     r = requests.get('https://production.dataviz.cnn.io/index/fearandgreed/graphdata',
                      headers=req_headers, timeout=10)
     fg = r.json()['fear_and_greed']
-    fg_score = int(float(fg['score']))
+    fg_score  = int(float(fg['score']))
     fg_rating = fg.get('rating', 'N/A').replace('_', ' ').title()
     P['FEAR_GREED']        = str(fg_score)
     P['FEAR_GREED_RATING'] = fg_rating
     print(f"  Fear & Greed: {fg_score} ({fg_rating})")
 except Exception as e:
-    print(f"  ⚠️  Fear & Greed: {e}")
+    print(f"  WARNING Fear & Greed: {e}")
     P['FEAR_GREED']        = 'N/A'
     P['FEAR_GREED_RATING'] = 'N/A'
 
 # NAAIM — download Excel, read row 2 (most recent, newest-first)
 try:
     import openpyxl
-    naaim_url = 'https://naaim.org/wp-content/uploads/2026/03/NAAIM-Exposure-Index.xlsx'
-    r = requests.get(naaim_url, headers=req_headers, timeout=15)
+    # Try current year first, then previous year
+    for year in [REPORT_DATE.year, REPORT_DATE.year - 1]:
+        naaim_url = f'https://naaim.org/wp-content/uploads/{year}/03/NAAIM-Exposure-Index.xlsx'
+        try:
+            r = requests.get(naaim_url, headers=req_headers, timeout=15)
+            if r.status_code == 200:
+                break
+        except Exception:
+            continue
     wb = openpyxl.load_workbook(io.BytesIO(r.content))
     ws = wb.active
     row2 = list(ws.iter_rows(min_row=2, max_row=2, values_only=True))[0]
+    # Column index 3 = Mean (0-indexed), column 0 = Date
     naaim_val  = round(float(row2[3] if row2[3] is not None else row2[1]), 2)
     naaim_date = row2[0]
     naaim_date_str = naaim_date.strftime('%b %-d, %Y') if hasattr(naaim_date, 'strftime') else str(naaim_date)
@@ -361,7 +356,7 @@ try:
     P['NAAIM_DATE'] = naaim_date_str
     print(f"  NAAIM: {naaim_val} ({naaim_date_str})")
 except Exception as e:
-    print(f"  ⚠️  NAAIM: {e}")
+    print(f"  WARNING NAAIM: {e}")
     P['NAAIM']      = 'N/A'
     P['NAAIM_DATE'] = 'N/A'
 
@@ -382,22 +377,24 @@ BREADTH = [
     ('NYA200R',  '$NYA200R'),
 ]
 
+breadth_paths = {name: str(IMG_DIR / f'{name}.png') for name, _ in BREADTH}
+
 ok, out, err = run_playwright(f"""
 import asyncio
 from playwright.async_api import async_playwright
 
-CHARTS = {json.dumps(BREADTH)}
+CHARTS = {json.dumps([(n, s, breadth_paths[n]) for n, s in BREADTH])}
 
 async def main():
     async with async_playwright() as p:
         browser = await p.chromium.launch()
-        for name, symbol in CHARTS:
+        for name, symbol, save_path in CHARTS:
             page = await browser.new_page(viewport={{'width': 1600, 'height': 700}})
             url = f'https://stockcharts.com/h-sc/ui?s={{symbol}}&p=D&yr=1&mn=0&dy=0'
             try:
                 await page.goto(url, wait_until='networkidle', timeout=30000)
                 await page.wait_for_timeout(2000)
-                await page.screenshot(path=f'/home/ubuntu/eod_data/{DATE}_{{name}}.png')
+                await page.screenshot(path=save_path)
                 print(f'done:{{name}}')
             except Exception as e:
                 print(f'fail:{{name}}:{{e}}')
@@ -408,19 +405,15 @@ asyncio.run(main())
 """, timeout=150)
 
 print(out)
-
-# Upload each breadth chart
 for name, _ in BREADTH:
-    path = EOD / f'{DATE}_{name}.png'
+    path = IMG_DIR / f'{name}.png'
     if path.exists():
-        url = upload_cdn(path)
-        P[f'IMG_{name}'] = url or 'MISSING'
+        P[f'IMG_{name}'] = img_path(f'{name}.png')
     else:
-        P[f'IMG_{name}'] = 'MISSING'
-        print(f"  ⚠️  Missing: {name}")
+        P[f'IMG_{name}'] = ''
+        print(f"  WARNING Missing: {name}")
 
-# Breadth values — these are read from the screenshots visually.
-# Set to N/A; they will be visible in the screenshots.
+# Breadth values shown in screenshots; set display to N/A
 for name, _ in BREADTH:
     P[name] = 'N/A'
 
@@ -464,10 +457,11 @@ for ticker, sector_name in SECTOR_ETFS:
             'vs200': (price-ma200)/ma200*100,
         })
     except Exception as e:
-        print(f"  ⚠️  {ticker}: {e}")
+        print(f"  WARNING {ticker}: {e}")
 
 sector_rows.sort(key=lambda x: x['rsi'], reverse=True)
-print(f"  Top sector: {sector_rows[0]['ticker']} RSI={sector_rows[0]['rsi']}")
+if sector_rows:
+    print(f"  Top sector: {sector_rows[0]['ticker']} RSI={sector_rows[0]['rsi']}")
 
 def sector_row_html(i, s):
     chg_cls = 'green' if s['chg'] >= 0 else 'red'
@@ -475,7 +469,6 @@ def sector_row_html(i, s):
     rsi = s['rsi']
     rsi_badge = 'badge-warn' if rsi >= 70 else ('badge-bear' if rsi <= 30 else 'badge-neutral')
     signal = 'OVERBOUGHT' if rsi >= 70 else ('OVERSOLD' if rsi <= 30 else 'NEUTRAL')
-    sig_cls = rsi_badge
 
     def ma_td(v):
         c = 'green' if v >= 0 else 'red'
@@ -489,7 +482,7 @@ def sector_row_html(i, s):
             f'<td style="color:{chg_cls};">{chg_str}</td>'
             + ma_td(s['vs20']) + ma_td(s['vs50']) + ma_td(s['vs200']) +
             f'<td><span class="badge {rsi_badge}">{rsi:.1f}</span></td>'
-            f'<td><span class="badge {sig_cls}">{signal}</span></td>'
+            f'<td><span class="badge {rsi_badge}">{signal}</span></td>'
             f'</tr>\n')
 
 SECTOR_ROWS_HTML = ''
@@ -503,67 +496,81 @@ P['SECTOR_ROWS'] = SECTOR_ROWS_HTML
 # ═══════════════════════════════════════════════════════════════════════════════
 print("\n[Step 5A/5B] Finviz screenshots...")
 
+sectors_path   = str(IMG_DIR / '5A_sectors.png')
+industry_path  = str(IMG_DIR / '5B_industry.png')
+
+UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+
 ok, out, err = run_playwright(f"""
 import asyncio
 from playwright.async_api import async_playwright
 from PIL import Image
 
-UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+UA = '{UA}'
 
 async def main():
     async with async_playwright() as p:
         browser = await p.chromium.launch()
-        
+
         # 5A: Sectors sorted by 1D change
         page = await browser.new_page(
             viewport={{'width': 1600, 'height': 900}},
             extra_http_headers={{'User-Agent': UA}})
-        await page.goto('https://finviz.com/groups.ashx?g=sector&o=-change&v=140',
-                        wait_until='networkidle', timeout=30000)
-        await page.wait_for_timeout(2000)
-        await page.screenshot(path='/home/ubuntu/eod_data/{DATE}_5A_raw.png')
+        try:
+            await page.goto('https://finviz.com/groups.ashx?g=sector&o=-change&v=140',
+                            wait_until='networkidle', timeout=30000)
+            await page.wait_for_timeout(2000)
+            await page.screenshot(path='/tmp/5A_raw.png')
+            img = Image.open('/tmp/5A_raw.png')
+            w, h = img.size
+            img.crop((0, 110, w, min(h, 420))).save('{sectors_path}')
+            print('done:5A')
+        except Exception as e:
+            print(f'fail:5A:{{e}}')
         await page.close()
-        
+
         # 5B: Industries sorted by 1D change
         page = await browser.new_page(
             viewport={{'width': 1600, 'height': 1400}},
             extra_http_headers={{'User-Agent': UA}})
-        await page.goto('https://finviz.com/groups.ashx?g=industry&o=-change&v=140',
-                        wait_until='networkidle', timeout=30000)
-        await page.wait_for_timeout(2000)
-        await page.screenshot(path='/home/ubuntu/eod_data/{DATE}_5B_raw.png')
+        try:
+            await page.goto('https://finviz.com/groups.ashx?g=industry&o=-change&v=140',
+                            wait_until='networkidle', timeout=30000)
+            await page.wait_for_timeout(2000)
+            await page.screenshot(path='/tmp/5B_raw.png')
+            img = Image.open('/tmp/5B_raw.png')
+            w, h = img.size
+            img.crop((0, 110, w, min(h, 900))).save('{industry_path}')
+            print('done:5B')
+        except Exception as e:
+            print(f'fail:5B:{{e}}')
         await page.close()
-        
+
         await browser.close()
 
 asyncio.run(main())
-
-# Crop to table area
-for suffix, top_crop, bot_crop in [('5A', 110, 420), ('5B', 110, 900)]:
-    try:
-        img = Image.open(f'/home/ubuntu/eod_data/{DATE}_{{suffix}}_raw.png')
-        w, h = img.size
-        cropped = img.crop((0, top_crop, w, min(h, bot_crop)))
-        cropped.save(f'/home/ubuntu/eod_data/{DATE}_{{suffix}}.png')
-        print(f'done:{{suffix}}')
-    except Exception as e:
-        print(f'fail:{{suffix}}:{{e}}')
 """, timeout=90)
 
 print(out)
-for suffix, key in [('5A', 'IMG_5A_SECTORS'), ('5B', 'IMG_5B_INDUSTRY')]:
-    path = EOD / f'{DATE}_{suffix}.png'
-    if path.exists():
-        url = upload_cdn(path)
-        P[key] = url or 'MISSING'
-    else:
-        P[key] = 'MISSING'
-        print(f"  ⚠️  Missing: {suffix}")
+
+if (IMG_DIR / '5A_sectors.png').exists():
+    P['IMG_5A_SECTORS'] = img_path('5A_sectors.png')
+else:
+    P['IMG_5A_SECTORS'] = ''
+    print("  WARNING 5A screenshot failed")
+
+if (IMG_DIR / '5B_industry.png').exists():
+    P['IMG_5B_INDUSTRY'] = img_path('5B_industry.png')
+else:
+    P['IMG_5B_INDUSTRY'] = ''
+    print("  WARNING 5B screenshot failed")
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # STEP 6A: MARKETINOUT A/D RATIO SCREENSHOT
 # ═══════════════════════════════════════════════════════════════════════════════
 print("\n[Step 6A] MarketInOut A/D Ratio screenshot...")
+
+marketinout_path = str(IMG_DIR / 'marketinout.png')
 
 ok, out, err = run_playwright(f"""
 import asyncio
@@ -573,31 +580,32 @@ async def main():
     async with async_playwright() as p:
         browser = await p.chromium.launch()
         page = await browser.new_page(viewport={{'width': 1400, 'height': 800}})
-        await page.goto('https://www.marketinout.com/advance_decline.php',
-                        wait_until='networkidle', timeout=30000)
-        await page.wait_for_timeout(3000)
-        await page.screenshot(path='/home/ubuntu/eod_data/{DATE}_marketinout.png')
+        try:
+            await page.goto('https://www.marketinout.com/advance_decline.php',
+                            wait_until='networkidle', timeout=30000)
+            await page.wait_for_timeout(3000)
+            await page.screenshot(path='{marketinout_path}')
+            print('done')
+        except Exception as e:
+            print(f'fail:{{e}}')
         await browser.close()
-        print('done')
 
 asyncio.run(main())
 """, timeout=60)
 
-path = EOD / f'{DATE}_marketinout.png'
-if path.exists():
-    url = upload_cdn(path)
-    P['IMG_MARKETINOUT'] = url or 'MISSING'
+if (IMG_DIR / 'marketinout.png').exists():
+    P['IMG_MARKETINOUT'] = img_path('marketinout.png')
     print("  ✅ MarketInOut done")
 else:
-    P['IMG_MARKETINOUT'] = 'MISSING'
-    print(f"  ⚠️  MarketInOut failed: {err[-150:]}")
+    P['IMG_MARKETINOUT'] = ''
+    print(f"  WARNING MarketInOut failed: {err[-100:]}")
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # STEP 6B: STOCKBEE T2108 (Google Sheets CSV + screenshot)
 # ═══════════════════════════════════════════════════════════════════════════════
 print("\n[Step 6B] Stockbee T2108...")
 
-STOCKBEE_CSV = 'https://docs.google.com/spreadsheet/pub?key=0Am_cU8NLIU20dEhiQnVHN3Nnc3B1S3J6eGhKZFo0N3c&output=csv'
+STOCKBEE_CSV  = 'https://docs.google.com/spreadsheet/pub?key=0Am_cU8NLIU20dEhiQnVHN3Nnc3B1S3J6eGhKZFo0N3c&output=csv'
 STOCKBEE_HTML = 'https://docs.google.com/spreadsheet/pub?key=0Am_cU8NLIU20dEhiQnVHN3Nnc3B1S3J6eGhKZFo0N3c&output=html&widget=true'
 
 t2108_val = up4_val = dn4_val = r5d_val = r10d_val = None
@@ -605,45 +613,47 @@ t2108_val = up4_val = dn4_val = r5d_val = r10d_val = None
 try:
     r = requests.get(STOCKBEE_CSV, timeout=15)
     rows = list(csv.reader(io.StringIO(r.text)))
-    
-    # Find header row
+
+    # Find header row (first row containing 'T2108' or 'Date')
     header_idx = 0
     for i, row in enumerate(rows[:5]):
         if any('t2108' in str(c).lower() or 'date' in str(c).lower() for c in row):
             header_idx = i
             break
-    
-    hdr = rows[header_idx]
+
+    hdr  = rows[header_idx]
     data = rows[header_idx + 1]
-    
-    def find_col(keywords):
+
+    # Find columns by keyword
+    def find_col(*keywords):
         for i, h in enumerate(hdr):
-            if all(k in str(h).lower() for k in keywords):
+            h_lower = str(h).lower()
+            if all(k in h_lower for k in keywords):
                 return i
         return None
-    
-    t2108_col = find_col(['t2108']) or find_col(['t21'])
+
+    t2108_col = find_col('t2108') or find_col('t21')
     up4_col   = next((i for i, h in enumerate(hdr) if 'up' in str(h).lower() and '4' in str(h)), None)
     dn4_col   = next((i for i, h in enumerate(hdr) if 'down' in str(h).lower() and '4' in str(h)), None)
     r5d_col   = next((i for i, h in enumerate(hdr) if '5' in str(h) and 'ratio' in str(h).lower()), None)
     r10d_col  = next((i for i, h in enumerate(hdr) if '10' in str(h) and 'ratio' in str(h).lower()), None)
-    
-    if t2108_col is not None:
+
+    if t2108_col is not None and data[t2108_col]:
         t2108_val = round(float(data[t2108_col]), 2)
-    if up4_col is not None:
+    if up4_col is not None and data[up4_col]:
         up4_val = int(float(data[up4_col]))
-    if dn4_col is not None:
+    if dn4_col is not None and data[dn4_col]:
         dn4_val = int(float(data[dn4_col]))
-    if r5d_col is not None:
+    if r5d_col is not None and data[r5d_col]:
         r5d_val = round(float(data[r5d_col]), 2)
-    if r10d_col is not None:
+    if r10d_col is not None and data[r10d_col]:
         r10d_val = round(float(data[r10d_col]), 2)
-    
+
     print(f"  T2108: {t2108_val}% | Up4%+: {up4_val} | Down4%+: {dn4_val}")
     print(f"  5D ratio: {r5d_val} | 10D ratio: {r10d_val}")
 
 except Exception as e:
-    print(f"  ⚠️  Stockbee CSV: {e}")
+    print(f"  WARNING Stockbee CSV: {e}")
 
 P['T2108']     = str(t2108_val) if t2108_val is not None else 'N/A'
 P['UP4PCT']    = str(up4_val)   if up4_val   is not None else 'N/A'
@@ -651,7 +661,27 @@ P['DOWN4PCT']  = str(dn4_val)   if dn4_val   is not None else 'N/A'
 P['RATIO_5D']  = str(r5d_val)   if r5d_val   is not None else 'N/A'
 P['RATIO_10D'] = str(r10d_val)  if r10d_val  is not None else 'N/A'
 
+# T2108 progress bar color
+if t2108_val is not None:
+    if t2108_val >= 70:
+        t2108_color = '#e74c3c'
+        t2108_zone  = 'Overbought'
+    elif t2108_val <= 20:
+        t2108_color = '#2ecc71'
+        t2108_zone  = 'Oversold'
+    else:
+        t2108_color = '#f1c40f'
+        t2108_zone  = 'Neutral'
+else:
+    t2108_color = '#8b949e'
+    t2108_zone  = 'N/A'
+
+P['T2108_COLOR'] = t2108_color
+P['T2108_ZONE']  = t2108_zone
+
 # Screenshot the Google Sheets (wide viewport to show T2108 column)
+t2108_sheet_path = str(IMG_DIR / 't2108_sheet.png')
+
 ok, out, err = run_playwright(f"""
 import asyncio
 from playwright.async_api import async_playwright
@@ -660,29 +690,29 @@ async def main():
     async with async_playwright() as p:
         browser = await p.chromium.launch()
         page = await browser.new_page(viewport={{'width': 1800, 'height': 600}})
-        await page.goto('{STOCKBEE_HTML}', wait_until='networkidle', timeout=30000)
-        await page.wait_for_timeout(3000)
-        # Scroll right to show T2108 column
-        await page.evaluate('''
-            var c = document.querySelector(".waffle-container") || document.querySelector("iframe");
-            if (c) c.scrollLeft = 400;
-        ''')
-        await page.wait_for_timeout(500)
-        await page.screenshot(path='/home/ubuntu/eod_data/{DATE}_t2108_sheet.png')
+        try:
+            await page.goto('{STOCKBEE_HTML}', wait_until='networkidle', timeout=30000)
+            await page.wait_for_timeout(3000)
+            await page.evaluate('''
+                var containers = document.querySelectorAll(".waffle-container, .grid-container, iframe");
+                containers.forEach(c => {{ c.scrollLeft = 500; }});
+            ''')
+            await page.wait_for_timeout(500)
+            await page.screenshot(path='{t2108_sheet_path}')
+            print('done')
+        except Exception as e:
+            print(f'fail:{{e}}')
         await browser.close()
-        print('done')
 
 asyncio.run(main())
 """, timeout=60)
 
-path = EOD / f'{DATE}_t2108_sheet.png'
-if path.exists():
-    url = upload_cdn(path)
-    P['IMG_T2108_SHEET'] = url or 'MISSING'
+if (IMG_DIR / 't2108_sheet.png').exists():
+    P['IMG_T2108_SHEET'] = img_path('t2108_sheet.png')
     print("  ✅ T2108 screenshot done")
 else:
-    P['IMG_T2108_SHEET'] = 'MISSING'
-    print(f"  ⚠️  T2108 screenshot failed")
+    P['IMG_T2108_SHEET'] = ''
+    print("  WARNING T2108 screenshot failed")
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # STEP 7: BULL VS BEAR COMMENTARY (OpenAI, Traditional Chinese)
@@ -700,24 +730,31 @@ if spy_d:
     if spy_d['price'] < spy_d['ma20']:  regime_score += 1
 if vix_d.get('price', 0) > 25: regime_score += 2
 elif vix_d.get('price', 0) > 20: regime_score += 1
-if isinstance(P.get('FEAR_GREED'), str) and P['FEAR_GREED'].isdigit():
-    if int(P['FEAR_GREED']) < 25: regime_score += 1
+fg_str = P.get('FEAR_GREED', '')
+if fg_str.isdigit() and int(fg_str) < 25:
+    regime_score += 1
 
-REGIME = 'BEARISH' if regime_score >= 6 else ('BEARISH-TO-NEUTRAL' if regime_score >= 4 else ('NEUTRAL' if regime_score >= 2 else 'BULLISH'))
+REGIME = ('BEARISH' if regime_score >= 6
+          else 'BEARISH-TO-NEUTRAL' if regime_score >= 4
+          else 'NEUTRAL' if regime_score >= 2
+          else 'BULLISH')
 P['REGIME'] = REGIME
 
 context = f"""
 Date: {DATE_DISP}
-SPY: ${spy_d.get('price','?'):.2f} ({spy_d.get('chg',0):+.2f}%) | vs 20MA: {spy_d.get('vs20',0):+.2f}% | vs 50MA: {spy_d.get('vs50',0):+.2f}% | vs 200MA: {spy_d.get('vs200',0):+.2f}%
-VIX: {vix_d.get('price','?'):.2f} ({vix_d.get('chg',0):+.2f}%)
+SPY: ${spy_d.get('price',0):.2f} ({spy_d.get('chg',0):+.2f}%) | vs 20MA: {spy_d.get('vs20',0):+.2f}% | vs 50MA: {spy_d.get('vs50',0):+.2f}% | vs 200MA: {spy_d.get('vs200',0):+.2f}%
+VIX: {vix_d.get('price',0):.2f} ({vix_d.get('chg',0):+.2f}%)
 Fear & Greed: {P.get('FEAR_GREED','N/A')} ({P.get('FEAR_GREED_RATING','N/A')})
 NAAIM: {P.get('NAAIM','N/A')} ({P.get('NAAIM_DATE','N/A')})
-T2108: {P.get('T2108','N/A')}%
+T2108: {P.get('T2108','N/A')}% ({P.get('T2108_ZONE','N/A')})
 Up 4%+: {P.get('UP4PCT','N/A')} | Down 4%+: {P.get('DOWN4PCT','N/A')}
 5D ratio: {P.get('RATIO_5D','N/A')} | 10D ratio: {P.get('RATIO_10D','N/A')}
-Top sector by RSI: {sector_rows[0]['ticker']} ({sector_rows[0]['sector']}) RSI={sector_rows[0]['rsi']}
+Top sector by RSI: {sector_rows[0]['ticker'] if sector_rows else 'N/A'} RSI={sector_rows[0]['rsi'] if sector_rows else 'N/A'}
 Regime: {REGIME}
 """
+
+bear_pts = bull_pts = table_rows = []
+guidance = ''
 
 try:
     client = OpenAI()
@@ -726,12 +763,12 @@ try:
         messages=[{
             'role': 'system',
             'content': '''You are a professional swing trader analyst. Generate a bull vs bear analysis in Traditional Chinese (繁體中文).
-Return JSON:
+Return JSON with these exact keys:
 {
-  "bear_points": ["4 bear arguments"],
-  "bull_points": ["3 bull arguments"],
-  "table_rows": [{"indicator":"...", "bull":true/false/null, "neutral":true/false/null, "bear":true/false/null}],
-  "guidance": "trading guidance in Traditional Chinese"
+  "bear_points": ["4 bear arguments in Traditional Chinese"],
+  "bull_points": ["3 bull arguments in Traditional Chinese"],
+  "table_rows": [{"indicator":"indicator name","bull":true/false,"neutral":true/false,"bear":true/false}],
+  "guidance": "trading guidance in Traditional Chinese, 2-3 sentences"
 }'''
         }, {
             'role': 'user',
@@ -747,18 +784,21 @@ Return JSON:
     guidance   = bb.get('guidance', '')
     print(f"  ✅ Commentary generated ({len(bear_pts)} bear, {len(bull_pts)} bull)")
 except Exception as e:
-    print(f"  ⚠️  OpenAI commentary: {e}")
-    bear_pts = bull_pts = table_rows = []
-    guidance = ''
+    print(f"  WARNING OpenAI commentary: {e}")
 
 bear_li = ''.join(f'<li style="margin-bottom:6px;">{p}</li>\n' for p in bear_pts)
 bull_li = ''.join(f'<li style="margin-bottom:6px;">{p}</li>\n' for p in bull_pts)
 table_body = ''
 for row in table_rows:
-    b = '✔' if row.get('bull')    else ''
-    n = '✔' if row.get('neutral') else ''
-    br = '✔' if row.get('bear')   else ''
-    table_body += f'<tr style="border-bottom:1px solid #333;"><td style="padding:10px;">{row.get("indicator","")}</td><td style="text-align:center;color:#2ecc71;">{b}</td><td style="text-align:center;color:#f1c40f;">{n}</td><td style="text-align:center;color:#e74c3c;">{br}</td></tr>\n'
+    b  = '✔' if row.get('bull')    else ''
+    n  = '✔' if row.get('neutral') else ''
+    br = '✔' if row.get('bear')    else ''
+    table_body += (f'<tr style="border-bottom:1px solid #333;">'
+                   f'<td style="padding:10px;">{row.get("indicator","")}</td>'
+                   f'<td style="text-align:center;color:#2ecc71;">{b}</td>'
+                   f'<td style="text-align:center;color:#f1c40f;">{n}</td>'
+                   f'<td style="text-align:center;color:#e74c3c;">{br}</td>'
+                   f'</tr>\n')
 
 BULL_BEAR_HTML = f'''<div style="background:#1c2128; border:1px solid #e74c3c; border-radius:8px; padding:16px; margin-bottom:16px;">
   <h3 style="color:#e74c3c; margin:0 0 12px 0;">🐻 空頭論點</h3>
@@ -806,7 +846,7 @@ for key, value in P.items():
 # Check for remaining unfilled placeholders
 remaining = re.findall(r'\{\{[A-Z0-9_]+\}\}', html)
 if remaining:
-    print(f"  ⚠️  Unfilled placeholders: {set(remaining)}")
+    print(f"  WARNING Unfilled placeholders: {set(remaining)}")
 else:
     print("  ✅ All placeholders filled")
 
@@ -814,14 +854,14 @@ else:
 out_path = REPO / f'{DATE}.html'
 with open(out_path, 'w') as f:
     f.write(html)
-print(f"  ✅ Saved: {out_path}")
+print(f"  ✅ Saved: {DATE}.html")
 
 # ── Update MARKET_HISTORY.md ───────────────────────────────────────────────────
 history_path = REPO / 'MARKET_HISTORY.md'
 new_entry = (f"| [{DATE}](https://matt-manus.github.io/swing-trader-daily/{DATE}.html) "
              f"| {REGIME} "
-             f"| ${spy_d.get('price','?'):.2f} ({spy_d.get('chg',0):+.2f}%) "
-             f"| {vix_d.get('price','?'):.2f} "
+             f"| ${spy_d.get('price',0):.2f} ({spy_d.get('chg',0):+.2f}%) "
+             f"| {vix_d.get('price',0):.2f} "
              f"| {P.get('FEAR_GREED','N/A')} "
              f"| {P.get('NAAIM','N/A')} "
              f"| {P.get('T2108','N/A')}% |\n")
@@ -830,30 +870,31 @@ try:
     with open(history_path) as f:
         history = f.read()
     marker = '|---|---|---|---|---|---|---|\n'
-    if marker in history:
+    if marker in history and DATE not in history:
         history = history.replace(marker, marker + new_entry, 1)
         with open(history_path, 'w') as f:
             f.write(history)
         print("  ✅ MARKET_HISTORY.md updated")
 except Exception as e:
-    print(f"  ⚠️  MARKET_HISTORY: {e}")
+    print(f"  WARNING MARKET_HISTORY: {e}")
 
 # ── Git push ───────────────────────────────────────────────────────────────────
 print("\n[Git] Committing and pushing...")
 os.chdir(REPO)
-subprocess.run(['git', 'config', 'user.email', 'manus@manus.ai'], check=True)
-subprocess.run(['git', 'config', 'user.name', 'Manus'], check=True)
-subprocess.run(['git', 'add', f'{DATE}.html', 'MARKET_HISTORY.md'], check=True)
+subprocess.run(['git', 'config', 'user.email', 'github-actions@github.com'], check=True)
+subprocess.run(['git', 'config', 'user.name', 'GitHub Actions'], check=True)
+subprocess.run(['git', 'add', f'{DATE}.html', 'MARKET_HISTORY.md',
+                f'images/{DATE}/'], check=True)
 r = subprocess.run(['git', 'commit', '-m', f'Daily report {DATE}: {REGIME}'],
                    capture_output=True, text=True)
 print(r.stdout.strip())
-r = subprocess.run(['git', 'push', 'origin', 'main'], capture_output=True, text=True)
+r = subprocess.run(['git', 'push'], capture_output=True, text=True)
 if r.returncode == 0:
     print(f"  ✅ Pushed to GitHub")
     print(f"\n{'='*60}")
     print(f"🌐 https://matt-manus.github.io/swing-trader-daily/{DATE}.html")
     print(f"{'='*60}")
 else:
-    print(f"  ⚠️  Push failed: {r.stderr}")
+    print(f"  WARNING Push failed: {r.stderr[-200:]}")
 
 print("\n=== Done ===")
