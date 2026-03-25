@@ -1,0 +1,81 @@
+name: Daily Market Report
+
+on:
+  # HKT 06:30 = UTC 22:30 (previous calendar day)
+  schedule:
+    - cron: '30 22 * * *'
+
+  # Allow manual trigger from GitHub Actions UI
+  workflow_dispatch:
+    inputs:
+      report_date:
+        description: 'Report date (YYYY-MM-DD). Leave blank for today (HKT).'
+        required: false
+        default: ''
+
+permissions:
+  contents: write   # needed to push HTML + images back to repo
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      # ── 1. Checkout ──────────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      # ── 2. Python setup ──────────────────────────────────────────────────────
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # ── 3. Install Python dependencies ───────────────────────────────────────
+      - name: Install Python packages
+        run: |
+          pip install --upgrade pip
+          pip install \
+            yfinance \
+            numpy \
+            requests \
+            beautifulsoup4 \
+            openai \
+            openpyxl \
+            pillow \
+            playwright \
+            pytz
+
+      # ── 4. Install Playwright browsers (Chromium only) ───────────────────────
+      - name: Install Playwright Chromium
+        run: playwright install chromium --with-deps
+
+      # ── 5. Generate report ───────────────────────────────────────────────────
+      - name: Generate daily report
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          # Determine date argument
+          if [ -n "${{ github.event.inputs.report_date }}" ]; then
+            DATE_ARG="${{ github.event.inputs.report_date }}"
+          else
+            # Use HKT date (UTC+8)
+            DATE_ARG=$(TZ='Asia/Hong_Kong' date '+%Y-%m-%d')
+          fi
+          echo "Generating report for: $DATE_ARG"
+          python3 daily_report.py "$DATE_ARG"
+
+      # ── 6. Commit & push generated files ─────────────────────────────────────
+      # (daily_report.py already runs git add/commit/push internally,
+      #  but we add a safety net here in case the script's push fails)
+      - name: Safety push (if script push failed)
+        run: |
+          git config user.email "github-actions@github.com"
+          git config user.name  "GitHub Actions"
+          git add -A
+          # Only commit if there are staged changes
+          git diff --cached --quiet || git commit -m "Safety push: daily report $(TZ='Asia/Hong_Kong' date '+%Y-%m-%d')"
+          git push || echo "Nothing new to push"
