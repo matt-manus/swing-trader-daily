@@ -175,6 +175,15 @@ def fill_ticker_placeholders(key):
 for key in ['SPY', 'QQQ', 'IWM', 'DIA', 'GLD', 'USO', 'TLT', 'TNX', 'DXY']:
     fill_ticker_placeholders(key)
 
+# Add template-compatible aliases (template uses SPY_20MA, SPY_50MA, SPY_200MA, SPY_CHANGE_PCT)
+# while fill_ticker_placeholders sets SPY_MA20, SPY_MA50, SPY_MA200, SPY_CHG
+for key in ['SPY', 'QQQ', 'IWM', 'DIA', 'GLD', 'USO', 'TLT', 'TNX', 'DXY']:
+    if f'{key}_MA20' in P:
+        P[f'{key}_20MA']      = P[f'{key}_MA20']
+        P[f'{key}_50MA']      = P[f'{key}_MA50']
+        P[f'{key}_200MA']     = P[f'{key}_MA200']
+        P[f'{key}_CHANGE_PCT'] = P[f'{key}_CHG'] + '%'
+
 if 'VIX' in macro:
     d = macro['VIX']
     P['VIX']           = f"{d['price']:.2f}"
