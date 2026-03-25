@@ -76,39 +76,17 @@
 
 報告分為多個固定的 Steps，每個 Step 都有嚴格指定的數據來源和格式要求。
 
-### 總覽與關鍵水平 (Verdict Box & Key Levels)
+### 總覽 (Verdict Box)
 - **要求：** 總結當日市場環境（Regime）。
 - **標題格式：** 必須使用 "Market Summary — [Date] | Generated [Time] HKT / [Time] ET"。
 - **時間戳：** 數據時間必須精確到具體時間（例如 4:00 PM ET），不能只寫 "EOD close"。
 - **時區換算（重要）：** HKT = UTC+8，ET（夏令時 EDT）= UTC-4。HKT 比 ET **快 12 小時**。正確換算：07:45 HKT = 19:45 ET（前一日）。**絕不能**寫成 "19:45 HKT / 07:45 ET"（方向相反）。報告生成時間通常係香港早上 6:45–7:45 HKT，對應美東時間前一日 18:45–19:45 ET。
-- **MA 數值：** SPX 的 20MA、50MA、200MA 必須通過 `yfinance` 精確計算，不能使用約數。
 
 ### Step 1: 宏觀環境 (Macro Environment)
 - **來源：** `yfinance` (SPY, QQQ, IWM, DIA, VIX, GLD, USO, ^TNX, DX-Y.NYB)。
 - **USD 指數：** 使用 **DXY（`DX-Y.NYB`）** 而非 UUP ETF。DXY 係美元指數本身，更直接、更標準；UUP 係 ETF，有追蹤誤差。
 - **Fear & Greed：** 來源為 https://feargreedmeter.com （抓取精確數值）。
 - **經濟日曆：** 來源為 https://forex.tradingcharts.com/economic_calendar/ （手動查看未來三天的重要數據）。
-
-### Step 2: Fullstack Investor
-- **正確 URL：** **https://fullstackinvestor.co/market-model** （注意是 `.co`，不是 `.com`）。
-- **要求：** **只放截圖，不作任何解讀**。不需要提取數據表，不需要寫 "Positive" 或 "Neutral" 的文字總結。
-- **截圖技術：** 必須使用 Playwright/Selenium 等工具進行整頁截圖（Full-page screenshot），並加入滾動等待（Scroll-and-wait）以觸發懶加載（Lazy loading），**絕對不能出現黑色空隙（Black gap）**。
-
-### Step 1B: 市場情報 (Market Intelligence News)
-- **目的：** 從當日主要 tickers 的新聞標題中，篩選出對市場判斷最有價值的 5–7 條新聞，並標明影響等級。
-- **新聞來源：** Finviz ticker 頁面（`https://finviz.com/quote.ashx?t=TICKER`），免費，無需 API key，無需登入。
-- **抓取方式：** 自動抓取以下 tickers 的當日新聞標題（`#news-table` HTML 元素）：
-  - 市場 ETF：SPY, QQQ, IWM, DIA
-  - 強勢/弱勢板塊 ETF：XLE, XLK, XLF, XLV, XLB
-  - 權重股：NVDA, AAPL, MSFT, META, AMZN, TSLA, GOOGL
-  - 宏觀資產：GLD, TLT, USO, UUP
-- **AI 過濾：** 抓取所有當日標題後，使用 AI（OpenAI API）結合當日市場環境（VIX、板塊強弱、宏觀背景）自動篩選出 5–7 條最有投資判斷價值的新聞。
-- **輸出格式：** 每條新聞需標明：
-  - 影響等級：HIGH / MEDIUM / LOW
-  - 涉及板塊/tickers
-  - 一句說明：為何對投資判斷重要
-- **位置：** 放在 Step 1 宏觀環境表格之後，Step 2 Fullstack 之前。
-- **注意：** 只顯示當日（report date）的新聞標題，不顯示前日或更早的標題。
 
 ### Step 3: 市場情緒 (Market Sentiment)
 - **要求：** 包含 VIX、Fear & Greed、T2108 和 **NAAIM Exposure Index** 的計分卡（Scorecard）。
@@ -123,29 +101,29 @@
 - **4A Index vs MAs：** 使用 `yfinance` 數據。**特別注意：不需要 SPY 日線圖（已刪除）**。
   - **只使用以下 4 個指數：SPY、QQQ、DIA（道瓊斯 ETF）、IWM**。不需要 SPX 或 NDX 指數本身。
   - **MA 顏色規則（必須嚴格執行）：** 若某指數收市價低於某條 MA，該欄位必須顯示**紅色**；若高於，顯示**綠色**。絕不能因為照搬模板而顯示錯誤顏色。Signal badge 亦必須根據實際 MA 位置自動判斷（ABOVE / BELOW / BREACHED）。
-- **4B Sector ETF Rotation：** 
-  - 必須包含 11 個板塊 ETF 和 SPY。
-  - **必須增加 RSI 14 欄位**。
-  - **排序規則：** 必須按 **RSI 14 由高至低排序**（不是按 1D% 排序）。SPY 需按照其 RSI 數值插入到正確的排名位置。
-  - **RSI 計算方法：** 必須使用 **Wilder's Smoothed Moving Average（SMMA / RMA）** 計算 RSI 14，而非簡單 rolling mean。使用 `pandas_ta` 庫的 `ta.rsi()` 或手動實現 SMMA：`smma = (prev_smma * 13 + current_value) / 14`。簡單 rolling mean 會導致 RSI 數值偏低，與 Yahoo Finance / TradingView 顯示的數值不符。
-- **4C % of Stocks Above MAs：**
+- **4B % of Stocks Above MAs：**
   - **正確來源：** **StockCharts.com**。絕對不能使用 TradingView 或 MarketInOut。
   - **所需截圖（共 9 張）：** 
     - S&P 500: $SPXA20R, $SPXA50R, $SPXA200R
     - Nasdaq 100: $NDXA20R, $NDXA50R, $NDXA200R
     - NYSE: $NYA20R, $NYA50R, $NYA200R
-  - **要求：** 必須顯示這 9 個指標的精確數值和截圖，不能有任何 "estimated" 標籤。
+  - **要求：** 必須顯示這 9 個指標的精確數值和截圖，不能有任何 "estimated" 標籤。**注意：截圖大小必須是原來的兩倍（Double the size of current screenshots）。**
+- **4C Sector ETF Rotation：** 
+  - 必須包含 11 個板塊 ETF 和 SPY。
+  - **必須增加 RSI 14 欄位**。
+  - **排序規則：** 必須按 **RSI 14 由高至低排序**（不是按 1D% 排序）。SPY 需按照其 RSI 數值插入到正確的排名位置。
+  - **RSI 計算方法：** 必須使用 **Wilder's Smoothed Moving Average（SMMA / RMA）** 計算 RSI 14，而非簡單 rolling mean。使用 `pandas_ta` 庫的 `ta.rsi()` 或手動實現 SMMA：`smma = (prev_smma * 13 + current_value) / 14`。簡單 rolling mean 會導致 RSI 數值偏低，與 Yahoo Finance / TradingView 顯示的數值不符。
 
 ### Step 5: 板塊與行業強度 (Sector & Industry Strength)
 - **5A Sector Performance：** 來源為 Finviz (https://finviz.com/groups.ashx?g=sector&o=-change) 的數據與截圖。
-- **5B Industry Leaders：** 來源為 Finviz (https://finviz.com/groups.ashx?g=industry&o=-change)。
+
+**注意：原 Step 5B 已移至 Step 4D。**
+
+**4D Industry Leaders：** 來源為 Finviz (https://finviz.com/groups.ashx?g=industry&o=-change)。
   - **要求：** 必須列出當日表現最好的 **Top 10** 行業，並且**必須包含其所屬的母板塊（Parent Sector）**。
   - **刪除：** 不需要列出表現最差的 Laggards（Bottom 5）。
 
 ### Step 6: 市場廣度 (Market Breadth)
-- **6A Advance/Decline Ratio：** 
-  - **正確 URL：** https://www.marketinout.com/chart/market.php?breadth=advance-decline-ratio （不需要登入）。
-  - **要求：** 必須提供一張包含所有主要指數（S&P 500, Dow, NYSE, Nasdaq）的完整 MarketInOut 截圖。
 - **6B Stockbee Market Monitor：**
   - **正確 URL：** **https://stockbee.blogspot.com/p/mm.html** （不需要登入，不是 `.biz`）。
   - **要求：** 截圖**必須包含 T2108 欄位**。
@@ -176,18 +154,16 @@
 
 在推送至 GitHub 前，必須進行以下自我檢查：
 
-- [ ] Fullstack 網址是否正確（`.co` 而非 `.com`）？
 - [ ] Stockbee 網址是否正確（`blogspot.com` 而非 `.biz`）？
 - [ ] 報告中是否含有任何 `~` 符號或 "estimated" 字眼（時間戳除外）？
-- [ ] Step 4B 是否已按 RSI 14 排序？
-- [ ] Step 4C 是否使用了 StockCharts（$SPXA20R 等）的截圖？
+- [ ] Step 4B 是否使用了 StockCharts（$SPXA20R 等）的截圖，並且尺寸為兩倍大？
+- [ ] Step 4C 是否已按 RSI 14 排序？
 - [ ] Step 6B 的 Stockbee 截圖是否包含了 T2108 數據？
 - [ ] 是否已刪除 Step 7 UFO 和 Report Comparison？
-- [ ] Step 1B 市場情報是否已包含 5–7 條 AI 篩選新聞（HIGH/MEDIUM/LOW 標記）？
 - [ ] Step 3 Scorecard 是否已包含 NAAIM Exposure Index 數值（並標明數據日期）？
 - [ ] Step 1 USD 是否使用 DXY（`DX-Y.NYB`）而非 UUP？
 - [ ] Step 4A 是否只有 SPY/QQQ/DIA/IWM 四個指數？MA 顏色是否根據實際位置正確顯示（低於 MA = 紅色）？
-- [ ] Step 4B RSI 是否使用 Wilder's SMMA 算法計算？排序是否正確（由高至低）？
+- [ ] Step 4C RSI 是否使用 Wilder's SMMA 算法計算？排序是否正確（由高至低）？
 - [ ] Step 6B Stockbee 截圖是否在收市後（4:00 PM ET 後）重新截取？
 - [ ] 所有描述文字（如 VIX 漲跌描述）是否根據當日實際數據更新，而非照搬昨日模板？
 - [ ] Step 7 市場評論是否包含空頭論點、多頭論點及多空對比表？所有論點是否引用報告內的具體數據？

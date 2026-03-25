@@ -35,20 +35,18 @@ A daily market report that runs automatically via GitHub Actions every day at **
 | Step | Name | URL | Method |
 |------|------|-----|--------|
 | Step 1 | Yahoo Finance (macro data) | yfinance library | API |
-| Step 2 | Fullstack Investor Market Model | `https://fullstackinvestor.co/market-model` | Playwright screenshot |
 | Step 3 | Fear & Greed Index | `https://production.dataviz.cnn.io/index/fearandgreed/graphdata` | requests JSON |
 | Step 3 | NAAIM Exposure Index | `https://naaim.org/wp-content/uploads/{year}/03/NAAIM-Exposure-Index.xlsx` | requests download |
-| Step 4C | StockCharts breadth (9 charts) | `https://stockcharts.com/h-sc/ui?s={symbol}&p=D&yr=1&mn=0&dy=0` | Playwright screenshot |
-| Step 4B | Sector ETF RSI | yfinance library | API |
-| Step 5B | Finviz Industry | `https://finviz.com/groups.ashx?g=industry&o=-change&v=110` | requests + BeautifulSoup |
-| Step 6A | MarketInOut A/D Ratio | `https://www.marketinout.com/chart/market.php?breadth=advance-decline-ratio` | Playwright screenshot |
+| Step 4B | StockCharts breadth (9 charts) | `https://stockcharts.com/h-sc/ui?s={symbol}&p=D&yr=1&mn=0&dy=0` | Playwright screenshot (Double size) |
+| Step 4C | Sector ETF RSI | yfinance library | API |
+| Step 4D | Finviz Industry | `https://finviz.com/groups.ashx?g=industry&o=-change&v=110` | requests + BeautifulSoup |
 | Step 6B | Stockbee T2108 (CSV) | `https://docs.google.com/spreadsheet/pub?key=0Am_cU8NLIU20dEhiQnVHN3Nnc3B1S3J6eGhKZFo0N3c&output=csv` | requests CSV |
 | Step 6B | Stockbee T2108 (screenshot) | `https://docs.google.com/spreadsheet/pub?key=0Am_cU8NLIU20dEhiQnVHN3Nnc3B1S3J6eGhKZFo0N3c&output=html&widget=true` | Playwright screenshot |
 | Step 7 | OpenAI commentary | OpenAI API (`gpt-4.1-mini`) | API |
 
 ---
 
-## StockCharts Symbols (Step 4C)
+## StockCharts Symbols (Step 4B)
 
 9 charts, all using URL pattern `https://stockcharts.com/h-sc/ui?s={symbol}&p=D&yr=1&mn=0&dy=0`:
 
@@ -68,7 +66,7 @@ Screenshot viewport: **1600px wide × 700px tall**
 
 ---
 
-## Sector ETFs (Step 4B)
+## Sector ETFs (Step 4C)
 
 XLK, XLF, XLE, XLV, XLI, XLY, XLP, XLB, XLU, XLRE, XLC, SPY (reference)
 
@@ -84,9 +82,7 @@ SPY, QQQ, IWM, DIA, VIX (^VIX), GLD, USO, TLT, TNX (^TNX), DXY (DX-Y.NYB)
 
 | Screenshot | Width | Height |
 |-----------|-------|--------|
-| Fullstack Investor | 1400px | 900px (2 pages combined) |
-| StockCharts (each) | 1600px | 700px |
-| MarketInOut | 1400px | 800px |
+| StockCharts (each) | 3200px | 1400px |
 | Stockbee T2108 sheet | 1800px | 600px |
 
 ---
@@ -97,14 +93,12 @@ SPY, QQQ, IWM, DIA, VIX (^VIX), GLD, USO, TLT, TNX (^TNX), DXY (DX-Y.NYB)
 |------|--------|-------|
 | Step 1 Macro data | ✅ Working | All tickers from Yahoo Finance |
 | Step 1B News | ✅ Disabled | Removed — not needed |
-| Step 2 Fullstack Investor | ✅ Working | Uses `.co` not `.com` |
 | Step 3 Fear & Greed | ✅ Working | |
 | Step 3 NAAIM | ⚠️ Intermittent | NAAIM updates weekly on Wednesdays; file format sometimes changes |
-| Step 4C StockCharts | ✅ Working | 9 screenshots, values show N/A (by design — read from screenshot) |
-| Step 4B Sector ETF RSI | ✅ Working | |
+| Step 4B StockCharts | ✅ Working | 9 screenshots, values show N/A (by design — read from screenshot), double size |
+| Step 4C Sector ETF RSI | ✅ Working | |
 | Step 5A Finviz Sector | ✅ Removed | Not needed |
-| Step 5B Finviz Industry | ✅ Working | Uses requests+BS4, not Playwright |
-| Step 6A MarketInOut | ✅ Working | Fixed URL: `/chart/market.php?breadth=advance-decline-ratio` |
+| Step 4D Finviz Industry | ✅ Working | Uses requests+BS4, not Playwright |
 | Step 6B Stockbee T2108 | ✅ Working | CSV data + screenshot |
 | Step 7 OpenAI commentary | ⚠️ Needs key | Skipped if no OPENAI_API_KEY |
 | GitHub Actions schedule | ✅ Working | HKT 06:30 daily |
@@ -114,13 +108,13 @@ SPY, QQQ, IWM, DIA, VIX (^VIX), GLD, USO, TLT, TNX (^TNX), DXY (DX-Y.NYB)
 
 ## Known Issues
 
-1. **Step 4C values show N/A** — This is intentional. The numbers are visible in the screenshots. StockCharts does not provide a free API for these values.
+1. **Step 4B values show N/A** — This is intentional. The numbers are visible in the screenshots. StockCharts does not provide a free API for these values.
 
 2. **NAAIM intermittent failure** — NAAIM updates their Excel file every Wednesday. The URL includes the year and month, which may need updating. Current pattern: `https://naaim.org/wp-content/uploads/{year}/03/NAAIM-Exposure-Index.xlsx`
 
 3. **OpenAI commentary missing** — Step 7 requires `OPENAI_API_KEY` secret. Without it, the bull/bear commentary section is empty. The rest of the report is unaffected.
 
-4. **Finviz Sector screenshot removed** — Finviz has anti-scraping that causes Playwright timeouts. Replaced with requests-based Industry table (Step 5B).
+4. **Finviz Sector screenshot removed** — Finviz has anti-scraping that causes Playwright timeouts. Replaced with requests-based Industry table (Step 4D).
 
 ---
 
