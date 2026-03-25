@@ -190,96 +190,11 @@ if 'VIX' in macro:
     P['VIX_CHG']       = fmt(d['chg'])
     P['VIX_CHG_COLOR'] = color(-d['chg'])  # VIX up = bearish
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# STEP 1B: NEWS
-# ═══════════════════════════════════════════════════════════════════════════════
-print("\n[Step 1B] Finviz news + OpenAI filter...")
-
-import requests
-from bs4 import BeautifulSoup
-from openai import OpenAI
-
-NEWS_TICKERS = ['SPY','QQQ','IWM','DIA','XLE','XLK','XLF','XLV','XLB',
-                'NVDA','AAPL','MSFT','META','AMZN','TSLA','GOOGL',
-                'GLD','TLT','USO','UUP']
-
-req_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-all_headlines = []
-
-for ticker in NEWS_TICKERS:
-    try:
-        resp = requests.get(f'https://finviz.com/quote.ashx?t={ticker}',
-                            headers=req_headers, timeout=10)
-        soup = BeautifulSoup(resp.text, 'html.parser')
-        news_table = soup.find(id='news-table')
-        if not news_table:
-            continue
-        current_date = None
-        for row in news_table.find_all('tr'):
-            td_date = row.find('td', {'align': 'right'})
-            td_news = row.find('td', {'align': 'left'})
-            if not td_news:
-                continue
-            if td_date:
-                dt = td_date.text.strip()
-                if len(dt) > 8:
-                    current_date = dt.split()[0]
-            if current_date and ('Today' in current_date or
-                                  REPORT_DATE.strftime('%b-%d-%y') in current_date):
-                link = td_news.find('a')
-                if link:
-                    all_headlines.append({'ticker': ticker, 'headline': link.text.strip()})
-        time.sleep(0.2)
-    except Exception:
-        pass
-
-print(f"  Collected {len(all_headlines)} headlines")
-
-filtered_news_html = ''
-if all_headlines:
-    try:
-        client = OpenAI()
-        headlines_text = '\n'.join([f"[{h['ticker']}] {h['headline']}" for h in all_headlines[:80]])
-        spy_chg = macro.get('SPY', {}).get('chg', 0)
-        vix_val = macro.get('VIX', {}).get('price', 0)
-        resp = client.chat.completions.create(
-            model='gpt-4.1-mini',
-            messages=[{'role': 'user', 'content': f"""Today is {DATE}. SPY {spy_chg:+.2f}%, VIX={vix_val:.1f}.
-Select 5-7 most market-moving headlines. Return JSON array:
-[{{"impact":"HIGH|MEDIUM","ticker":"...","headline":"...","reason":"one sentence"}}]
-
-Headlines:
-{headlines_text}"""}],
-            temperature=0.3
-        )
-        raw = resp.choices[0].message.content.strip()
-        m = re.search(r'\[.*\]', raw, re.DOTALL)
-        if m:
-            items = json.loads(m.group())
-            rows = []
-            for item in items:
-                impact = item.get('impact', 'MEDIUM')
-                color_map = {'HIGH': '#e74c3c', 'MEDIUM': '#f39c12'}
-                badge_map = {'HIGH': 'badge-bear', 'MEDIUM': 'badge-warn'}
-                c = color_map.get(impact, '#3498db')
-                b = badge_map.get(impact, 'badge-neutral')
-                rows.append(f'''  <div style="border-left:3px solid {c}; padding:8px 12px; margin-bottom:8px; background:#161b22; border-radius:0 6px 6px 0;">
-    <span class="badge {b}" style="font-size:10px;">{impact}</span>
-    <span style="color:#8b949e; font-size:11px; margin-left:6px;">[{item.get('ticker','')}]</span>
-    <strong style="color:#e6edf3; font-size:13px; margin-left:4px;">{item.get('headline','')}</strong>
-    <div style="color:#8b949e; font-size:12px; margin-top:4px;">📌 {item.get('reason','')}</div>
-  </div>''')
-            filtered_news_html = '\n'.join(rows)
-            print(f"  AI filtered to {len(items)} stories")
-    except Exception as e:
-        print(f"  WARNING OpenAI news: {e}")
-
-if not filtered_news_html:
-    filtered_news_html = '<div style="color:#8b949e; padding:12px;">⚠️ News data unavailable.</div>'
-
-P['NEWS_ITEMS'] = filtered_news_html
-
-# ═══════════════════════════════════════════════════════════════════════════════
+# ===============================================================================
+# STEP 1B: NEWS (disabled)
+# ===============================================================================
+print("[Step 1B] News disabled.")
+P['NEWS_ITEMS'] = ''
 # STEP 2: FULLSTACK INVESTOR SCREENSHOT
 # ═══════════════════════════════════════════════════════════════════════════════
 print("\n[Step 2] Fullstack Investor screenshot...")
@@ -508,7 +423,7 @@ print("\n[Step 5A/5B] Finviz screenshots...")
 sectors_path   = str(IMG_DIR / '5A_sectors.png')
 industry_path  = str(IMG_DIR / '5B_industry.png')
 
-UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
 
 ok, out, err = run_playwright(f"""
 import asyncio
@@ -524,7 +439,16 @@ async def main():
         # 5A: Sectors sorted by 1D change
         page = await browser.new_page(
             viewport={{'width': 1600, 'height': 900}},
-            extra_http_headers={{'User-Agent': UA}})
+            extra_http_headers={{
+                'User-Agent': UA,
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+                'Accept-Language': 'en-US,en;q=0.9',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Referer': 'https://www.google.com/',
+                'Sec-Fetch-Dest': 'document',
+                'Sec-Fetch-Mode': 'navigate',
+                'Sec-Fetch-Site': 'cross-site',
+            }})
         try:
             await page.goto('https://finviz.com/groups.ashx?g=sector&o=-change&v=140',
                             wait_until='networkidle', timeout=30000)
@@ -541,7 +465,16 @@ async def main():
         # 5B: Industries sorted by 1D change
         page = await browser.new_page(
             viewport={{'width': 1600, 'height': 1400}},
-            extra_http_headers={{'User-Agent': UA}})
+            extra_http_headers={{
+                'User-Agent': UA,
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+                'Accept-Language': 'en-US,en;q=0.9',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Referer': 'https://www.google.com/',
+                'Sec-Fetch-Dest': 'document',
+                'Sec-Fetch-Mode': 'navigate',
+                'Sec-Fetch-Site': 'cross-site',
+            }})
         try:
             await page.goto('https://finviz.com/groups.ashx?g=industry&o=-change&v=140',
                             wait_until='networkidle', timeout=30000)
