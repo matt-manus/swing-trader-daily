@@ -888,7 +888,10 @@ subprocess.run(['git', 'add', f'{DATE}.html', 'MARKET_HISTORY.md',
 r = subprocess.run(['git', 'commit', '-m', f'Daily report {DATE}: {REGIME}'],
                    capture_output=True, text=True)
 print(r.stdout.strip())
-r = subprocess.run(['git', 'push'], capture_output=True, text=True)
+# Pull with rebase to avoid conflicts, then push
+subprocess.run(['git', 'pull', '--rebase', 'origin', 'main'],
+               capture_output=True, text=True)
+r = subprocess.run(['git', 'push', 'origin', 'main'], capture_output=True, text=True)
 if r.returncode == 0:
     print(f"  ✅ Pushed to GitHub")
     print(f"\n{'='*60}")

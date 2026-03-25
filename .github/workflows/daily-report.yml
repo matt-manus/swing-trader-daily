@@ -13,6 +13,11 @@ on:
         required: false
         default: ''
 
+# Prevent concurrent runs from conflicting on git push
+concurrency:
+  group: daily-report
+  cancel-in-progress: false
+
 permissions:
   contents: write   # needed to push HTML + images back to repo
 
@@ -55,8 +60,6 @@ jobs:
 
       # ── 5. Generate report ───────────────────────────────────────────────────
       - name: Generate daily report
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           # Determine date argument
           if [ -n "${{ github.event.inputs.report_date }}" ]; then
@@ -69,13 +72,14 @@ jobs:
           python3 daily_report.py "$DATE_ARG"
 
       # ── 6. Commit & push generated files ─────────────────────────────────────
-      # (daily_report.py already runs git add/commit/push internally,
-      #  but we add a safety net here in case the script's push fails)
-      - name: Safety push (if script push failed)
+      - name: Push report to repo
         run: |
           git config user.email "github-actions@github.com"
           git config user.name  "GitHub Actions"
           git add -A
           # Only commit if there are staged changes
-          git diff --cached --quiet || git commit -m "Safety push: daily report $(TZ='Asia/Hong_Kong' date '+%Y-%m-%d')"
-          git push || echo "Nothing new to push"
+          git diff --cached --quiet && echo "Nothing to commit" && exit 0
+          git commit -m "Daily report $(TZ='Asia/Hong_Kong' date '+%Y-%m-%d')"
+          # Pull with rebase to avoid conflicts, then push
+          git pull --rebase origin main
+          git push origin main
