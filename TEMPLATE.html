@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Market Summary — {{REPORT_DAY_FULL}} | 每日市場總結</title>
+<style>
+ body { background:#0d1117; color:#e6edf3; font-family:'Segoe UI',Arial,sans-serif; font-size:13px; margin:0; padding:12px; }
+ h1 { font-size:20px; color:#58a6ff; margin:0 0 4px 0; }
+ .subtitle { color:#8b949e; font-size:12px; margin-bottom:14px; }
+ .section { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 20px 24px; margin-bottom: 18px; }
+ .section-title { font-size: 15px; font-weight: bold; color: #58a6ff; border-bottom: 1px solid #30363d; padding-bottom: 10px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+ .step-badge { background:#1f6feb; color:#fff; font-size:11px; padding:2px 8px; border-radius:4px; font-weight:bold; }
+ .live-badge { background:#238636; color:#fff; font-size:10px; padding:2px 7px; border-radius:4px; font-weight:bold; margin-left:6px; }
+ table { width:100%; border-collapse:collapse; margin-bottom:10px; font-size:12px; }
+ th { background:#21262d; color:#8b949e; padding:7px 8px; text-align:left; font-weight:600; border-bottom:1px solid #30363d; }
+ td { padding:6px 8px; border-bottom:1px solid #21262d; }
+ tr:hover { background:#1c2128; }
+ .green { color:#3fb950; font-weight:bold; }
+ .red { color:#f85149; font-weight:bold; }
+ .yellow { color:#e3b341; font-weight:bold; }
+ .badge { font-size:10px; padding:2px 7px; border-radius:4px; font-weight:bold; white-space:nowrap; }
+ .badge-bull { background:#1a4731; color:#3fb950; }
+ .badge-bear { background:#3d1a1a; color:#f85149; }
+ .badge-warn { background:#3d2e00; color:#e3b341; }
+ .badge-info { background:#1f3a5f; color:#58a6ff; }
+ .badge-neutral { background:#21262d; color:#8b949e; }
+ .note { background:#1c2128; border-left:4px solid #58a6ff; padding:10px 14px; margin:10px 0; border-radius:0 6px 6px 0; font-size:12px; color:#ccc; }
+ .source-label { color:#8b949e; font-size:10px; margin:4px 0 10px 0; }
+ h3.sub { color:#e6edf3; font-size:13px; margin:18px 0 8px 0; border-bottom:1px solid #21262d; padding-bottom:5px; }
+ .three-col { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:14px; }
+ .chart-card { background:#0d1117; border:1px solid #30363d; border-radius:8px; padding:10px; }
+ .chart-card-title { font-size:11px; color:#8b949e; margin-bottom:6px; }
+ .chart-card img { width:100%; border-radius:4px; }
+ .regime-box { background:#0d1117; border:2px solid #f39c12; border-radius:8px; padding:14px; margin-bottom:10px; }
+ .regime-title { font-size:14px; font-weight:bold; color:#f39c12; margin-bottom:10px; }
+ .news-item { background:#0d1117; border:1px solid #30363d; border-radius:6px; padding:10px 12px; margin-bottom:8px; }
+ .news-headline { color:#e6edf3; font-size:12px; font-weight:bold; margin-bottom:4px; }
+ .news-why { color:#8b949e; font-size:11px; margin:4px 0 0 0; }
+ .news-tickers { font-size:10px; color:#58a6ff; margin-bottom:3px; }
+ .impact-high { border-left:3px solid #f85149; }
+ .impact-medium { border-left:3px solid #e3b341; }
+ .impact-low { border-left:3px solid #8b949e; }
+</style>
+</head>
+<body>
+<div class="section" style="padding:14px 20px; margin-bottom:14px;">
+  <h1>📊 Market Summary — {{REPORT_DAY_FULL}}</h1>
+  <div class="subtitle">每日市場總結 | Steps 1–6 | Sources: Yahoo Finance · feargreedmeter.com · Finviz · StockCharts · MarketInOut · Stockbee · forex.tradingcharts.com</div>
+  <div class="subtitle">⏱ Report generated: {{REPORT_DAY_FULL}} · {{REPORT_TIME_HKT}} HKT ({{REPORT_TIME_ET}} ET)</div>
+</div>
+
+<!-- KEY LEVELS -->
+<div class="section">
+  <div class="section-title">🔑 關鍵水平 Key Levels to Watch</div>
+  <table>
+    <tr><th>Level</th><th>Value</th><th>Status</th></tr>
+    <tr><td>SPY 200MA</td><td>${{SPY_MA200}}</td><td><span class="badge badge-bear">BELOW — SPY @ ${{SPY_PRICE}} ({{SPY_VS_200MA}}%)</span></td></tr>
+    <tr><td>SPY 50MA</td><td>${{SPY_MA50}}</td><td><span class="badge badge-bear">BELOW — SPY @ ${{SPY_PRICE}} ({{SPY_VS_50MA}}%)</span></td></tr>
+    <tr><td>SPY 20MA</td><td>${{SPY_MA20}}</td><td><span class="badge badge-bear">BELOW — SPY @ ${{SPY_PRICE}} ({{SPY_VS_20MA}}%)</span></td></tr>
+    <tr><td>VIX Level</td><td>{{VIX}}</td><td><span class="badge badge-warn">ELEVATED — Above 20 (Caution)</span></td></tr>
+    <tr><td>T2108 (% above 40MA)</td><td>{{T2108}}%</td><td><span class="badge badge-bear">OVERSOLD — Below 20%</span></td></tr>
+    <tr><td>$SPXA20R</td><td>{{SPXA20R}}%</td><td><span class="badge badge-bear">BEARISH</span></td></tr>
+  </table>
+</div>
+
+<!-- STEP 1A: MACRO ENVIRONMENT -->
+<div class="section">
+  <div class="section-title"><span class="step-badge">STEP 1A</span> 宏觀環境 Macro Environment</div>
+  <table>
+    <tr><th>Asset</th><th>Price</th><th>1D Chg</th><th>vs 20MA</th><th>vs 50MA</th><th>vs 200MA</th><th>RSI(14)</th><th>Signal</th></tr>
+    <tr>
+      <td><strong>SPY (S&amp;P 500)</strong></td>
+      <td><strong>${{SPY_PRICE}}</strong></td>
+      <td class="{{SPY_CHG_COLOR}}"><strong>{{SPY_CHG}}%</strong></td>
+      <td class="{{SPY_20_COLOR}}">{{SPY_VS_20MA}}%</td>
+      <td class="{{SPY_50_COLOR}}">{{SPY_VS_50MA}}%</td>
+      <td class="{{SPY_200_COLOR}}">{{SPY_VS_200MA}}%</td>
+      <td class="{{SPY_RSI_COLOR}}"><strong>{{SPY_RSI}}</strong></td>
+      <td><span class="badge {{SPY_BADGE}}">{{SPY_SIGNAL}}</span></td>
+    </tr>
+    <tr>
+      <td>QQQ (Nasdaq 100)</td>
+      <td>${{QQQ_PRICE}}</td>
+      <td class="{{QQQ_CHG_COLOR}}">{{QQQ_CHG}}%</td>
+      <td class="{{QQQ_20_COLOR}}">{{QQQ_VS_20MA}}%</td>
+      <td class="{{QQQ_50_COLOR}}">{{QQQ_VS_50MA}}%</td>
+      <td class="{{QQQ_200_COLOR}}">{{QQQ_VS_200MA}}%</td>
+      <td class="{{QQQ_RSI_COLOR}}">{{QQQ_RSI}}</td>
+      <td><span class="badge {{QQQ_BADGE}}">{{QQQ_SIGNAL}}</span></td>
+    </tr>
+    <tr>
+      <td>IWM (Russell 2000)</td>
+      <td>${{IWM_PRICE}}</td>
+      <td class="{{IWM_CHG_COLOR}}">{{IWM_CHG}}%</td>
+      <td class="{{IWM_20_COLOR}}">{{IWM_VS_20MA}}%</td>
+      <td class="{{IWM_50_COLOR}}">{{IWM_VS_50MA}}%</td>
+      <td class="{{IWM_200_COLOR}}">{{IWM_VS_200MA}}%</td>
+      <td class="{{IWM_RSI_COLOR}}">{{IWM_RSI}}</td>
+      <td><span class="badge {{IWM_BADGE}}">{{IWM_SIGNAL}}</span></td>
+    </tr>
+    <tr>
+      <td>DIA (Dow Jones)</td>
+      <td>${{DIA_PRICE}}</td>
+      <td class="{{DIA_CHG_COLOR}}">{{DIA_CHG}}%</td>
+      <td class="{{DIA_20_COLOR}}">{{DIA_VS_20MA}}%</td>
+      <td class="{{DIA_50_COLOR}}">{{DIA_VS_50MA}}%</td>
+      <td class="{{DIA_200_COLOR}}">{{DIA_VS_200MA}}%</td>
+      <td class="{{DIA_RSI_COLOR}}">{{DIA_RSI}}</td>
+      <td><span class="badge {{DIA_BADGE}}">{{DIA_SIGNAL}}</span></td>
+    </tr>
+    <tr>
+      <td><strong>VIX</strong></td>
+      <td><strong>{{VIX}}</strong></td>
+      <td class="{{VIX_CHG_COLOR}}">{{VIX_CHG}}%</td>
+      <td colspan="3">—</td>
+      <td class="yellow">—</td>
+      <td><span class="badge badge-warn">ELEVATED (>20)</span></td>
+    </tr>
+    <tr>
+      <td>GLD (Gold)</td>
+      <td>${{GLD_PRICE}}</td>
+      <td class="{{GLD_CHG_COLOR}}">{{GLD_CHG}}%</td>
+      <td class="{{GLD_20_COLOR}}">{{GLD_VS_20MA}}%</td>
+      <td class="{{GLD_50_COLOR}}">{{GLD_VS_50MA}}%</td>
+      <td class="{{GLD_200_COLOR}}">{{GLD_VS_200MA}}%</td>
+      <td class="{{GLD_RSI_COLOR}}">{{GLD_RSI}}</td>
+      <td><span class="badge {{GLD_BADGE}}">{{GLD_SIGNAL}}</span></td>
+    </tr>
+    <tr>
+      <td>USO (Oil)</td>
+      <td>${{USO_PRICE}}</td>
+      <td class="{{USO_CHG_COLOR}}">{{USO_CHG}}%</td>
+      <td class="{{USO_20_COLOR}}">{{USO_VS_20MA}}%</td>
+      <td class="{{USO_50_COLOR}}">{{USO_VS_50MA}}%</td>
+      <td class="{{USO_200_COLOR}}">{{USO_VS_200MA}}%</td>
+      <td class="{{USO_RSI_COLOR}}">{{USO_RSI}}</td>
+      <td><span class="badge {{USO_BADGE}}">{{USO_SIGNAL}}</span></td>
+    </tr>
+    <tr>
+      <td>TLT (20Y Treasury)</td>
+      <td>${{TLT_PRICE}}</td>
+      <td class="{{TLT_CHG_COLOR}}">{{TLT_CHG}}%</td>
+      <td class="{{TLT_20_COLOR}}">{{TLT_VS_20MA}}%</td>
+      <td class="{{TLT_50_COLOR}}">{{TLT_VS_50MA}}%</td>
+      <td class="{{TLT_200_COLOR}}">{{TLT_VS_200MA}}%</td>
+      <td class="{{TLT_RSI_COLOR}}">{{TLT_RSI}}</td>
+      <td><span class="badge {{TLT_BADGE}}">{{TLT_SIGNAL}}</span></td>
+    </tr>
+    <tr>
+      <td>10Y Yield (^TNX)</td>
+      <td>{{TNX_PRICE}}%</td>
+      <td class="{{TNX_CHG_COLOR}}">{{TNX_CHG}}%</td>
+      <td class="{{TNX_20_COLOR}}">{{TNX_VS_20MA}}%</td>
+      <td class="{{TNX_50_COLOR}}">{{TNX_VS_50MA}}%</td>
+      <td class="{{TNX_200_COLOR}}">{{TNX_VS_200MA}}%</td>
+      <td class="{{TNX_RSI_COLOR}}">{{TNX_RSI}}</td>
+      <td><span class="badge {{TNX_BADGE}}">{{TNX_SIGNAL}}</span></td>
+    </tr>
+    <tr>
+      <td>DXY (US Dollar)</td>
+      <td>{{DXY_PRICE}}</td>
+      <td class="{{DXY_CHG_COLOR}}">{{DXY_CHG}}%</td>
+      <td class="{{DXY_20_COLOR}}">{{DXY_VS_20MA}}%</td>
+      <td class="{{DXY_50_COLOR}}">{{DXY_VS_50MA}}%</td>
+      <td class="{{DXY_200_COLOR}}">{{DXY_VS_200MA}}%</td>
+      <td class="{{DXY_RSI_COLOR}}">{{DXY_RSI}}</td>
+      <td><span class="badge {{DXY_BADGE}}">{{DXY_SIGNAL}}</span></td>
+    </tr>
+  </table>
+  <div class="note">📌 宏觀總結: {{MACRO_SUMMARY}}</div>
+</div>
+
+<!-- STEP 1B: MARKET INTELLIGENCE NEWS -->
+<div class="section">
+  <div class="section-title"><span class="step-badge">STEP 1B</span> 市場情報 Market Intelligence News <span class="live-badge">✅ {{REPORT_DATE_SHORT}} Headlines</span></div>
+  <div class="news-item impact-high">
+    <div class="news-tickers">🏷 XLE · Energy</div>
+    <div class="news-headline">Iran war is pushing need for energy efficiency: Honeywell CEO (Yahoo Finance Video)</div>
+    <div class="news-why">⚡ <strong>HIGH IMPACT:</strong> Ongoing Iran war tensions are driving structural demand for energy efficiency, supporting XLE's leadership and signaling sector resilience amid geopolitical risks.</div>
+  </div>
+  <div class="news-item impact-high">
+    <div class="news-tickers">🏷 XLE · Energy</div>
+    <div class="news-headline">What energy leaders are saying about oil prices, Iran at CERAWeek 2026 (Yahoo Finance Video)</div>
+    <div class="news-why">⚡ <strong>HIGH IMPACT:</strong> Insights from energy leaders on oil price dynamics and Iran conflict provide critical context for energy sector outlook and price volatility expectations.</div>
+  </div>
+  <div class="news-item impact-high">
+    <div class="news-tickers">🏷 NVDA · TSLA · MU · PLTR · Tech</div>
+    <div class="news-headline">Dow Jones Futures: Trump's Iran Comments Spark Stock Market Rally; Micron, Nvidia, Palantir, Tesla Are Big Movers (Investor's Business Daily)</div>
+    <div class="news-why">⚡ <strong>HIGH IMPACT:</strong> Geopolitical developments easing Iran war fears triggered a market bounce led by key tech and semiconductor stocks, highlighting sensitivity to macro risk shifts.</div>
+  </div>
+  <div class="news-item impact-medium">
+    <div class="news-tickers">🏷 NVDA · AMD · Tech · Semiconductors</div>
+    <div class="news-headline">Nvidia, AMD Rally As War Fears Ease (GuruFocus.com)</div>
+    <div class="news-why">🔶 <strong>MEDIUM IMPACT:</strong> The rally in Nvidia and AMD on easing war fears confirms the tech sector's vulnerability to geopolitical risk and potential for upside in a bearish market.</div>
+  </div>
+  <div class="news-item impact-medium">
+    <div class="news-tickers">🏷 NVDA · Energy · Tech</div>
+    <div class="news-headline">NVIDIA, Emeral AI partner with energy firms to develop grid-flexible AI data centers (Proactive)</div>
+    <div class="news-why">🔶 <strong>MEDIUM IMPACT:</strong> Nvidia's collaboration with energy firms to build AI-powered flexible data centers aligns with energy sector trends and could drive cross-sector growth opportunities.</div>
+  </div>
+  <div class="news-item impact-medium">
+    <div class="news-tickers">🏷 XLE · Energy</div>
+    <div class="news-headline">Energy: What to watch at CERAWeek amid Iran war, rising oil prices (Yahoo Finance Video)</div>
+    <div class="news-why">🔶 <strong>MEDIUM IMPACT:</strong> CERAWeek discussions highlight key energy market drivers including Iran tensions and oil price inflation, essential for positioning within the energy sector.</div>
+  </div>
+  <div class="news-item impact-low">
+    <div class="news-tickers">🏷 SPY · Market</div>
+    <div class="news-headline">Here's a big reason the S&amp;P 500 has trailed 'pure' versions of the index that focus on value and growth (MarketWatch)</div>
+    <div class="news-why">⬜ <strong>LOW IMPACT:</strong> Understanding index composition effects aids in interpreting SPY performance but has limited immediate impact given current bearish regime and macro risks.</div>
+  </div>
+</div>
+
+<!-- STEP 2: FULLSTACK MARKET MODEL -->
+<div class="section">
+  <div class="section-title"><span class="step-badge">STEP 2</span> Fullstack Investor Market Model <span class="live-badge">✅ LIVE — {{REPORT_DATE_SHORT}}</span></div>
+  <img src="{{FULLSTACK_IMG}}" alt="Fullstack Market Model {{REPORT_DATE_SHORT}}" style="max-width:100%;border-radius:8px;margin-top:8px;">
+  <div class="source-label">Source: <a href="https://fullstacktrading.com" style="color:#58a6ff">fullstacktrading.com</a></div>
+</div>
+
+<!-- STEP 3: MARKET SENTIMENT -->
+<div class="section">
+  <div class="section-title"><span class="step-badge">STEP 3</span> 市場情緒 Market Sentiment</div>
+  <table>
+    <tr><th>Indicator</th><th>Reading</th><th>Signal</th><th>Source</th></tr>
+    <tr>
+      <td><strong>Fear &amp; Greed Index</strong></td>
+      <td><strong class="red">{{FEAR_GREED}} — {{FEAR_GREED_LABEL}}</strong></td>
+      <td><span class="badge {{FEAR_GREED_BADGE}}">{{FEAR_GREED_LABEL}}</span></td>
+      <td>feargreedmeter.com</td>
+    </tr>
+    <tr>
+      <td><strong>NAAIM Exposure Index</strong></td>
+      <td><strong class="red">{{NAAIM}}</strong> (as of {{NAAIM_DATE}})</td>
+      <td><span class="badge {{NAAIM_BADGE}}">{{NAAIM_SIGNAL}}</span></td>
+      <td>naaim.org</td>
+    </tr>
+    <tr>
+      <td>VIX (Volatility Index)</td>
+      <td>{{VIX}} ({{VIX_CHG}}%)</td>
+      <td><span class="badge badge-warn">ELEVATED — Above 20</span></td>
+      <td>Yahoo Finance</td>
+    </tr>
+    <tr>
+      <td>T2108 (% Above 40MA)</td>
+      <td>{{T2108}}% (Stockbee MM)</td>
+      <td><span class="badge badge-bear">OVERSOLD</span></td>
+      <td>Stockbee</td>
+    </tr>
+  </table>
+  <div class="note">📌 情緒總結: {{SENTIMENT_SUMMARY}}</div>
+</div>
+
+<!-- STEP 4: TECHNICAL & BREADTH -->
+<div class="section">
+  <div class="section-title"><span class="step-badge">STEP 4</span> 技術面 &amp; 市場廣度 Technical &amp; Breadth</div>
+
+  <h3 class="sub">4A. Major Index vs Moving Averages ({{REPORT_DATE_SHORT}} EOD — Yahoo Finance)</h3>
+  <table>
+    <tr><th>Index</th><th>Price</th><th>1D Chg</th><th>20MA</th><th>vs 20MA</th><th>50MA</th><th>vs 50MA</th><th>200MA</th><th>vs 200MA</th><th>RSI(14)</th><th>Signal</th></tr>
+    <tr>
+      <td><strong>SPY (S&amp;P 500)</strong></td>
+      <td><strong>${{SPY_PRICE}}</strong></td>
+      <td class="{{SPY_CHG_COLOR}}"><strong>{{SPY_CHG}}%</strong></td>
+      <td>${{SPY_MA20}}</td><td class="{{SPY_20_COLOR}}">{{SPY_VS_20MA}}%</td>
+      <td>${{SPY_MA50}}</td><td class="{{SPY_50_COLOR}}">{{SPY_VS_50MA}}%</td>
+      <td>${{SPY_MA200}}</td><td class="{{SPY_200_COLOR}}">{{SPY_VS_200MA}}%</td>
+      <td class="{{SPY_RSI_COLOR}}"><strong>{{SPY_RSI}}</strong></td>
+      <td><span class="badge {{SPY_BADGE}}">{{SPY_SIGNAL}}</span></td>
+    </tr>
+    <tr>
+      <td>QQQ (NDX)</td>
+      <td>${{QQQ_PRICE}}</td>
+      <td class="{{QQQ_CHG_COLOR}}">{{QQQ_CHG}}%</td>
+      <td>${{QQQ_MA20}}</td><td class="{{QQQ_20_COLOR}}">{{QQQ_VS_20MA}}%</td>
+      <td>${{QQQ_MA50}}</td><td class="{{QQQ_50_COLOR}}">{{QQQ_VS_50MA}}%</td>
+      <td>${{QQQ_MA200}}</td><td class="{{QQQ_200_COLOR}}">{{QQQ_VS_200MA}}%</td>
+      <td class="{{QQQ_RSI_COLOR}}">{{QQQ_RSI}}</td>
+      <td><span class="badge {{QQQ_BADGE}}">{{QQQ_SIGNAL}}</span></td>
+    </tr>
+    <tr>
+      <td>IWM (RUT)</td>
+      <td>${{IWM_PRICE}}</td>
+      <td class="{{IWM_CHG_COLOR}}">{{IWM_CHG}}%</td>
+      <td>${{IWM_MA20}}</td><td class="{{IWM_20_COLOR}}">{{IWM_VS_20MA}}%</td>
+      <td>${{IWM_MA50}}</td><td class="{{IWM_50_COLOR}}">{{IWM_VS_50MA}}%</td>
+      <td>${{IWM_MA200}}</td><td class="{{IWM_200_COLOR}}">{{IWM_VS_200MA}}%</td>
+      <td class="yellow">42.0</td>
+      <td><span class="badge badge-warn">BELOW 20/50MA</span></td>
+    </tr>
+    <tr>
+      <td>DIA (DJI)</td>
+      <td>${{DIA_PRICE}}</td>
+      <td class="{{DIA_CHG_COLOR}}">{{DIA_CHG}}%</td>
+      <td>${{DIA_MA20}}</td><td class="{{DIA_20_COLOR}}">{{DIA_VS_20MA}}%</td>
+      <td>${{DIA_MA50}}</td><td class="{{DIA_50_COLOR}}">{{DIA_VS_50MA}}%</td>
+      <td>${{DIA_MA200}}</td><td class="{{DIA_200_COLOR}}">{{DIA_VS_200MA}}%</td>
+      <td class="{{DIA_RSI_COLOR}}">{{DIA_RSI}}</td>
+      <td><span class="badge {{DIA_BADGE}}">{{DIA_SIGNAL}}</span></td>
+    </tr>
+  </table>
+
+  <h3 class="sub">4B. Sector ETF Performance — Sorted by RSI 14 (SPY Ranked Inline) <span class="live-badge">✅ LIVE</span></h3>
+  <table>
+    <tr><th>ETF</th><th>Sector</th><th>Price</th><th>1D Chg</th><th>vs 20MA</th><th>vs 50MA</th><th>vs 200MA</th><th>RSI(14)</th><th>Signal</th></tr>
+{{SECTOR_ROWS}}</table>
+  <div class="note">📌 板塊 ETF 總結 (RSI 排序): XLE (Energy) RSI 68.4 唯一強勢板塊，且在所有移動平均線之上。XLV (Health Care) RSI 26.3 最超賣。XLP (Consumer Staples) RSI 28.8 極度超賣。SPY RSI 37.2。IWM (+2.16%) 今日表現最佳，顯示小型股有相對強勢。所有板塊 RSI 均低於 50（除 XLE 外），顯示整體市場仍偏弱，但今日出現廣泛反彈。</div>
+
+  <h3 class="sub">4C. % of Stocks Above Moving Averages <span class="live-badge">✅ LIVE — StockCharts</span></h3>
+  <table>
+    <tr><th>Index</th><th>Ticker</th><th>MA</th><th>Value ({{REPORT_DATE_SHORT}})</th><th>Signal</th><th>Source</th></tr>
+    <tr><td rowspan="3"><strong>S&amp;P 500</strong></td><td>$SPXA20R</td><td>20MA</td><td class="{{SPXA20R_COLOR}}">{{SPXA20R}}%</td><td><span class="badge {{SPXA20R_BADGE}}">{{SPXA20R_SIGNAL}}</span></td><td>StockCharts</td></tr>
+    <tr><td>$SPXA50R</td><td>50MA</td><td class="{{SPXA50R_COLOR}}">{{SPXA50R}}%</td><td><span class="badge {{SPXA50R_BADGE}}">{{SPXA50R_SIGNAL}}</span></td><td>StockCharts</td></tr>
+    <tr><td>$SPXA200R</td><td>200MA</td><td class="{{SPXA200R_COLOR}}">{{SPXA200R}}%</td><td><span class="badge {{SPXA200R_BADGE}}">{{SPXA200R_SIGNAL}}</span></td><td>StockCharts</td></tr>
+    <tr><td rowspan="3"><strong>Nasdaq 100</strong></td><td>$NDXA20R</td><td>20MA</td><td class="{{NDXA20R_COLOR}}">{{NDXA20R}}%</td><td><span class="badge {{NDXA20R_BADGE}}">{{NDXA20R_SIGNAL}}</span></td><td>StockCharts</td></tr>
+    <tr><td>$NDXA50R</td><td>50MA</td><td class="{{NDXA50R_COLOR}}">{{NDXA50R}}%</td><td><span class="badge {{NDXA50R_BADGE}}">{{NDXA50R_SIGNAL}}</span></td><td>StockCharts</td></tr>
+    <tr><td>$NDXA200R</td><td>200MA</td><td class="{{NDXA200R_COLOR}}">{{NDXA200R}}%</td><td><span class="badge {{NDXA200R_BADGE}}">{{NDXA200R_SIGNAL}}</span></td><td>StockCharts</td></tr>
+    <tr><td rowspan="3"><strong>NYSE</strong></td><td>$NYA20R</td><td>20MA</td><td class="{{NYA20R_COLOR}}">{{NYA20R}}%</td><td><span class="badge {{NYA20R_BADGE}}">{{NYA20R_SIGNAL}}</span></td><td>StockCharts</td></tr>
+    <tr><td>$NYA50R</td><td>50MA</td><td class="{{NYA50R_COLOR}}">{{NYA50R}}%</td><td><span class="badge {{NYA50R_BADGE}}">{{NYA50R_SIGNAL}}</span></td><td>StockCharts</td></tr>
+    <tr><td>$NYA200R</td><td>200MA</td><td class="{{NYA200R_COLOR}}">{{NYA200R}}%</td><td><span class="badge {{NYA200R_BADGE}}">{{NYA200R_SIGNAL}}</span></td><td>StockCharts</td></tr>
+  </table>
+  <div class="source-label">Source: <a href="https://stockcharts.com" style="color:#58a6ff">StockCharts.com</a> | Data as of {{REPORT_DATE_SHORT}}, 2026 close</div>
+  <p style="color:#8b949e; font-size:12px; margin: 12px 0 6px"><strong>S&amp;P 500</strong></p>
+  <div class="three-col">
+    <div class="chart-card">
+      <div class="chart-card-title">S&amp;P 500 — % Above 20MA ($SPXA20R) = {{SPXA20R}}%</div>
+      <img src="{{IMG_SPXA20R}}" alt="$SPXA20R Chart">
+      <div class="source-label">StockCharts.com</div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">S&amp;P 500 — % Above 50MA ($SPXA50R) = {{SPXA50R}}%</div>
+      <img src="{{IMG_SPXA50R}}" alt="$SPXA50R Chart">
+      <div class="source-label">StockCharts.com</div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">S&amp;P 500 — % Above 200MA ($SPXA200R) = {{SPXA200R}}%</div>
+      <img src="{{IMG_SPXA200R}}" alt="$SPXA200R Chart">
+      <div class="source-label">StockCharts.com</div>
+    </div>
+  </div>
+  <p style="color:#8b949e; font-size:12px; margin: 12px 0 6px"><strong>Nasdaq 100</strong></p>
+  <div class="three-col">
+    <div class="chart-card">
+      <div class="chart-card-title">Nasdaq 100 — % Above 20MA ($NDXA20R) = {{NDXA20R}}%</div>
+      <img src="{{IMG_NDXA20R}}" alt="$NDXA20R Chart">
+      <div class="source-label">StockCharts.com</div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">Nasdaq 100 — % Above 50MA ($NDXA50R) = {{NDXA50R}}%</div>
+      <img src="{{IMG_NDXA50R}}" alt="$NDXA50R Chart">
+      <div class="source-label">StockCharts.com</div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">Nasdaq 100 — % Above 200MA ($NDXA200R) = {{NDXA200R}}%</div>
+      <img src="{{IMG_NDXA200R}}" alt="$NDXA200R Chart">
+      <div class="source-label">StockCharts.com</div>
+    </div>
+  </div>
+  <p style="color:#8b949e; font-size:12px; margin: 12px 0 6px"><strong>NYSE</strong></p>
+  <div class="three-col">
+    <div class="chart-card">
+      <div class="chart-card-title">NYSE — % Above 20MA ($NYA20R) = {{NYA20R}}%</div>
+      <img src="{{IMG_NYA20R}}" alt="$NYA20R Chart">
+      <div class="source-label">StockCharts.com</div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">NYSE — % Above 50MA ($NYA50R) = {{NYA50R}}%</div>
+      <img src="{{IMG_NYA50R}}" alt="$NYA50R Chart">
+      <div class="source-label">StockCharts.com</div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">NYSE — % Above 200MA ($NYA200R) = {{NYA200R}}%</div>
+      <img src="{{IMG_NYA200R}}" alt="$NYA200R Chart">
+      <div class="source-label">StockCharts.com</div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 5: SECTOR & INDUSTRY STRENGTH -->
+<div class="section">
+  <div class="section-title"><span class="step-badge">STEP 5</span> 板塊 &amp; 行業強度 Sector &amp; Industry Strength</div>
+
+  <h3 class="sub">5A. Sector Performance (Finviz — {{REPORT_DATE_SHORT}} EOD) <span class="live-badge">✅ LIVE</span></h3>
+  <table>
+    <tr><th>Rank</th><th>Sector</th><th>1D Chg</th><th>1W Chg</th><th>1M Chg</th><th>YTD Chg</th></tr>
+{{SECTOR5A_ROWS}}
+</table>
+  <div class="note">📌 板塊總結: 今日全面反彈，所有板塊均收漲。Basic Materials (+2.80%) 和 Consumer Cyclical (+2.54%) 領漲。Energy 雖今日漲幅最小 (+0.59%)，但 YTD +32.33% 仍是年度最強板塊。Healthcare 漲幅最小 (+0.27%)，反映防守性板塊弱勢。</div>
+
+  <h3 class="sub">5B. Industry Leaders — Top 10 (Finviz — {{REPORT_DATE_SHORT}}) <span class="live-badge">✅ LIVE</span></h3>
+  <table>
+    <tr><th>Rank</th><th>Industry</th><th>Sector</th><th>1D Chg</th></tr>
+{{INDUSTRY_ROWS}}</table>
+  <div class="source-label">Source: <a href="https://finviz.com/groups.ashx?g=industry&o=-change" style="color:#58a6ff">Finviz.com</a> | Data as of {{REPORT_DATE_SHORT}}, 2026 close</div>
+</div>
+
+<!-- STEP 6: MARKET BREADTH -->
+<div class="section">
+  <div class="section-title"><span class="step-badge">STEP 6</span> 市場廣度 Market Breadth</div>
+
+  <h3 class="sub">6A. Advance / Decline Ratio <span class="live-badge">✅ LIVE — MarketInOut</span></h3>
+  <div class="note">📌 MarketInOut A/D Ratio 截圖如下。今日廣泛反彈，預計 A/D ratio 較上週有所改善。</div>
+  <img src="{{IMG_MARKETINOUT}}" alt="MarketInOut A/D Ratio" style="width:100%; border-radius:6px; margin-bottom:8px;">
+  <div class="source-label">Source: <a href="https://www.marketinout.com" style="color:#58a6ff">MarketInOut.com</a> | Data as of Mar 23, 2026</div>
+
+  <h3 class="sub">6B. Stockbee Market Monitor (T2108 &amp; 4% Movers) <span class="live-badge">✅ LIVE</span></h3>
+  <table>
+    <tr><th>Date</th><th>Up 4%+</th><th>Down 4%+</th><th>5D Ratio</th><th>10D Ratio</th><th>Up 25%+ (Qtr)</th><th>Down 25%+ (Qtr)</th><th>Signal</th></tr>
+    <tr style="background:#1a4731;">
+      <td><strong>3/23/2026</strong></td>
+      <td class="green"><strong>233</strong></td>
+      <td class="red"><strong>83</strong></td>
+      <td>0.58</td>
+      <td>0.66</td>
+      <td>947</td>
+      <td>1421</td>
+      <td><span class="badge badge-warn">RECOVERING — Up day</span></td>
+    </tr>
+    <tr>
+      <td>3/20/2026</td>
+      <td class="red">146</td>
+      <td class="green">662</td>
+      <td>0.60</td>
+      <td>0.68</td>
+      <td>829</td>
+      <td>1572</td>
+      <td><span class="badge badge-bear">BEARISH</span></td>
+    </tr>
+    <tr>
+      <td>3/19/2026</td>
+      <td>184</td>
+      <td>263</td>
+      <td>0.76</td>
+      <td>0.75</td>
+      <td>934</td>
+      <td>1453</td>
+      <td><span class="badge badge-warn">WEAK</span></td>
+    </tr>
+    <tr>
+      <td>3/18/2026</td>
+      <td>110</td>
+      <td>486</td>
+      <td>0.57</td>
+      <td>0.72</td>
+      <td>927</td>
+      <td>1428</td>
+      <td><span class="badge badge-bear">BEARISH</span></td>
+    </tr>
+    <tr>
+      <td>3/17/2026</td>
+      <td>274</td>
+      <td>141</td>
+      <td>0.79</td>
+      <td>0.94</td>
+      <td>1029</td>
+      <td>1315</td>
+      <td><span class="badge badge-warn">WEAK</span></td>
+    </tr>
+  </table>
+  <img src="{{IMG_STOCKBEE}}" alt="Stockbee Market Monitor" style="width:100%; border-radius:6px; margin:10px 0 8px 0;">
+  <div class="source-label">Source: <a href="https://stockbee.blogspot.com" style="color:#58a6ff">Stockbee.blogspot.com</a> | Data as of Mar 23, 2026</div>
+  <div class="note">📌 Stockbee MM 今日: 上漲 4%+ 股票 233 隻，下跌 4%+ 股票 83 隻，比率 2.81:1 — 今日為明確的上漲日。5日比率 0.58，10日比率 0.66，仍低於 1.0，顯示中期趨勢仍偏弱。季度內下跌 25%+ 股票 1421 隻遠多於上漲 25%+ 的 947 隻，顯示市場仍在熊市環境中。</div>
+</div>
+
+<!-- STEP 7: DAILY COMMENTARY -->
+<div class="section" id="step7">
+  <h2 class="section-title">📝 每日市場評論 — 多空論戰 <span class="live-badge">✅ {{REPORT_DATE_SHORT}}, 2026</span></h2>
+  {{BULL_BEAR_CONTENT}}
+</div>
+
+<!-- REGIME DETERMINATION -->
+<div class="section">
+  <div class="section-title">🎯 市場環境判定 Regime Determination</div>
+  <div class="regime-box">
+    <div class="regime-title">⚠ REGIME: {{REGIME_TITLE}}</div>
+    <table>
+      <tr><th>Factor</th><th>Reading</th><th>Source</th><th>Status</th></tr>
+      <tr><td>VIX</td><td><span class="badge badge-warn">{{VIX}} (ELEVATED — still above 20)</span></td><td>Yahoo Finance</td><td>✅ Live</td></tr>
+      <tr><td>SPX vs Key MAs</td><td><span class="badge badge-bear">Below 20MA, 50MA &amp; 200MA ({{SPY_VS_200MA}}% vs 200MA)</span></td><td>Yahoo Finance</td><td>✅ Live</td></tr>
+      <tr><td>DJI vs 200MA</td><td><span class="badge badge-bear">BREACHED — Below 200MA ({{DIA_VS_200MA}}%)</span></td><td>Yahoo Finance</td><td>✅ Live</td></tr>
+      <tr><td>Fear &amp; Greed</td><td><span class="badge badge-bear">{{FEAR_GREED}} — {{FEAR_GREED_LABEL}}</span></td><td>feargreedmeter.com</td><td>✅ Live</td></tr>
+      <tr><td>Sector Leadership</td><td><span class="badge badge-warn">{{SECTOR_LEADER}}</span></td><td>Yahoo Finance / Finviz</td><td>✅ Live</td></tr>
+      <tr><td>Fullstack Exposure</td><td><span class="badge badge-neutral">N/A — Login required</span></td><td>fullstackinvestor.co</td><td>⚠ Manual check needed</td></tr>
+      <tr><td>T2108</td><td><span class="badge badge-bear">{{T2108}}% (Oversold)</span></td><td>stockbee.blogspot.com</td><td>✅ Live</td></tr>
+      <tr><td>$SPXA20R</td><td><span class="badge badge-warn">{{SPXA20R}}%</span></td><td>StockCharts.com</td><td>✅ Live</td></tr>
+      <tr><td>A/D Ratio</td><td><span class="badge badge-warn">Improving — See MarketInOut chart</span></td><td>MarketInOut.com</td><td>✅ Live</td></tr>
+      <tr><td>NAAIM</td><td><span class="badge badge-bear">{{NAAIM}} — ({{NAAIM_DATE}})</span></td><td>naaim.org</td><td>✅ Live</td></tr>
+    </table>
+  </div>
+  <div class="note" style="margin-top:12px">
+    📌 <strong>交易建議 Trading Guidance:</strong> {{TRADING_GUIDANCE}}
+  </div>
+</div>
+</body>
+</html>

@@ -1,3 +1,16 @@
+## 2026-03-24 — ⚠ REGIME: BEARISH-TO-NEUTRAL
+
+| Indicator | Value |
+|---|---|
+| SPY | $653.18 (-0.34%) |
+| VIX | 26.95 (+3.06%) |
+| Fear & Greed | 17 — EXTREME FEAR |
+| NAAIM | 60.24 (as of Mar 18, 2026) |
+| T2108 | 18.0% |
+| SPXA20R/50R/200R | 19.80% / 25.80% / 49.20% |
+| NYA20R/50R/200R | 26.05% / 26.80% / 47.15% |
+| Top Sector | XLE (Energy) RSI 80.5 |
+
 # 📊 Daily Market Summary — History & Trend Evolution
 
 This file tracks the evolution of key market metrics and structural trends across all daily reports. It provides a macro-level view of market health over time, making it easier to identify regime shifts, breadth divergences, and sector rotations.
