@@ -590,7 +590,7 @@ async def main():
         browser = await p.chromium.launch()
         page = await browser.new_page(viewport={{'width': 1400, 'height': 800}})
         try:
-            await page.goto('https://www.marketinout.com/advance_decline.php',
+            await page.goto('https://www.marketinout.com/chart/market.php?breadth=advance-decline-ratio',
                             wait_until='networkidle', timeout=30000)
             await page.wait_for_timeout(3000)
             await page.screenshot(path='{marketinout_path}')
