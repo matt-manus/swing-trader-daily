@@ -21,6 +21,21 @@ This document records all actions taken, decisions made, rationale, and outcomes
 
 ---
 
+### 2026-03-26 (Session 2 — Step 6B Rule Restoration)
+**Task/Session Objective**: Restore the Google Sheets iframe fallback instruction for Step 6B T2108 screenshot into all relevant documents.
+**Actions Taken**:
+- Updated `MASTER_INSTRUCTION.md` (GitHub repo): Step 6B screenshot technique now explicitly states that T2108 is in a Google Sheets iframe; added 3-step fallback procedure (scroll iframe → extract Google Sheets source URL → screenshot directly).
+- Updated `WORKFLOW.md` (GitHub repo): Same iframe instruction added to data sources table, User Requirements item 11, and a new row added to Common Mistakes to Avoid table.
+- Updated `Swing Trader Daily Report — Master Instruction.md` (Manus project shared directory): Same Step 6B update applied.
+- Updated `Daily EOD Market Summary — Master Workflow Reference.md` (Manus project shared directory): Same Step 6B update applied.
+- Committed and pushed `MASTER_INSTRUCTION.md` and `WORKFLOW.md` to GitHub (`main` branch).
+**Decisions Made & Rationale**:
+- Rule was previously present in project-level instructions but had been omitted from the repo documents; restored to ensure all 4 core files are consistent and the agent never misses T2108 in the screenshot.
+**Outcomes/Observations**: All 4 documents now consistently document the Google Sheets iframe fallback for Step 6B.
+**Risk/Exposure**: N/A (Documentation update)
+
+---
+
 ### 2026-03-26
 **Task/Session Objective**: Align the Daily Market Summary project with the self-evolving-system framework.
 **Actions Taken**:

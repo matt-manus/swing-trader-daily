@@ -16,6 +16,19 @@ This document is the "brain" of the self-evolving system. It captures insights, 
 
 ---
 
+### 2026-03-26 (Rule Restoration — Step 6B Google Sheets iframe for T2108)
+**Insight/Lesson Learned**: The Step 6B screenshot instruction for T2108 must explicitly state that T2108 data is embedded inside a Google Sheets iframe on the Stockbee page. Without this instruction, the agent may screenshot the outer Stockbee page and miss the T2108 column entirely.
+**Triggering Event/Observation**: User noticed the Google Sheets iframe fallback instruction was present in the project-level instructions but missing from the 4 core repo documents (`MASTER_INSTRUCTION.md`, `WORKFLOW.md`, `Log.md`, `evolution.md`).
+**Systemic Improvement/Rule Update**:
+- Step 6B screenshot technique must follow this 3-step procedure:
+  1. First try scrolling into the iframe on the Stockbee page (https://stockbee.blogspot.com/p/mm.html) and screenshot from there.
+  2. If T2108 is not visible in the iframe screenshot, extract the Google Sheets iframe source URL and visit it directly for a full-page screenshot.
+  3. The T2108 column must **never** be missing from the final screenshot.
+- This rule has been added to all 4 core documents and both Manus project shared files.
+**Status**: Implemented (2026-03-26)
+
+---
+
 ### 2026-03-26 (Rule Updates — Step 1 BTC, Step 4B Barchart, Step 6A AD Ratio)
 **Insight/Lesson Learned**: Three new data requirements were added to the daily report workflow: (1) BTC price in Step 1, (2) Barchart tickers as the authoritative source for exact % above MA values in Step 4B (StockCharts remains for screenshots only), and (3) a new Step 6A Advance/Decline Ratio table sourced from StockCharts Market Summary.
 **Triggering Event/Observation**: User explicitly requested these additions to improve data accuracy and breadth coverage.
