@@ -238,21 +238,20 @@ except Exception as e:
 
 # NAAIM — download Excel, read row 2 (most recent, newest-first)
 try:
-    import openpyxl
-    # Try current year first, then previous year
-    for year in [REPORT_DATE.year, REPORT_DATE.year - 1]:
-        naaim_url = f'https://naaim.org/wp-content/uploads/{year}/03/NAAIM-Exposure-Index.xlsx'
-        try:
-            r = requests.get(naaim_url, headers=req_headers, timeout=15)
-            if r.status_code == 200:
-                break
-        except Exception:
-            continue
+    import openpyxl, re as _re2
+    # Scrape the NAAIM page to find the Excel URL dynamically
+    naaim_page = requests.get('https://naaim.org/programs/naaim-exposure-index/', headers=req_headers, timeout=15)
+    xlsx_links = _re2.findall(r'https://naaim\.org/wp-content/uploads/[^"\' ]+\.xlsx', naaim_page.text, _re2.I)
+    if not xlsx_links:
+        raise ValueError('No NAAIM Excel link found on page')
+    naaim_url = xlsx_links[0]
+    print(f"  NAAIM URL: {naaim_url}")
+    r = requests.get(naaim_url, headers=req_headers, timeout=15)
     wb = openpyxl.load_workbook(io.BytesIO(r.content))
     ws = wb.active
     row2 = list(ws.iter_rows(min_row=2, max_row=2, values_only=True))[0]
-    # Column index 3 = Mean (0-indexed), column 0 = Date
-    naaim_val  = round(float(row2[3] if row2[3] is not None else row2[1]), 2)
+    # Column 0 = Date, Column 1 = Mean/Average (NAAIM Number)
+    naaim_val  = round(float(row2[1] if row2[1] is not None else row2[0]), 2)
     naaim_date = row2[0]
     naaim_date_str = naaim_date.strftime('%b %-d, %Y') if hasattr(naaim_date, 'strftime') else str(naaim_date)
     P['NAAIM']      = str(naaim_val)
@@ -305,7 +304,7 @@ async def main():
         await browser.close()
 
 asyncio.run(main())
-""", timeout=150)
+""", timeout=360)
 
 print(out)
 for name, _ in BREADTH:
@@ -324,6 +323,8 @@ for name, _ in BREADTH:
 # ═══════════════════════════════════════════════════════════════════════════════
 print("\n[Step 4C-values] Barchart exact breadth values...")
 
+from bs4 import BeautifulSoup as BS
+
 BARCHART_BREADTH = [
     # (placeholder_key, barchart_symbol, description)
     ('SPXA20R',  'S5TW',  'S&P 500 % above 20MA'),
@@ -337,37 +338,37 @@ BARCHART_BREADTH = [
     ('NYA200R',  'MMTH',  'NYSE % above 200MA'),
 ]
 
+import re as _re
 for placeholder, symbol, desc in BARCHART_BREADTH:
     try:
         bc_url = f'https://www.barchart.com/stocks/quotes/%24{symbol}/overview'
         bc_resp = requests.get(bc_url, headers=req_headers, timeout=12)
         bc_soup = BS(bc_resp.text, 'html.parser')
-        # Barchart shows the last price in a span with class 'last-price' or data-ng-bind
-        # Try multiple selectors
         val_str = None
-        # Method 1: og:description meta tag often has the price
-        meta_desc = bc_soup.find('meta', {'property': 'og:description'})
-        if meta_desc:
-            import re as _re
-            m = _re.search(r'([\d.]+)%?\s+(?:last|price|value)', meta_desc.get('content',''), _re.I)
-            if not m:
-                m = _re.search(r'last\s+price[^\d]*([\d.]+)', meta_desc.get('content',''), _re.I)
+        # Method 1: JSON lastPrice in script tags (most reliable)
+        for script in bc_soup.find_all('script'):
+            txt = script.get_text()
+            m = _re.search(r'"lastPrice"\s*:\s*([\d.]+)', txt)
             if m:
                 val_str = m.group(1)
-        # Method 2: look for the price in the page title
+                break
+        # Method 2: look for the number near 'Last Price' label
         if not val_str:
-            title_tag = bc_soup.find('title')
-            if title_tag:
-                m = _re.search(r'\$([\d.]+)', title_tag.get_text())
+            for elem in bc_soup.find_all(string=_re.compile(r'Last Price', _re.I)):
+                parent = elem.parent
+                sibling = parent.find_next_sibling()
+                if sibling:
+                    txt = sibling.get_text(strip=True).replace('%','')
+                    if _re.match(r'^[\d.]+$', txt):
+                        val_str = txt
+                        break
+        # Method 3: og:description meta tag
+        if not val_str:
+            meta_desc = bc_soup.find('meta', {'property': 'og:description'})
+            if meta_desc:
+                m = _re.search(r'([\d.]+)%?\s+(?:last|price|value)', meta_desc.get('content',''), _re.I)
                 if m:
                     val_str = m.group(1)
-        # Method 3: look for spans/divs with the value near the symbol
-        if not val_str:
-            for span in bc_soup.find_all(['span','div'], class_=_re.compile(r'last.?price|price.?value|quote.?price', _re.I)):
-                txt = span.get_text(strip=True).replace('%','')
-                if _re.match(r'^[\d.]+$', txt):
-                    val_str = txt
-                    break
         if val_str:
             val = round(float(val_str), 2)
             P[placeholder] = f'{val:.2f}%'
