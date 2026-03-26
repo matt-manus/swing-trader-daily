@@ -16,6 +16,17 @@ This document is the "brain" of the self-evolving system. It captures insights, 
 
 ---
 
+### 2026-03-26 (Critical Rule — The Hard-Coded Template Trap)
+**Insight/Lesson Learned**: If `TEMPLATE.html` contains hard-coded values, text, or HTML structure, updates to `daily_report.py` will appear to fail. The Python script only replaces `{{PLACEHOLDERS}}` it knows about. If a section is removed from the docs, or a data source changes, but the template still hard-codes the old HTML, the final report will always inherit the mistakes.
+**Triggering Event/Observation**: Even after updating the script to remove Step 2 and use Barchart for exact values, the generated reports still showed Step 2 and hard-coded values like `-2.66%` for SPY 20MA. The root cause was that `TEMPLATE.html` was never cleaned up to be fully dynamic.
+**Systemic Improvement/Rule Update**:
+- **Rule**: `TEMPLATE.html` must remain 100% dynamic. Every single number, percentage, color class, and badge must be a `{{PLACEHOLDER}}`.
+- **Rule**: If a section is removed from the report (e.g., Step 2), it must be physically deleted from `TEMPLATE.html`, not just disabled in the Python script.
+- **Prevention Strategy**: Whenever updating `daily_report.py` to add new data or change logic, ALWAYS verify that `TEMPLATE.html` has the corresponding `{{PLACEHOLDER}}` tags and NO hard-coded fallback text.
+**Status**: Implemented (2026-03-26)
+
+---
+
 ### 2026-03-26 (Critical Rule — Document Updates Must Sync daily_report.py)
 **Insight/Lesson Learned**: Updating documentation files (`MASTER_INSTRUCTION.md`, `WORKFLOW.md`, `evolution.md`) does NOT automatically change the behaviour of the automated report. The GitHub Actions cron job runs `daily_report.py` directly and does not read documentation. If the script is not updated, the automated report will continue using old logic indefinitely, regardless of what the documents say.
 **Triggering Event/Observation**: Multiple document updates (Step 2 removal, Step 6A source change, BTC addition, Barchart exact values) had been written into the documentation but never applied to `daily_report.py`, causing new tasks to still run old behaviour.

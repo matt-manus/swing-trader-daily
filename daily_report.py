@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 daily_report.py — Swing Trader Daily Market Summary
 ====================================================
@@ -10,6 +9,9 @@ Usage:
 
 Screenshots are saved to images/{DATE}/ and referenced as relative paths.
 No external CDN required — works in GitHub Actions.
+
+IMPORTANT: This script is the single source of truth for report generation.
+Every change to MASTER_INSTRUCTION.md or WORKFLOW.md MUST be reflected here.
 """
 
 import os, sys, json, re, time, subprocess, io, csv
@@ -43,7 +45,7 @@ DATE        = REPORT_DATE.strftime('%Y-%m-%d')
 DATE_DISP   = REPORT_DATE.strftime('%a %b %-d, %Y')
 DATE_SHORT  = REPORT_DATE.strftime('%b %-d, %Y')
 DATE_MMDD   = REPORT_DATE.strftime('%b %-d')
-REPORT_TIME = f"{now_hkt.strftime('%H:%M')} HKT ({now_et.strftime('%H:%M')} ET)"
+REPORT_TIME = f"{now_hkt.strftime('%H:%M')} HKT / {now_et.strftime('%H:%M')} ET"
 
 # Image folder for this date (relative to repo root)
 IMG_DIR = REPO / 'images' / DATE
@@ -75,6 +77,104 @@ def run_playwright(script_content, timeout=120):
     r = subprocess.run(['python3', path], capture_output=True, text=True, timeout=timeout)
     return r.returncode == 0, r.stdout, r.stderr
 
+# ── Helper: color/badge logic ──────────────────────────────────────────────────
+def chg_color(v):
+    return 'green' if float(v) >= 0 else 'red'
+
+def fmt(v, decimals=2):
+    v = float(v)
+    sign = '+' if v >= 0 else ''
+    return f"{sign}{v:.{decimals}f}"
+
+def breadth_signal(val_str):
+    """Return (color_class, badge_class, signal_text) for a breadth % value string."""
+    try:
+        v = float(str(val_str).replace('%',''))
+    except:
+        return 'yellow', 'badge-neutral', 'N/A'
+    if v >= 70:
+        return 'green', 'badge-bull', 'BULLISH'
+    elif v >= 50:
+        return 'green', 'badge-bull', 'ABOVE AVERAGE'
+    elif v >= 30:
+        return 'yellow', 'badge-warn', 'BELOW AVERAGE'
+    elif v >= 15:
+        return 'red', 'badge-bear', 'BEARISH'
+    else:
+        return 'red', 'badge-bear', 'EXTREME BEARISH'
+
+def vix_badge(vix_price):
+    if vix_price >= 30:
+        return 'badge-bear', 'EXTREME FEAR (>30)'
+    elif vix_price >= 20:
+        return 'badge-warn', 'ELEVATED (>20)'
+    else:
+        return 'badge-bull', 'CALM (<20)'
+
+def fg_badge(score):
+    if score <= 25:
+        return 'red', 'badge-bear', 'EXTREME FEAR'
+    elif score <= 45:
+        return 'red', 'badge-bear', 'FEAR'
+    elif score <= 55:
+        return 'yellow', 'badge-warn', 'NEUTRAL'
+    elif score <= 75:
+        return 'green', 'badge-bull', 'GREED'
+    else:
+        return 'green', 'badge-bull', 'EXTREME GREED'
+
+def naaim_badge(val):
+    if val >= 75:
+        return 'green', 'badge-bull', 'OVERWEIGHT'
+    elif val >= 50:
+        return 'yellow', 'badge-warn', 'MODERATE'
+    elif val >= 25:
+        return 'red', 'badge-bear', 'UNDERWEIGHT'
+    else:
+        return 'red', 'badge-bear', 'HEAVILY UNDERWEIGHT'
+
+def t2108_badge(val):
+    if val >= 70:
+        return 'red', 'badge-bear', 'OVERBOUGHT (>70%)'
+    elif val >= 40:
+        return 'yellow', 'badge-warn', 'NEUTRAL (40-70%)'
+    elif val >= 20:
+        return 'red', 'badge-bear', 'OVERSOLD (<40%)'
+    else:
+        return 'red', 'badge-bear', 'EXTREME OVERSOLD (<20%)'
+
+def ratio_badge(val):
+    if val is None:
+        return 'yellow', 'badge-neutral', 'N/A'
+    if val >= 1.5:
+        return 'green', 'badge-bull', 'BULLISH (>1.5)'
+    elif val >= 1.0:
+        return 'green', 'badge-bull', 'POSITIVE (>1.0)'
+    elif val >= 0.7:
+        return 'yellow', 'badge-warn', 'BEARISH (<1.0)'
+    else:
+        return 'red', 'badge-bear', 'VERY BEARISH (<0.7)'
+
+def movers_badge(up4, dn4):
+    """Signal for up/down 4%+ movers."""
+    if up4 is None or dn4 is None:
+        return ('yellow', 'badge-neutral', 'N/A'), ('yellow', 'badge-neutral', 'N/A')
+    up_sig = ('green', 'badge-bull', 'BUYING PRESSURE') if up4 > dn4 else ('red', 'badge-bear', 'SELLING PRESSURE')
+    dn_sig = ('red', 'badge-bear', 'SELLING PRESSURE') if dn4 > up4 else ('green', 'badge-bull', 'BUYING PRESSURE')
+    return up_sig, dn_sig
+
+def ad_ratio_badge(ratio_str):
+    try:
+        r = float(ratio_str)
+        if r >= 2.0:
+            return 'badge-bull'
+        elif r >= 1.0:
+            return 'badge-warn'
+        else:
+            return 'badge-bear'
+    except:
+        return 'badge-neutral'
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # STEP 1: MACRO DATA
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -84,6 +184,7 @@ import yfinance as yf
 import numpy as np
 
 def wilder_rsi(closes, period=14):
+    """Wilder's Smoothed Moving Average RSI — matches Yahoo Finance/TradingView."""
     closes = np.array(closes, dtype=float)
     deltas = np.diff(closes)
     gains  = np.where(deltas > 0, deltas, 0.0)
@@ -97,17 +198,9 @@ def wilder_rsi(closes, period=14):
         return 100.0
     return round(100 - 100 / (1 + avg_gain / avg_loss), 1)
 
-def color(v):
-    return 'green' if float(v) >= 0 else 'red'
-
-def fmt(v, decimals=2):
-    v = float(v)
-    sign = '+' if v >= 0 else ''
-    return f"{sign}{v:.{decimals}f}"
-
 MACRO_TICKERS = {
     'SPY': 'SPY', 'QQQ': 'QQQ', 'IWM': 'IWM', 'DIA': 'DIA',
-    'VIX': '^VIX', 'GLD': 'GLD', 'USO': 'USO', 'TLT': 'TLT',
+    'VIX': '^VIX', 'GLD': 'GLD', 'USO': 'USO',
     'TNX': '^TNX', 'DXY': 'DX-Y.NYB', 'BTC': 'BTC-USD',
 }
 
@@ -141,7 +234,6 @@ def fill_ticker_placeholders(key):
     if not d:
         return
     price = d['price']
-    # Determine MA signal badge
     above_20  = price > d['ma20']
     above_50  = price > d['ma50']
     above_200 = price > d['ma200']
@@ -158,56 +250,64 @@ def fill_ticker_placeholders(key):
 
     P[f'{key}_PRICE']     = f"{price:.2f}"
     P[f'{key}_CHG']       = fmt(d['chg'])
-    P[f'{key}_CHG_COLOR'] = color(d['chg'])
+    P[f'{key}_CHG_COLOR'] = chg_color(d['chg'])
     P[f'{key}_MA20']      = f"{d['ma20']:.2f}"
     P[f'{key}_MA50']      = f"{d['ma50']:.2f}"
     P[f'{key}_MA200']     = f"{d['ma200']:.2f}"
+    # Aliases used in Step 4A table
+    P[f'{key}_20MA']      = f"{d['ma20']:.2f}"
+    P[f'{key}_50MA']      = f"{d['ma50']:.2f}"
+    P[f'{key}_200MA']     = f"{d['ma200']:.2f}"
     P[f'{key}_VS_20MA']   = fmt(d['vs20'])
     P[f'{key}_VS_50MA']   = fmt(d['vs50'])
     P[f'{key}_VS_200MA']  = fmt(d['vs200'])
-    P[f'{key}_20_COLOR']  = color(d['vs20'])
-    P[f'{key}_50_COLOR']  = color(d['vs50'])
-    P[f'{key}_200_COLOR'] = color(d['vs200'])
+    P[f'{key}_20_COLOR']  = chg_color(d['vs20'])
+    P[f'{key}_50_COLOR']  = chg_color(d['vs50'])
+    P[f'{key}_200_COLOR'] = chg_color(d['vs200'])
     P[f'{key}_RSI']       = str(d['rsi'])
     P[f'{key}_RSI_COLOR'] = 'green' if d['rsi'] >= 60 else ('red' if d['rsi'] <= 40 else 'yellow')
     P[f'{key}_BADGE']     = bc
     P[f'{key}_SIGNAL']    = sig
 
-for key in ['SPY', 'QQQ', 'IWM', 'DIA', 'GLD', 'USO', 'TLT', 'TNX', 'DXY', 'BTC']:
+for key in ['SPY', 'QQQ', 'IWM', 'DIA', 'GLD', 'USO', 'TNX', 'DXY', 'BTC']:
     fill_ticker_placeholders(key)
 
-# BTC display placeholders (price shown without $ prefix convention, uses comma formatting)
+# BTC price with comma formatting
 if 'BTC' in macro:
-    P['BTC_PRICE']     = f"{macro['BTC']['price']:,.2f}"
-    P['BTC_CHG']       = fmt(macro['BTC']['chg'])
-    P['BTC_CHG_COLOR'] = color(macro['BTC']['chg'])
-    print(f"  BTC: ${macro['BTC']['price']:,.2f} ({macro['BTC']['chg']:+.2f}%)")
-else:
-    P['BTC_PRICE']     = 'N/A'
-    P['BTC_CHG']       = 'N/A'
-    P['BTC_CHG_COLOR'] = 'grey'
+    P['BTC_PRICE'] = f"{macro['BTC']['price']:,.2f}"
 
-# Add template-compatible aliases (template uses SPY_20MA, SPY_50MA, SPY_200MA, SPY_CHANGE_PCT)
-# while fill_ticker_placeholders sets SPY_MA20, SPY_MA50, SPY_MA200, SPY_CHG
-for key in ['SPY', 'QQQ', 'IWM', 'DIA', 'GLD', 'USO', 'TLT', 'TNX', 'DXY', 'BTC']:
-    if f'{key}_MA20' in P:
-        P[f'{key}_20MA']      = P[f'{key}_MA20']
-        P[f'{key}_50MA']      = P[f'{key}_MA50']
-        P[f'{key}_200MA']     = P[f'{key}_MA200']
-        P[f'{key}_CHANGE_PCT'] = P[f'{key}_CHG'] + '%'
-
+# VIX special handling
 if 'VIX' in macro:
     d = macro['VIX']
     P['VIX']           = f"{d['price']:.2f}"
     P['VIX_CHG']       = fmt(d['chg'])
-    P['VIX_CHG_COLOR'] = color(-d['chg'])  # VIX up = bearish
+    P['VIX_CHG_COLOR'] = chg_color(-d['chg'])  # VIX up = bearish = red
+    vbc, vsig = vix_badge(d['price'])
+    P['VIX_BADGE']  = vbc
+    P['VIX_SIGNAL'] = vsig
 
-# ===============================================================================
-# STEP 1B: NEWS (disabled)
-# ===============================================================================
-print("[Step 1B] News disabled.")
-P['NEWS_ITEMS'] = ''
-P['IMG_FULLSTACK'] = ''  # Step 2 removed per updated instructions
+# Macro summary note (dynamic)
+spy_d = macro.get('SPY', {})
+vix_d = macro.get('VIX', {})
+btc_d = macro.get('BTC', {})
+gld_d = macro.get('GLD', {})
+uso_d = macro.get('USO', {})
+tnx_d = macro.get('TNX', {})
+
+macro_parts = []
+if spy_d:
+    macro_parts.append(f"SPY {fmt(spy_d['chg'])}%")
+if vix_d:
+    macro_parts.append(f"VIX {vix_d['price']:.2f} ({fmt(vix_d['chg'])}%)")
+if gld_d:
+    macro_parts.append(f"GLD {fmt(gld_d['chg'])}%")
+if uso_d:
+    macro_parts.append(f"USO {fmt(uso_d['chg'])}%")
+if tnx_d:
+    macro_parts.append(f"10Y Yield {tnx_d['price']:.2f}%")
+if btc_d:
+    macro_parts.append(f"BTC ${btc_d['price']:,.0f} ({fmt(btc_d['chg'])}%)")
+P['MACRO_SUMMARY'] = '📌 宏觀總結: ' + ' | '.join(macro_parts) if macro_parts else '📌 宏觀總結: 數據載入中'
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # STEP 3: FEAR & GREED + NAAIM
@@ -222,6 +322,7 @@ req_headers = {
 }
 
 # Fear & Greed via CNN API
+fg_score = 50
 try:
     r = requests.get('https://production.dataviz.cnn.io/index/fearandgreed/graphdata',
                      headers=req_headers, timeout=10)
@@ -230,16 +331,20 @@ try:
     fg_rating = fg.get('rating', 'N/A').replace('_', ' ').title()
     P['FEAR_GREED']        = str(fg_score)
     P['FEAR_GREED_RATING'] = fg_rating
+    fg_color, fg_bc, fg_sig = fg_badge(fg_score)
+    P['FEAR_GREED_COLOR'] = fg_color
+    P['FEAR_GREED_BADGE'] = fg_bc
     print(f"  Fear & Greed: {fg_score} ({fg_rating})")
 except Exception as e:
     print(f"  WARNING Fear & Greed: {e}")
     P['FEAR_GREED']        = 'N/A'
     P['FEAR_GREED_RATING'] = 'N/A'
+    P['FEAR_GREED_COLOR']  = 'yellow'
+    P['FEAR_GREED_BADGE']  = 'badge-neutral'
 
-# NAAIM — download Excel, read row 2 (most recent, newest-first)
+# NAAIM — download Excel, read row 2 (most recent)
 try:
     import openpyxl, re as _re2
-    # Scrape the NAAIM page to find the Excel URL dynamically
     naaim_page = requests.get('https://naaim.org/programs/naaim-exposure-index/', headers=req_headers, timeout=15)
     xlsx_links = _re2.findall(r'https://naaim\.org/wp-content/uploads/[^"\' ]+\.xlsx', naaim_page.text, _re2.I)
     if not xlsx_links:
@@ -250,20 +355,34 @@ try:
     wb = openpyxl.load_workbook(io.BytesIO(r.content))
     ws = wb.active
     row2 = list(ws.iter_rows(min_row=2, max_row=2, values_only=True))[0]
-    # Column 0 = Date, Column 1 = Mean/Average (NAAIM Number)
     naaim_val  = round(float(row2[1] if row2[1] is not None else row2[0]), 2)
     naaim_date = row2[0]
     naaim_date_str = naaim_date.strftime('%b %-d, %Y') if hasattr(naaim_date, 'strftime') else str(naaim_date)
     P['NAAIM']      = str(naaim_val)
     P['NAAIM_DATE'] = naaim_date_str
+    nc, nbc, nsig = naaim_badge(naaim_val)
+    P['NAAIM_COLOR']  = nc
+    P['NAAIM_BADGE']  = nbc
+    P['NAAIM_SIGNAL'] = nsig
     print(f"  NAAIM: {naaim_val} ({naaim_date_str})")
 except Exception as e:
     print(f"  WARNING NAAIM: {e}")
-    P['NAAIM']      = 'N/A'
-    P['NAAIM_DATE'] = 'N/A'
+    P['NAAIM']        = 'N/A'
+    P['NAAIM_DATE']   = 'N/A'
+    P['NAAIM_COLOR']  = 'yellow'
+    P['NAAIM_BADGE']  = 'badge-neutral'
+    P['NAAIM_SIGNAL'] = 'N/A'
+
+# Sentiment summary note
+P['SENTIMENT_SUMMARY'] = (
+    f"📌 情緒總結: Fear & Greed {P.get('FEAR_GREED','N/A')} ({P.get('FEAR_GREED_RATING','N/A')}) | "
+    f"VIX {P.get('VIX','N/A')} | "
+    f"T2108 {P.get('T2108','N/A')}% | "
+    f"NAAIM {P.get('NAAIM','N/A')} (as of {P.get('NAAIM_DATE','N/A')})"
+)
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# STEP 4C: STOCKCHARTS BREADTH SCREENSHOTS (9 charts, 1600px wide)
+# STEP 4C: STOCKCHARTS BREADTH SCREENSHOTS (9 charts)
 # ═══════════════════════════════════════════════════════════════════════════════
 print("\n[Step 4C] StockCharts breadth screenshots (9 charts)...")
 
@@ -316,17 +435,16 @@ for name, _ in BREADTH:
         print(f"  WARNING Missing: {name}")
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# STEP 4C (PART 2): BARCHART EXACT % VALUES FOR BREADTH
+# STEP 4C (PART 2): BARCHART EXACT % VALUES
 # Barchart is the authoritative source for exact numeric values.
 # StockCharts screenshots are for visual reference only.
-# Barchart symbols: $S5TW/$S5FI/$S5TH (SPX), $NDTW/$NDFI/$NDTH (NDX), $MMTW/$MMFI/$MMTH (NYSE)
 # ═══════════════════════════════════════════════════════════════════════════════
 print("\n[Step 4C-values] Barchart exact breadth values...")
 
 from bs4 import BeautifulSoup as BS
+import re as _re
 
 BARCHART_BREADTH = [
-    # (placeholder_key, barchart_symbol, description)
     ('SPXA20R',  'S5TW',  'S&P 500 % above 20MA'),
     ('SPXA50R',  'S5FI',  'S&P 500 % above 50MA'),
     ('SPXA200R', 'S5TH',  'S&P 500 % above 200MA'),
@@ -338,21 +456,20 @@ BARCHART_BREADTH = [
     ('NYA200R',  'MMTH',  'NYSE % above 200MA'),
 ]
 
-import re as _re
 for placeholder, symbol, desc in BARCHART_BREADTH:
     try:
         bc_url = f'https://www.barchart.com/stocks/quotes/%24{symbol}/overview'
         bc_resp = requests.get(bc_url, headers=req_headers, timeout=12)
         bc_soup = BS(bc_resp.text, 'html.parser')
         val_str = None
-        # Method 1: JSON lastPrice in script tags (most reliable)
+        # Method 1: JSON lastPrice in script tags
         for script in bc_soup.find_all('script'):
             txt = script.get_text()
             m = _re.search(r'"lastPrice"\s*:\s*([\d.]+)', txt)
             if m:
                 val_str = m.group(1)
                 break
-        # Method 2: look for the number near 'Last Price' label
+        # Method 2: look for number near 'Last Price' label
         if not val_str:
             for elem in bc_soup.find_all(string=_re.compile(r'Last Price', _re.I)):
                 parent = elem.parent
@@ -371,13 +488,24 @@ for placeholder, symbol, desc in BARCHART_BREADTH:
                     val_str = m.group(1)
         if val_str:
             val = round(float(val_str), 2)
-            P[placeholder] = f'{val:.2f}%'
-            print(f"  {desc} ({symbol}): {val:.2f}%")
+            val_display = f'{val:.2f}%'
+            P[placeholder] = val_display
+            col, bc, sig = breadth_signal(val)
+            P[f'{placeholder}_COLOR']  = col
+            P[f'{placeholder}_BADGE']  = bc
+            P[f'{placeholder}_SIGNAL'] = sig
+            print(f"  {desc} ({symbol}): {val_display}")
         else:
             P[placeholder] = 'N/A'
+            P[f'{placeholder}_COLOR']  = 'yellow'
+            P[f'{placeholder}_BADGE']  = 'badge-neutral'
+            P[f'{placeholder}_SIGNAL'] = 'N/A'
             print(f"  WARNING {symbol}: value not found in page")
     except Exception as _e:
         P[placeholder] = 'N/A'
+        P[f'{placeholder}_COLOR']  = 'yellow'
+        P[f'{placeholder}_BADGE']  = 'badge-neutral'
+        P[f'{placeholder}_SIGNAL'] = 'N/A'
         print(f"  WARNING {symbol}: {_e}")
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -437,9 +565,14 @@ def sector_row_html(i, s):
         c = 'green' if v >= 0 else 'red'
         return f'<td style="color:{c};">{v:+.2f}%</td>'
 
-    return (f'<tr>'
+    # Highlight SPY row
+    row_style = ' style="background:#1c2128;border-left:3px solid #f39c12;"' if s['ticker'] == 'SPY' else ''
+
+    return (f'<tr{row_style}>'
             f'<td>{i}</td>'
-            f'<td><strong>{s["ticker"]}</strong></td>'
+            f'<td><strong>{s["ticker"]}</strong>'
+            + (' <span class="badge badge-info">BENCHMARK</span>' if s['ticker'] == 'SPY' else '') +
+            f'</td>'
             f'<td>{s["sector"]}</td>'
             f'<td>${s["price"]:.2f}</td>'
             f'<td style="color:{chg_cls};">{chg_str}</td>'
@@ -454,12 +587,23 @@ for i, s in enumerate(sector_rows, 1):
 
 P['SECTOR_ROWS'] = SECTOR_ROWS_HTML
 
+# Sector summary note
+if sector_rows:
+    top = sector_rows[0]
+    bot = sector_rows[-1]
+    P['SECTOR_SUMMARY'] = (
+        f"📌 板塊 ETF 總結 (RSI 排序): {top['ticker']} ({top['sector']}) RSI {top['rsi']:.1f} 最強。"
+        f"{bot['ticker']} ({bot['sector']}) RSI {bot['rsi']:.1f} 最弱。"
+        f"SPY RSI {next((s['rsi'] for s in sector_rows if s['ticker']=='SPY'), 'N/A')}。"
+    )
+else:
+    P['SECTOR_SUMMARY'] = '📌 板塊 ETF 數據載入中'
+
 # ═══════════════════════════════════════════════════════════════════════════════
+# STEP 4D / 5B: FINVIZ INDUSTRY LEADERS (Top 10, with parent sector)
 # ═══════════════════════════════════════════════════════════════════════════════
-# STEP 5A/5B: FINVIZ SECTOR (removed) + INDUSTRY (scraped via requests)
-# ═══════════════════════════════════════════════════════════════════════════════
-print("[Step 5A/5B] Finviz Industry data (requests)...")
-P["IMG_5A_SECTORS"] = ""  # Sector screenshot removed
+print("[Step 4D] Finviz Industry data...")
+P["IMG_5A_SECTORS"] = ""
 
 import requests as _req
 from bs4 import BeautifulSoup as _BS
@@ -487,46 +631,44 @@ try:
                 _col_names = _hdrow
                 break
     if _data_table:
-        _chg_idx = _col_names.index("Change")
-        _name_idx = _col_names.index("Name")
+        _chg_idx    = _col_names.index("Change")
+        _name_idx   = _col_names.index("Name")
         _stocks_idx = _col_names.index("Stocks") if "Stocks" in _col_names else None
+        _sector_idx = _col_names.index("Sector") if "Sector" in _col_names else None
         _rows_data = []
         for _row in _data_table.find_all("tr")[1:]:
             _cells = [c.get_text(strip=True) for c in _row.find_all("td")]
             if len(_cells) > _chg_idx:
                 _rows_data.append(_cells)
-        # Top 10 gainers (already sorted desc by change)
+        # Top 10 gainers only (already sorted desc by change)
         _top10 = _rows_data[:10]
-        # Bottom 5 losers
-        _bot5 = [r for r in _rows_data if r[_chg_idx].startswith("-")][-5:]
         def _row_html(cells, idx):
-            name = cells[_name_idx]
-            chg = cells[_chg_idx]
-            stocks = cells[_stocks_idx] if _stocks_idx else ""
-            color = "#2ecc71" if not chg.startswith("-") else "#e74c3c"
+            name    = cells[_name_idx]
+            chg     = cells[_chg_idx]
+            stocks  = cells[_stocks_idx] if _stocks_idx else ""
+            sector  = cells[_sector_idx] if _sector_idx else "—"
+            color   = "#2ecc71" if not chg.startswith("-") else "#e74c3c"
             return f"""<tr>
   <td style="color:#8b949e;padding:4px 8px;">{idx}</td>
   <td style="color:#e6edf3;padding:4px 8px;font-weight:600;">{name}</td>
+  <td style="color:#8b949e;padding:4px 8px;">{sector}</td>
   <td style="color:#8b949e;padding:4px 8px;">{stocks}</td>
   <td style="color:{color};padding:4px 8px;font-weight:700;">{chg}</td>
 </tr>"""
         _rows_html_top = "".join([_row_html(r, i+1) for i, r in enumerate(_top10)])
-        _rows_html_bot = "".join([_row_html(r, len(_rows_data)-4+i) for i, r in enumerate(_bot5)])
         _industry_html = f"""
 <table style="width:100%;border-collapse:collapse;font-size:13px;">
 <thead><tr>
   <th style="color:#8b949e;padding:6px 8px;text-align:left;border-bottom:1px solid #30363d;">#</th>
   <th style="color:#8b949e;padding:6px 8px;text-align:left;border-bottom:1px solid #30363d;">Industry</th>
+  <th style="color:#8b949e;padding:6px 8px;text-align:left;border-bottom:1px solid #30363d;">Sector</th>
   <th style="color:#8b949e;padding:6px 8px;text-align:left;border-bottom:1px solid #30363d;">Stocks</th>
   <th style="color:#8b949e;padding:6px 8px;text-align:left;border-bottom:1px solid #30363d;">1D Change</th>
 </tr></thead>
 <tbody>
-<tr><td colspan="4" style="color:#f39c12;padding:6px 8px;font-weight:700;border-bottom:1px solid #30363d;">Top 10 Gainers</td></tr>
 {_rows_html_top}
-<tr><td colspan="4" style="color:#e74c3c;padding:6px 8px;font-weight:700;border-bottom:1px solid #30363d;">Bottom 5 Losers</td></tr>
-{_rows_html_bot}
 </tbody></table>"""
-        print(f"  ✅ Finviz Industry: {len(_rows_data)} industries scraped")
+        print(f"  ✅ Finviz Industry: {len(_rows_data)} industries scraped, top 10 shown")
     else:
         print("  WARNING: Industry table not found")
 except Exception as _e:
@@ -536,19 +678,14 @@ P["IMG_5B_INDUSTRY"] = _industry_html
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # STEP 6A: ADVANCE/DECLINE RATIO (StockCharts Market Summary)
-# Source: https://stockcharts.com/docs/doku.php?id=market_summary
-# Scrapes Advancing/Declining counts for S&P 500, Nasdaq 100, DJIA, Russell 2000
-# Calculates AD Ratio = Advancing ÷ Declining for each index
 # ═══════════════════════════════════════════════════════════════════════════════
 print("\n[Step 6A] StockCharts A/D Ratio...")
 
-from bs4 import BeautifulSoup as BS
-
 AD_INDICES = [
-    ('SP500',   'S&P 500',     'sp500'),
-    ('NDX100',  'Nasdaq 100',  'ndx'),
-    ('DJIA',    'DJIA',        'djia'),
-    ('RUT',     'Russell 2000','rut'),
+    ('SP500',   'S&P 500',      'sp500'),
+    ('NDX100',  'Nasdaq 100',   'ndx'),
+    ('DJIA',    'DJIA',         'djia'),
+    ('RUT',     'Russell 2000', 'rut'),
 ]
 
 ad_rows_html = ''
@@ -559,17 +696,15 @@ try:
     )
     sc_soup = BS(sc_resp.text, 'html.parser')
 
-    # StockCharts Market Summary page has a table with Advancing/Declining columns
-    # Find all tables and look for one with 'Advancing' and 'Declining' headers
-    ad_data = {}  # key -> {'adv': int, 'dec': int, 'unch': int}
+    ad_data = {}
     for tbl in sc_soup.find_all('table'):
         hdrs = [th.get_text(strip=True).lower() for th in tbl.find_all(['th','td'])[:10]]
         if any('advancing' in h for h in hdrs) and any('declining' in h for h in hdrs):
             rows = tbl.find_all('tr')
             hdr_row = rows[0].find_all(['th','td'])
             hdr_texts = [c.get_text(strip=True).lower() for c in hdr_row]
-            adv_idx = next((i for i, h in enumerate(hdr_texts) if 'advancing' in h), None)
-            dec_idx = next((i for i, h in enumerate(hdr_texts) if 'declining' in h), None)
+            adv_idx  = next((i for i, h in enumerate(hdr_texts) if 'advancing' in h), None)
+            dec_idx  = next((i for i, h in enumerate(hdr_texts) if 'declining' in h), None)
             unch_idx = next((i for i, h in enumerate(hdr_texts) if 'unchanged' in h), None)
             name_idx = 0
             for data_row in rows[1:]:
@@ -583,15 +718,14 @@ try:
                     txt = cells[idx].get_text(strip=True).replace(',','')
                     try: return int(txt)
                     except: return None
-                adv = safe_int(cells, adv_idx)
-                dec = safe_int(cells, dec_idx)
+                adv  = safe_int(cells, adv_idx)
+                dec  = safe_int(cells, dec_idx)
                 unch = safe_int(cells, unch_idx)
                 for key, label, match in AD_INDICES:
                     if match in row_name or label.lower() in row_name:
                         ad_data[key] = {'label': label, 'adv': adv, 'dec': dec, 'unch': unch}
             break
 
-    # Build HTML table rows for each index
     ad_table_rows = ''
     for key, label, _ in AD_INDICES:
         d = ad_data.get(key, {})
@@ -621,7 +755,14 @@ try:
         P[f'AD_{key}_DEC']   = dec_str
         P[f'AD_{key}_UNCH']  = unch_str
         P[f'AD_{key}_RATIO'] = ratio_str
+        P[f'AD_{key}_BADGE'] = ad_ratio_badge(ratio_str)
         print(f"  {label}: Adv={adv_str} Dec={dec_str} Ratio={ratio_str}")
+
+    # Alias for SP500 in regime box
+    P['AD_SP500_ADV']   = P.get('AD_SP500_ADV', 'N/A')
+    P['AD_SP500_DEC']   = P.get('AD_SP500_DEC', 'N/A')
+    P['AD_SP500_RATIO'] = P.get('AD_SP500_RATIO', 'N/A')
+    P['AD_SP500_BADGE'] = P.get('AD_SP500_BADGE', 'badge-neutral')
 
     AD_TABLE_HTML = f'''<table style="width:100%;border-collapse:collapse;font-size:13px;">
 <thead><tr style="background:#0d1117;border-bottom:1px solid #30363d;">
@@ -640,13 +781,23 @@ except Exception as _e:
     print(f"  WARNING Step 6A StockCharts A/D: {_e}")
     P['AD_RATIO_TABLE'] = '<p style="color:#8b949e;">A/D Ratio data unavailable</p>'
     for key, _, __ in AD_INDICES:
-        P[f'AD_{key}_ADV'] = P[f'AD_{key}_DEC'] = P[f'AD_{key}_UNCH'] = P[f'AD_{key}_RATIO'] = 'N/A'
+        P[f'AD_{key}_ADV']   = 'N/A'
+        P[f'AD_{key}_DEC']   = 'N/A'
+        P[f'AD_{key}_UNCH']  = 'N/A'
+        P[f'AD_{key}_RATIO'] = 'N/A'
+        P[f'AD_{key}_BADGE'] = 'badge-neutral'
+    P['AD_SP500_ADV']   = 'N/A'
+    P['AD_SP500_DEC']   = 'N/A'
+    P['AD_SP500_RATIO'] = 'N/A'
+    P['AD_SP500_BADGE'] = 'badge-neutral'
 
-# Keep placeholder for any legacy template references
+# Legacy placeholder — no longer used
 P['IMG_MARKETINOUT'] = ''
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # STEP 6B: STOCKBEE T2108 (Google Sheets CSV + screenshot)
+# Source: https://stockbee.blogspot.com/p/mm.html (no login needed)
+# T2108 data is inside a Google Sheets iframe on that page.
 # ═══════════════════════════════════════════════════════════════════════════════
 print("\n[Step 6B] Stockbee T2108...")
 
@@ -659,7 +810,6 @@ try:
     r = requests.get(STOCKBEE_CSV, timeout=15)
     rows = list(csv.reader(io.StringIO(r.text)))
 
-    # Find header row (first row containing 'T2108' or 'Date')
     header_idx = 0
     for i, row in enumerate(rows[:5]):
         if any('t2108' in str(c).lower() or 'date' in str(c).lower() for c in row):
@@ -669,7 +819,6 @@ try:
     hdr  = rows[header_idx]
     data = rows[header_idx + 1]
 
-    # Find columns by keyword
     def find_col(*keywords):
         for i, h in enumerate(hdr):
             h_lower = str(h).lower()
@@ -706,25 +855,75 @@ P['DOWN4PCT']  = str(dn4_val)   if dn4_val   is not None else 'N/A'
 P['RATIO_5D']  = str(r5d_val)   if r5d_val   is not None else 'N/A'
 P['RATIO_10D'] = str(r10d_val)  if r10d_val  is not None else 'N/A'
 
-# T2108 progress bar color
+# T2108 color/badge/zone
 if t2108_val is not None:
     if t2108_val >= 70:
         t2108_color = '#e74c3c'
         t2108_zone  = 'Overbought'
+        t2108_color_class = 'red'
+        t2108_badge = 'badge-bear'
     elif t2108_val <= 20:
         t2108_color = '#2ecc71'
+        t2108_zone  = 'Extreme Oversold'
+        t2108_color_class = 'green'
+        t2108_badge = 'badge-bear'
+    elif t2108_val <= 40:
+        t2108_color = '#e74c3c'
         t2108_zone  = 'Oversold'
+        t2108_color_class = 'red'
+        t2108_badge = 'badge-bear'
     else:
         t2108_color = '#f1c40f'
         t2108_zone  = 'Neutral'
+        t2108_color_class = 'yellow'
+        t2108_badge = 'badge-warn'
 else:
     t2108_color = '#8b949e'
     t2108_zone  = 'N/A'
+    t2108_color_class = 'yellow'
+    t2108_badge = 'badge-neutral'
 
-P['T2108_COLOR'] = t2108_color
-P['T2108_ZONE']  = t2108_zone
+P['T2108_COLOR']       = t2108_color
+P['T2108_ZONE']        = t2108_zone
+P['T2108_COLOR_CLASS'] = t2108_color_class
+P['T2108_BADGE']       = t2108_badge
+
+# Update sentiment summary now that T2108 is known
+P['SENTIMENT_SUMMARY'] = (
+    f"📌 情緒總結: Fear & Greed {P.get('FEAR_GREED','N/A')} ({P.get('FEAR_GREED_RATING','N/A')}) | "
+    f"VIX {P.get('VIX','N/A')} | "
+    f"T2108 {P.get('T2108','N/A')}% ({t2108_zone}) | "
+    f"NAAIM {P.get('NAAIM','N/A')} (as of {P.get('NAAIM_DATE','N/A')})"
+)
+
+# Movers badges
+up_sig, dn_sig = movers_badge(up4_val, dn4_val)
+P['UP4PCT_COLOR']    = up_sig[0]
+P['UP4PCT_BADGE']    = up_sig[1]
+P['UP4PCT_SIGNAL']   = up_sig[2]
+P['DOWN4PCT_COLOR']  = dn_sig[0]
+P['DOWN4PCT_BADGE']  = dn_sig[1]
+P['DOWN4PCT_SIGNAL'] = dn_sig[2]
+
+# Ratio badges
+r5_color, r5_badge, r5_sig = ratio_badge(r5d_val)
+r10_color, r10_badge, r10_sig = ratio_badge(r10d_val)
+P['RATIO_5D_COLOR']   = r5_color
+P['RATIO_5D_BADGE']   = r5_badge
+P['RATIO_5D_SIGNAL']  = r5_sig
+P['RATIO_10D_COLOR']  = r10_color
+P['RATIO_10D_BADGE']  = r10_badge
+P['RATIO_10D_SIGNAL'] = r10_sig
+
+# Breadth summary note
+P['BREADTH_SUMMARY'] = (
+    f"📌 廣度總結: T2108 {P['T2108']}% ({t2108_zone})。"
+    f"今日上漲 4%+ 股票 {P['UP4PCT']} 隻，下跌 4%+ 股票 {P['DOWN4PCT']} 隻。"
+    f"5日比率 {P['RATIO_5D']}，10日比率 {P['RATIO_10D']}。"
+)
 
 # Screenshot the Google Sheets (wide viewport to show T2108 column)
+# Step 1: Try Stockbee page directly; Step 2: Fall back to Google Sheets URL
 t2108_sheet_path = str(IMG_DIR / 't2108_sheet.png')
 
 ok, out, err = run_playwright(f"""
@@ -764,10 +963,7 @@ else:
 # ═══════════════════════════════════════════════════════════════════════════════
 print("\n[Step 7] Bull vs Bear commentary...")
 
-spy_d = macro.get('SPY', {})
-vix_d = macro.get('VIX', {})
-
-# Determine regime
+# Regime determination
 regime_score = 0
 if spy_d:
     if spy_d['price'] < spy_d['ma200']: regime_score += 2
@@ -785,15 +981,29 @@ REGIME = ('BEARISH' if regime_score >= 6
           else 'BULLISH')
 P['REGIME'] = REGIME
 
+# Regime guidance note
+spxa20r_val = P.get('SPXA20R', 'N/A')
+P['REGIME_GUIDANCE'] = (
+    f"📌 交易建議 Trading Guidance: Regime = {REGIME}。"
+    f"VIX {P.get('VIX','N/A')} ({P.get('VIX_SIGNAL','N/A')})。"
+    f"SPY vs 200MA: {P.get('SPY_VS_200MA','N/A')}%。"
+    f"$SPXA20R: {spxa20r_val}。"
+    f"T2108: {P.get('T2108','N/A')}%。"
+    f"等待 VIX 回落至 20 以下、SPY 收復 200MA (${P.get('SPY_MA200','N/A')}) 才考慮加倉。"
+)
+
 context = f"""
 Date: {DATE_DISP}
 SPY: ${spy_d.get('price',0):.2f} ({spy_d.get('chg',0):+.2f}%) | vs 20MA: {spy_d.get('vs20',0):+.2f}% | vs 50MA: {spy_d.get('vs50',0):+.2f}% | vs 200MA: {spy_d.get('vs200',0):+.2f}%
+QQQ: ${macro.get('QQQ',{}).get('price',0):.2f} ({macro.get('QQQ',{}).get('chg',0):+.2f}%)
+IWM: ${macro.get('IWM',{}).get('price',0):.2f} ({macro.get('IWM',{}).get('chg',0):+.2f}%)
 VIX: {vix_d.get('price',0):.2f} ({vix_d.get('chg',0):+.2f}%)
 Fear & Greed: {P.get('FEAR_GREED','N/A')} ({P.get('FEAR_GREED_RATING','N/A')})
 NAAIM: {P.get('NAAIM','N/A')} ({P.get('NAAIM_DATE','N/A')})
-T2108: {P.get('T2108','N/A')}% ({P.get('T2108_ZONE','N/A')})
+T2108: {P.get('T2108','N/A')}% ({t2108_zone})
 Up 4%+: {P.get('UP4PCT','N/A')} | Down 4%+: {P.get('DOWN4PCT','N/A')}
 5D ratio: {P.get('RATIO_5D','N/A')} | 10D ratio: {P.get('RATIO_10D','N/A')}
+$SPXA20R: {P.get('SPXA20R','N/A')} | $SPXA50R: {P.get('SPXA50R','N/A')} | $SPXA200R: {P.get('SPXA200R','N/A')}
 Top sector by RSI: {sector_rows[0]['ticker'] if sector_rows else 'N/A'} RSI={sector_rows[0]['rsi'] if sector_rows else 'N/A'}
 Regime: {REGIME}
 """
@@ -808,13 +1018,15 @@ try:
         messages=[{
             'role': 'system',
             'content': '''You are a professional swing trader analyst. Generate a bull vs bear analysis in Traditional Chinese (繁體中文).
+Every argument MUST cite exact data values from the context provided.
 Return JSON with these exact keys:
 {
-  "bear_points": ["4 bear arguments in Traditional Chinese"],
-  "bull_points": ["3 bull arguments in Traditional Chinese"],
+  "bear_points": ["4-6 bear arguments in Traditional Chinese, each citing exact data values"],
+  "bull_points": ["3-5 bull arguments in Traditional Chinese, each citing exact data values"],
   "table_rows": [{"indicator":"indicator name","bull":true/false,"neutral":true/false,"bear":true/false}],
-  "guidance": "trading guidance in Traditional Chinese, 2-3 sentences"
-}'''
+  "guidance": "trading guidance in Traditional Chinese, 2-3 sentences citing exact values"
+}
+Indicators for table_rows: Long-term Trend, Market Breadth, Sentiment, Institutional Positioning, Macro, Short-term Technical, Fundamentals'''
         }, {
             'role': 'user',
             'content': context
@@ -846,13 +1058,13 @@ for row in table_rows:
                    f'</tr>\n')
 
 BULL_BEAR_HTML = f'''<div style="background:#1c2128; border:1px solid #e74c3c; border-radius:8px; padding:16px; margin-bottom:16px;">
-  <h3 style="color:#e74c3c; margin:0 0 12px 0;">🐻 空頭論點</h3>
+  <h3 style="color:#e74c3c; margin:0 0 12px 0;">🐻 空頭論點 Bearish Case</h3>
   <ol style="color:#ecf0f1; margin:0; padding-left:20px; line-height:1.7;">
     {bear_li}
   </ol>
 </div>
 <div style="background:#1c2128; border:1px solid #2ecc71; border-radius:8px; padding:16px; margin-bottom:16px;">
-  <h3 style="color:#2ecc71; margin:0 0 12px 0;">🐂 多頭論點</h3>
+  <h3 style="color:#2ecc71; margin:0 0 12px 0;">🐂 多頭論點 Bullish Case</h3>
   <ol style="color:#ecf0f1; margin:0; padding-left:20px; line-height:1.7;">
     {bull_li}
   </ol>
@@ -876,6 +1088,9 @@ BULL_BEAR_HTML = f'''<div style="background:#1c2128; border:1px solid #e74c3c; b
 
 P['BULL_BEAR_CONTENT'] = BULL_BEAR_HTML
 
+# Economic Calendar placeholder (manual entry or future automation)
+P['ECONOMIC_CALENDAR'] = '📅 請查閱 <a href="https://forex.tradingcharts.com/economic_calendar/" style="color:#58a6ff">forex.tradingcharts.com</a> 獲取未來三個交易日的重要經濟數據。'
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # FINAL: BUILD HTML FROM TEMPLATE
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -895,11 +1110,17 @@ if remaining:
 else:
     print("  ✅ All placeholders filled")
 
-# Save
+# Save dated archive
 out_path = REPO / f'{DATE}.html'
 with open(out_path, 'w') as f:
     f.write(html)
 print(f"  ✅ Saved: {DATE}.html")
+
+# Also update index.html (the live page)
+index_path = REPO / 'index.html'
+with open(index_path, 'w') as f:
+    f.write(html)
+print(f"  ✅ Saved: index.html")
 
 # ── Update MARKET_HISTORY.md ───────────────────────────────────────────────────
 history_path = REPO / 'MARKET_HISTORY.md'
@@ -923,7 +1144,7 @@ try:
 except Exception as e:
     print(f"  WARNING MARKET_HISTORY: {e}")
 
-# ── Report complete — git push is handled by the GitHub Actions workflow ──────
+# ── Report complete ────────────────────────────────────────────────────────────
 print(f"\n{'='*60}")
 print(f"🌐 Report ready: {DATE}.html")
 print(f"🌐 https://matt-manus.github.io/swing-trader-daily/{DATE}.html")

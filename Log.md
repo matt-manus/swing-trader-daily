@@ -21,6 +21,20 @@ This document records all actions taken, decisions made, rationale, and outcomes
 
 ---
 
+### 2026-03-26 (Session 4 — Overhaul TEMPLATE.html and daily_report.py to fix hard-coded errors)
+**Task/Session Objective**: Fix recurring mistakes caused by hard-coded legacy data in the HTML template and missing placeholders in the Python script.
+**Actions Taken**:
+- Completely rewrote `TEMPLATE.html` to remove obsolete sections (Step 2, Key Levels, MarketInOut) and replaced all hard-coded data values, colors, and badges with dynamic `{{PLACEHOLDER}}` tags.
+- Updated `daily_report.py` to generate the exact color, badge, and signal placeholders required by the new template (e.g., `SPY_CHG_COLOR`, `SPXA20R_BADGE`).
+- Verified zero missing placeholders using a custom regex script.
+- Documented the "Hard-Coded Template Trap" in `evolution.md` as a lesson learned.
+**Decisions Made & Rationale**:
+- Previous updates focused only on `daily_report.py` and the Markdown instructions, but `TEMPLATE.html` was never cleaned up. Because the script only replaces known placeholders, hard-coded text in the template survived every run. Overhauling the template ensures 100% of the report is dynamically generated.
+**Outcomes/Observations**: The template is now fully dynamic. Future changes to data sources or logic in `daily_report.py` will accurately reflect in the HTML without being blocked by hard-coded HTML.
+**Risk/Exposure**: N/A (Codebase overhaul)
+
+---
+
 ### 2026-03-26 (Session 3 — daily_report.py Sync + Script-Sync Rule)
 **Task/Session Objective**: Fix `daily_report.py` to align with all current instructions, and add a rule to all documents that any instruction update must also update the script.
 **Actions Taken**:
