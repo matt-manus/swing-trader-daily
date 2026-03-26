@@ -150,7 +150,10 @@
 - **6B Stockbee Market Monitor：**
   - **正確 URL：** **https://stockbee.blogspot.com/p/mm.html** （不需要登入，不是 `.biz`）。
   - **要求：** 截圖**必須包含 T2108 欄位**。
-  - **截圖技術：** 由於 T2108 在 iframe 中，截圖時必須確保滾動到 iframe 內部或直接訪問 Google Sheets 來源 URL 進行截圖，確保 T2108 數據清晰可見。
+  - **截圖技術：** 由於 T2108 數據位於 Google Sheets iframe 中，截圖時必須採用以下方法確保 T2108 清晰可見：
+    1. 優先嘗試直接訪問 Stockbee 頁面（https://stockbee.blogspot.com/p/mm.html）並滾動至 iframe 內部截圖。
+    2. 若 iframe 截圖無法顯示 T2108，必須提取 Google Sheets iframe 的來源 URL，直接訪問該 Google Sheets URL 進行全頁截圖，確保 T2108 欄位清晰可見。
+    3. 絕不能在截圖中遺漏 T2108 欄位。
   - **數據：** 需讀取 Up/Down 4%+ 和 5-day/10-day ratio 的精確數據填入報告。
   - **截圖時機：** 必須在美股**收市後**（4:00 PM ET 之後）重新截圖，確保數據係當日收市數據。不能使用早上截的圖標示為 LIVE。
 

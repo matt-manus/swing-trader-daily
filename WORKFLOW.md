@@ -75,7 +75,7 @@ The report is built using `scripts/build_daily_report.py`, which takes the previ
 | Step 5A — Sector Performance | Finviz | https://finviz.com/groups.ashx?g=sector&o=-change | Data + screenshot |
 | Step 4D — Industry Performance | Finviz | https://finviz.com/groups.ashx?g=industry&o=-change | Data table — top 10 leaders with parent sector |
 | **Step 6A — Advance/Decline Ratio** | **StockCharts Market Summary** | https://stockcharts.com/docs/doku.php?id=market_summary | Scrape Advancing/Declining counts for S&P 500, Nasdaq 100, DJIA, Russell 2000. Calculate AD Ratio = Advancing ÷ Declining (2 decimal places). Present as table. |
-| Step 6B — Stockbee breadth | Stockbee | **https://stockbee.blogspot.com/p/mm.html** | Screenshot — must include T2108 column — no login needed — **must be taken AFTER 4:00 PM ET market close, not in the morning** |
+| Step 6B — Stockbee breadth | Stockbee | **https://stockbee.blogspot.com/p/mm.html** | Screenshot — must include T2108 column — no login needed — **must be taken AFTER 4:00 PM ET market close, not in the morning**. T2108 data is inside a Google Sheets iframe: (1) first try scrolling into the iframe on the Stockbee page; (2) if T2108 is not visible, extract the Google Sheets iframe source URL and screenshot that directly — T2108 column must never be missing from the screenshot. |
 
 ---
 
@@ -88,7 +88,7 @@ The report is built using `scripts/build_daily_report.py`, which takes the previ
 7. **Step 4A** — No SPY daily chart
 8. **Step 4B** — Exact values from **Barchart** tickers ($S5TW/$S5FI/$S5TH for S&P 500, $NDTW/$NDFI/$NDTH for Nasdaq 100, $MMTW/$MMFI/$MMTH for NYSE). Screenshots from StockCharts ($SPXA20R, $SPXA50R, $SPXA200R, $NDXA20R, $NDXA50R, $NDXA200R, $NYA20R, $NYA50R, $NYA200R). No TradingView. No estimates. Double the size of current screenshots.
 9. **Step 4C** — Must include RSI 14 column. Must be sorted by RSI descending (not 1D%)
-11. **Step 6B** — Stockbee screenshot must include T2108. No login needed. URL: stockbee.blogspot.com/p/mm.html
+11. **Step 6B** — Stockbee screenshot must include T2108. No login needed. URL: stockbee.blogspot.com/p/mm.html. T2108 is inside a Google Sheets iframe — if not visible via page scroll, extract the iframe source URL and screenshot the Google Sheets directly.
 12. **Step 7 UFO Watchlist** — REMOVED. Do not include.
 13. **Report Comparison Notes** — REMOVED. Do not include.
 14. **No estimated values** — No `~` approximations for any data values. All values must be exact and cited.
@@ -178,6 +178,7 @@ Returns a URL like: `https://static.manus.im/file/manuscdn.com/XXXXXXXX.png`
 | Using UUP for USD in Step 1 | Use DXY (`DX-Y.NYB`) — UUP is an ETF with tracking error |
 | Step 4A showing wrong MA colors from template | Always recalculate: price < MA = red, price > MA = green. Never copy colors from previous day's template |
 | Step 6B screenshot taken in morning | Must re-screenshot Stockbee AFTER 4:00 PM ET market close |
+| Step 6B T2108 missing from screenshot | T2108 is in a Google Sheets iframe — if not visible via Stockbee page scroll, extract the Google Sheets iframe source URL and screenshot it directly |
 | VIX/macro description copied from previous day | Always update all descriptive text to match today's actual data (e.g. VIX up vs down) |
 | Omitting NAAIM from Step 3 Scorecard | Always include NAAIM value + date in Scorecard |
 | Skipping Step 7 commentary | Always write Bull vs Bear commentary after all data is collected |
