@@ -16,6 +16,23 @@ This document is the "brain" of the self-evolving system. It captures insights, 
 
 ---
 
+### 2026-03-26 (Critical Rule — Document Updates Must Sync daily_report.py)
+**Insight/Lesson Learned**: Updating documentation files (`MASTER_INSTRUCTION.md`, `WORKFLOW.md`, `evolution.md`) does NOT automatically change the behaviour of the automated report. The GitHub Actions cron job runs `daily_report.py` directly and does not read documentation. If the script is not updated, the automated report will continue using old logic indefinitely, regardless of what the documents say.
+**Triggering Event/Observation**: Multiple document updates (Step 2 removal, Step 6A source change, BTC addition, Barchart exact values) had been written into the documentation but never applied to `daily_report.py`, causing new tasks to still run old behaviour.
+**Systemic Improvement/Rule Update**:
+- **Rule**: Every time any document is updated, `daily_report.py` MUST be updated in the same git commit.
+- Script Sync Checklist (must run after every document update):
+  1. New/removed data source → add/remove fetch code in script
+  2. Changed URL → update URL string in script
+  3. New calculation → implement in script
+  4. Removed Step → delete code block in script
+  5. Changed sort order → update sort logic in script
+  6. Run `python3 -m py_compile daily_report.py` to confirm no syntax errors
+  7. Commit and push script together with documents
+**Status**: Implemented (2026-03-26)
+
+---
+
 ### 2026-03-26 (Rule Restoration — Step 6B Google Sheets iframe for T2108)
 **Insight/Lesson Learned**: The Step 6B screenshot instruction for T2108 must explicitly state that T2108 data is embedded inside a Google Sheets iframe on the Stockbee page. Without this instruction, the agent may screenshot the outer Stockbee page and miss the T2108 column entirely.
 **Triggering Event/Observation**: User noticed the Google Sheets iframe fallback instruction was present in the project-level instructions but missing from the 4 core repo documents (`MASTER_INSTRUCTION.md`, `WORKFLOW.md`, `Log.md`, `evolution.md`).

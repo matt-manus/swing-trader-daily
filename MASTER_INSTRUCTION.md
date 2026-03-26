@@ -197,3 +197,20 @@
 - [ ] Step 7 市場評論是否包含空頭論點、多頭論點及多空對比表？所有論點是否引用報告內的具體數據？
 
 嚴格遵守以上所有指示，確保每日報告的結構穩定和數據絕對準確。
+
+---
+
+## 5. ⚠️ 關鍵規則：更新文件必須同步更新 `daily_report.py` (Script Sync Rule)
+
+**每當任何指示文件（`MASTER_INSTRUCTION.md`、`WORKFLOW.md`、`evolution.md`）有任何規則或數據來源的更新，必須同步更新 `daily_report.py` Python 腳本。**
+
+文件與腳本必須永遠保持一致（in sync）。如果只更新文件而不更新腳本，自動排程（GitHub Actions cron job）仍然會執行舊邏輯，導致報告與指示不符。
+
+**Script Sync Checklist（每次更新文件後必須執行）：**
+- [ ] 新增或刪除的數據來源 → 在 `daily_report.py` 中新增或刪除對應的抓取代碼
+- [ ] 更改的 URL → 在 `daily_report.py` 中更新對應的 URL 字串
+- [ ] 新增的計算邏輯 → 在 `daily_report.py` 中實現對應的計算
+- [ ] 刪除的 Step → 在 `daily_report.py` 中移除對應的代碼塊
+- [ ] 更改的排序規則 → 在 `daily_report.py` 中更新排序邏輯
+- [ ] 完成後執行 `python3 -m py_compile daily_report.py` 確認語法無誤
+- [ ] 將更新後的 `daily_report.py` 連同文件一起 commit 並 push 至 GitHub

@@ -21,6 +21,24 @@ This document records all actions taken, decisions made, rationale, and outcomes
 
 ---
 
+### 2026-03-26 (Session 3 — daily_report.py Sync + Script-Sync Rule)
+**Task/Session Objective**: Fix `daily_report.py` to align with all current instructions, and add a rule to all documents that any instruction update must also update the script.
+**Actions Taken**:
+- Fixed `daily_report.py` — 4 changes:
+  1. Added `BTC-USD` to `MACRO_TICKERS` (Step 1)
+  2. Removed Step 2 Fullstack Investor screenshot block entirely
+  3. Replaced Step 6A MarketInOut with StockCharts AD Ratio scraper (S&P 500, Nasdaq 100, DJIA, Russell 2000)
+  4. Added Barchart exact % value scraping for all 9 breadth indicators ($S5TW/$S5FI/$S5TH, $NDTW/$NDFI/$NDTH, $MMTW/$MMFI/$MMTH)
+- Added `from openai import OpenAI` to top-level imports
+- Added Script Sync Rule to: `MASTER_INSTRUCTION.md`, `WORKFLOW.md`, `evolution.md`, `Log.md` (GitHub repo) and all 4 Manus project shared files
+- Verified syntax: `python3 -m py_compile daily_report.py` → SYNTAX OK
+**Decisions Made & Rationale**:
+- Root cause of “old behaviour” in new tasks: documentation was updated but `daily_report.py` was never changed. The cron job runs the script directly and ignores documentation. Fix: enforce script sync as a mandatory rule in all documents.
+**Outcomes/Observations**: Script now matches all current instructions. Script Sync Rule added to all 8 documents.
+**Risk/Exposure**: N/A (Documentation + script update)
+
+---
+
 ### 2026-03-26 (Session 2 — Step 6B Rule Restoration)
 **Task/Session Objective**: Restore the Google Sheets iframe fallback instruction for Step 6B T2108 screenshot into all relevant documents.
 **Actions Taken**:

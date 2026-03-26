@@ -184,3 +184,21 @@ Returns a URL like: `https://static.manus.im/file/manuscdn.com/XXXXXXXX.png`
 | Skipping Step 7 commentary | Always write Bull vs Bear commentary after all data is collected |
 | Using estimates or opinions in Step 7 | Every point in commentary MUST cite exact data values from the report |
 | Placing Step 7 after Regime Box | Step 7 goes BEFORE the Regime Box, not after |
+| Updating documents without updating `daily_report.py` | **ALWAYS update `daily_report.py` in the same commit** — the cron job runs the script directly; documents alone do not change automated behaviour |
+
+---
+
+## ⚠️ Critical Rule: Every Document Update Must Also Update `daily_report.py`
+
+**Whenever any rule, data source, URL, step, or calculation logic changes in `MASTER_INSTRUCTION.md`, `WORKFLOW.md`, or `evolution.md`, the same change MUST be immediately reflected in `daily_report.py`.**
+
+The GitHub Actions cron job runs `daily_report.py` directly. It does not read the documentation files. If the script is not updated, the automated report will continue using old logic regardless of what the documents say.
+
+**Script Sync Checklist (run after every document update):**
+- [ ] New or removed data source → add or remove corresponding fetch code in `daily_report.py`
+- [ ] Changed URL → update the URL string in `daily_report.py`
+- [ ] New calculation logic → implement it in `daily_report.py`
+- [ ] Removed Step → delete the corresponding code block in `daily_report.py`
+- [ ] Changed sort order → update sort logic in `daily_report.py`
+- [ ] Run `python3 -m py_compile daily_report.py` to confirm no syntax errors
+- [ ] Commit and push `daily_report.py` together with the updated documents in the same git commit

@@ -13,6 +13,7 @@ No external CDN required — works in GitHub Actions.
 """
 
 import os, sys, json, re, time, subprocess, io, csv
+from openai import OpenAI
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -107,7 +108,7 @@ def fmt(v, decimals=2):
 MACRO_TICKERS = {
     'SPY': 'SPY', 'QQQ': 'QQQ', 'IWM': 'IWM', 'DIA': 'DIA',
     'VIX': '^VIX', 'GLD': 'GLD', 'USO': 'USO', 'TLT': 'TLT',
-    'TNX': '^TNX', 'DXY': 'DX-Y.NYB',
+    'TNX': '^TNX', 'DXY': 'DX-Y.NYB', 'BTC': 'BTC-USD',
 }
 
 macro = {}
@@ -172,12 +173,23 @@ def fill_ticker_placeholders(key):
     P[f'{key}_BADGE']     = bc
     P[f'{key}_SIGNAL']    = sig
 
-for key in ['SPY', 'QQQ', 'IWM', 'DIA', 'GLD', 'USO', 'TLT', 'TNX', 'DXY']:
+for key in ['SPY', 'QQQ', 'IWM', 'DIA', 'GLD', 'USO', 'TLT', 'TNX', 'DXY', 'BTC']:
     fill_ticker_placeholders(key)
+
+# BTC display placeholders (price shown without $ prefix convention, uses comma formatting)
+if 'BTC' in macro:
+    P['BTC_PRICE']     = f"{macro['BTC']['price']:,.2f}"
+    P['BTC_CHG']       = fmt(macro['BTC']['chg'])
+    P['BTC_CHG_COLOR'] = color(macro['BTC']['chg'])
+    print(f"  BTC: ${macro['BTC']['price']:,.2f} ({macro['BTC']['chg']:+.2f}%)")
+else:
+    P['BTC_PRICE']     = 'N/A'
+    P['BTC_CHG']       = 'N/A'
+    P['BTC_CHG_COLOR'] = 'grey'
 
 # Add template-compatible aliases (template uses SPY_20MA, SPY_50MA, SPY_200MA, SPY_CHANGE_PCT)
 # while fill_ticker_placeholders sets SPY_MA20, SPY_MA50, SPY_MA200, SPY_CHG
-for key in ['SPY', 'QQQ', 'IWM', 'DIA', 'GLD', 'USO', 'TLT', 'TNX', 'DXY']:
+for key in ['SPY', 'QQQ', 'IWM', 'DIA', 'GLD', 'USO', 'TLT', 'TNX', 'DXY', 'BTC']:
     if f'{key}_MA20' in P:
         P[f'{key}_20MA']      = P[f'{key}_MA20']
         P[f'{key}_50MA']      = P[f'{key}_MA50']
@@ -195,47 +207,7 @@ if 'VIX' in macro:
 # ===============================================================================
 print("[Step 1B] News disabled.")
 P['NEWS_ITEMS'] = ''
-# STEP 2: FULLSTACK INVESTOR SCREENSHOT
-# ═══════════════════════════════════════════════════════════════════════════════
-print("\n[Step 2] Fullstack Investor screenshot...")
-
-fullstack_path = IMG_DIR / 'fullstack.png'
-
-ok, out, err = run_playwright(f"""
-import asyncio
-from playwright.async_api import async_playwright
-from PIL import Image
-
-async def main():
-    async with async_playwright() as p:
-        browser = await p.chromium.launch()
-        page = await browser.new_page(viewport={{'width': 1400, 'height': 900}})
-        await page.goto('https://fullstackinvestor.co/market-model',
-                        wait_until='networkidle', timeout=30000)
-        await page.wait_for_timeout(3000)
-        await page.screenshot(path='/tmp/fs_top.png')
-        await page.evaluate('window.scrollTo(0, document.body.scrollHeight)')
-        await page.wait_for_timeout(1000)
-        await page.screenshot(path='/tmp/fs_bot.png')
-        await browser.close()
-
-asyncio.run(main())
-
-top = Image.open('/tmp/fs_top.png')
-bot = Image.open('/tmp/fs_bot.png')
-combined = Image.new('RGB', (top.width, top.height + bot.height))
-combined.paste(top, (0, 0))
-combined.paste(bot, (0, top.height))
-combined.save('{fullstack_path}')
-print('done')
-""", timeout=60)
-
-if fullstack_path.exists():
-    P['IMG_FULLSTACK'] = img_path('fullstack.png')
-    print("  ✅ Fullstack screenshot done")
-else:
-    P['IMG_FULLSTACK'] = ''
-    print(f"  WARNING Fullstack failed: {err[-150:]}")
+P['IMG_FULLSTACK'] = ''  # Step 2 removed per updated instructions
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # STEP 3: FEAR & GREED + NAAIM
@@ -344,9 +316,68 @@ for name, _ in BREADTH:
         P[f'IMG_{name}'] = ''
         print(f"  WARNING Missing: {name}")
 
-# Breadth values shown in screenshots; set display to N/A
-for name, _ in BREADTH:
-    P[name] = 'N/A'
+# ═══════════════════════════════════════════════════════════════════════════════
+# STEP 4C (PART 2): BARCHART EXACT % VALUES FOR BREADTH
+# Barchart is the authoritative source for exact numeric values.
+# StockCharts screenshots are for visual reference only.
+# Barchart symbols: $S5TW/$S5FI/$S5TH (SPX), $NDTW/$NDFI/$NDTH (NDX), $MMTW/$MMFI/$MMTH (NYSE)
+# ═══════════════════════════════════════════════════════════════════════════════
+print("\n[Step 4C-values] Barchart exact breadth values...")
+
+BARCHART_BREADTH = [
+    # (placeholder_key, barchart_symbol, description)
+    ('SPXA20R',  'S5TW',  'S&P 500 % above 20MA'),
+    ('SPXA50R',  'S5FI',  'S&P 500 % above 50MA'),
+    ('SPXA200R', 'S5TH',  'S&P 500 % above 200MA'),
+    ('NDXA20R',  'NDTW',  'Nasdaq 100 % above 20MA'),
+    ('NDXA50R',  'NDFI',  'Nasdaq 100 % above 50MA'),
+    ('NDXA200R', 'NDTH',  'Nasdaq 100 % above 200MA'),
+    ('NYA20R',   'MMTW',  'NYSE % above 20MA'),
+    ('NYA50R',   'MMFI',  'NYSE % above 50MA'),
+    ('NYA200R',  'MMTH',  'NYSE % above 200MA'),
+]
+
+for placeholder, symbol, desc in BARCHART_BREADTH:
+    try:
+        bc_url = f'https://www.barchart.com/stocks/quotes/%24{symbol}/overview'
+        bc_resp = requests.get(bc_url, headers=req_headers, timeout=12)
+        bc_soup = BS(bc_resp.text, 'html.parser')
+        # Barchart shows the last price in a span with class 'last-price' or data-ng-bind
+        # Try multiple selectors
+        val_str = None
+        # Method 1: og:description meta tag often has the price
+        meta_desc = bc_soup.find('meta', {'property': 'og:description'})
+        if meta_desc:
+            import re as _re
+            m = _re.search(r'([\d.]+)%?\s+(?:last|price|value)', meta_desc.get('content',''), _re.I)
+            if not m:
+                m = _re.search(r'last\s+price[^\d]*([\d.]+)', meta_desc.get('content',''), _re.I)
+            if m:
+                val_str = m.group(1)
+        # Method 2: look for the price in the page title
+        if not val_str:
+            title_tag = bc_soup.find('title')
+            if title_tag:
+                m = _re.search(r'\$([\d.]+)', title_tag.get_text())
+                if m:
+                    val_str = m.group(1)
+        # Method 3: look for spans/divs with the value near the symbol
+        if not val_str:
+            for span in bc_soup.find_all(['span','div'], class_=_re.compile(r'last.?price|price.?value|quote.?price', _re.I)):
+                txt = span.get_text(strip=True).replace('%','')
+                if _re.match(r'^[\d.]+$', txt):
+                    val_str = txt
+                    break
+        if val_str:
+            val = round(float(val_str), 2)
+            P[placeholder] = f'{val:.2f}%'
+            print(f"  {desc} ({symbol}): {val:.2f}%")
+        else:
+            P[placeholder] = 'N/A'
+            print(f"  WARNING {symbol}: value not found in page")
+    except Exception as _e:
+        P[placeholder] = 'N/A'
+        print(f"  WARNING {symbol}: {_e}")
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # STEP 4B: SECTOR ETF RSI (Wilder SMMA, sorted high→low)
@@ -502,39 +533,116 @@ except Exception as _e:
 
 P["IMG_5B_INDUSTRY"] = _industry_html
 
-# STEP 6A: MARKETINOUT A/D RATIO SCREENSHOT
 # ═══════════════════════════════════════════════════════════════════════════════
-print("\n[Step 6A] MarketInOut A/D Ratio screenshot...")
+# STEP 6A: ADVANCE/DECLINE RATIO (StockCharts Market Summary)
+# Source: https://stockcharts.com/docs/doku.php?id=market_summary
+# Scrapes Advancing/Declining counts for S&P 500, Nasdaq 100, DJIA, Russell 2000
+# Calculates AD Ratio = Advancing ÷ Declining for each index
+# ═══════════════════════════════════════════════════════════════════════════════
+print("\n[Step 6A] StockCharts A/D Ratio...")
 
-marketinout_path = str(IMG_DIR / 'marketinout.png')
+from bs4 import BeautifulSoup as BS
 
-ok, out, err = run_playwright(f"""
-import asyncio
-from playwright.async_api import async_playwright
+AD_INDICES = [
+    ('SP500',   'S&P 500',     'sp500'),
+    ('NDX100',  'Nasdaq 100',  'ndx'),
+    ('DJIA',    'DJIA',        'djia'),
+    ('RUT',     'Russell 2000','rut'),
+]
 
-async def main():
-    async with async_playwright() as p:
-        browser = await p.chromium.launch()
-        page = await browser.new_page(viewport={{'width': 1400, 'height': 800}})
-        try:
-            await page.goto('https://www.marketinout.com/chart/market.php?breadth=advance-decline-ratio',
-                            wait_until='networkidle', timeout=30000)
-            await page.wait_for_timeout(3000)
-            await page.screenshot(path='{marketinout_path}')
-            print('done')
-        except Exception as e:
-            print(f'fail:{{e}}')
-        await browser.close()
+ad_rows_html = ''
+try:
+    sc_resp = requests.get(
+        'https://stockcharts.com/docs/doku.php?id=market_summary',
+        headers=req_headers, timeout=15
+    )
+    sc_soup = BS(sc_resp.text, 'html.parser')
 
-asyncio.run(main())
-""", timeout=60)
+    # StockCharts Market Summary page has a table with Advancing/Declining columns
+    # Find all tables and look for one with 'Advancing' and 'Declining' headers
+    ad_data = {}  # key -> {'adv': int, 'dec': int, 'unch': int}
+    for tbl in sc_soup.find_all('table'):
+        hdrs = [th.get_text(strip=True).lower() for th in tbl.find_all(['th','td'])[:10]]
+        if any('advancing' in h for h in hdrs) and any('declining' in h for h in hdrs):
+            rows = tbl.find_all('tr')
+            hdr_row = rows[0].find_all(['th','td'])
+            hdr_texts = [c.get_text(strip=True).lower() for c in hdr_row]
+            adv_idx = next((i for i, h in enumerate(hdr_texts) if 'advancing' in h), None)
+            dec_idx = next((i for i, h in enumerate(hdr_texts) if 'declining' in h), None)
+            unch_idx = next((i for i, h in enumerate(hdr_texts) if 'unchanged' in h), None)
+            name_idx = 0
+            for data_row in rows[1:]:
+                cells = data_row.find_all(['th','td'])
+                if len(cells) < 2:
+                    continue
+                row_name = cells[name_idx].get_text(strip=True).lower()
+                def safe_int(cells, idx):
+                    if idx is None or idx >= len(cells):
+                        return None
+                    txt = cells[idx].get_text(strip=True).replace(',','')
+                    try: return int(txt)
+                    except: return None
+                adv = safe_int(cells, adv_idx)
+                dec = safe_int(cells, dec_idx)
+                unch = safe_int(cells, unch_idx)
+                for key, label, match in AD_INDICES:
+                    if match in row_name or label.lower() in row_name:
+                        ad_data[key] = {'label': label, 'adv': adv, 'dec': dec, 'unch': unch}
+            break
 
-if (IMG_DIR / 'marketinout.png').exists():
-    P['IMG_MARKETINOUT'] = img_path('marketinout.png')
-    print("  ✅ MarketInOut done")
-else:
-    P['IMG_MARKETINOUT'] = ''
-    print(f"  WARNING MarketInOut failed: {err[-100:]}")
+    # Build HTML table rows for each index
+    ad_table_rows = ''
+    for key, label, _ in AD_INDICES:
+        d = ad_data.get(key, {})
+        adv  = d.get('adv')
+        dec  = d.get('dec')
+        unch = d.get('unch')
+        if adv and dec and dec > 0:
+            ratio = round(adv / dec, 2)
+            ratio_color = '#2ecc71' if ratio >= 1.0 else '#e74c3c'
+        else:
+            ratio = None
+            ratio_color = '#8b949e'
+        adv_str   = f"{adv:,}"   if adv   is not None else 'N/A'
+        dec_str   = f"{dec:,}"   if dec   is not None else 'N/A'
+        unch_str  = f"{unch:,}"  if unch  is not None else 'N/A'
+        ratio_str = f"{ratio:.2f}" if ratio is not None else 'N/A'
+        ad_table_rows += (
+            f'<tr style="border-bottom:1px solid #30363d;">'
+            f'<td style="padding:8px 10px;color:#e6edf3;font-weight:600;">{label}</td>'
+            f'<td style="padding:8px 10px;color:#2ecc71;text-align:right;">{adv_str}</td>'
+            f'<td style="padding:8px 10px;color:#e74c3c;text-align:right;">{dec_str}</td>'
+            f'<td style="padding:8px 10px;color:#8b949e;text-align:right;">{unch_str}</td>'
+            f'<td style="padding:8px 10px;color:{ratio_color};text-align:right;font-weight:700;">{ratio_str}</td>'
+            f'</tr>\n'
+        )
+        P[f'AD_{key}_ADV']   = adv_str
+        P[f'AD_{key}_DEC']   = dec_str
+        P[f'AD_{key}_UNCH']  = unch_str
+        P[f'AD_{key}_RATIO'] = ratio_str
+        print(f"  {label}: Adv={adv_str} Dec={dec_str} Ratio={ratio_str}")
+
+    AD_TABLE_HTML = f'''<table style="width:100%;border-collapse:collapse;font-size:13px;">
+<thead><tr style="background:#0d1117;border-bottom:1px solid #30363d;">
+  <th style="padding:8px 10px;text-align:left;color:#8b949e;">Index</th>
+  <th style="padding:8px 10px;text-align:right;color:#2ecc71;">Advancing</th>
+  <th style="padding:8px 10px;text-align:right;color:#e74c3c;">Declining</th>
+  <th style="padding:8px 10px;text-align:right;color:#8b949e;">Unchanged</th>
+  <th style="padding:8px 10px;text-align:right;color:#f1c40f;">AD Ratio</th>
+</tr></thead>
+<tbody>
+{ad_table_rows}</tbody></table>'''
+    P['AD_RATIO_TABLE'] = AD_TABLE_HTML
+    print("  ✅ StockCharts A/D Ratio done")
+
+except Exception as _e:
+    print(f"  WARNING Step 6A StockCharts A/D: {_e}")
+    P['AD_RATIO_TABLE'] = '<p style="color:#8b949e;">A/D Ratio data unavailable</p>'
+    for key, _, __ in AD_INDICES:
+        P[f'AD_{key}_ADV'] = P[f'AD_{key}_DEC'] = P[f'AD_{key}_UNCH'] = P[f'AD_{key}_RATIO'] = 'N/A'
+
+# Keep placeholder for any legacy template references
+P['IMG_MARKETINOUT'] = ''
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # STEP 6B: STOCKBEE T2108 (Google Sheets CSV + screenshot)
