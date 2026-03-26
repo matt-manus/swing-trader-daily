@@ -677,115 +677,82 @@ except Exception as _e:
 P["IMG_5B_INDUSTRY"] = _industry_html
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# STEP 6A: ADVANCE/DECLINE RATIO (StockCharts Market Summary)
+# STEP 6A: ADVANCE/DECLINE RATIO (Finviz homepage — reliable, no SSL issues)
+# Finviz shows total market advancing/declining counts on its homepage.
 # ═══════════════════════════════════════════════════════════════════════════════
-print("\n[Step 6A] StockCharts A/D Ratio...")
+print("\n[Step 6A] Finviz A/D Ratio...")
 
-AD_INDICES = [
-    ('SP500',   'S&P 500',      'sp500'),
-    ('NDX100',  'Nasdaq 100',   'ndx'),
-    ('DJIA',    'DJIA',         'djia'),
-    ('RUT',     'Russell 2000', 'rut'),
-]
-
-ad_rows_html = ''
 try:
-    sc_resp = requests.get(
-        'https://stockcharts.com/docs/doku.php?id=market_summary',
-        headers=req_headers, timeout=15
-    )
-    sc_soup = BS(sc_resp.text, 'html.parser')
+    fv_resp = requests.get('https://finviz.com/', headers=req_headers, timeout=15)
+    fv_soup = BS(fv_resp.text, 'html.parser')
+    fv_text = fv_soup.get_text()
 
-    ad_data = {}
-    for tbl in sc_soup.find_all('table'):
-        hdrs = [th.get_text(strip=True).lower() for th in tbl.find_all(['th','td'])[:10]]
-        if any('advancing' in h for h in hdrs) and any('declining' in h for h in hdrs):
-            rows = tbl.find_all('tr')
-            hdr_row = rows[0].find_all(['th','td'])
-            hdr_texts = [c.get_text(strip=True).lower() for c in hdr_row]
-            adv_idx  = next((i for i, h in enumerate(hdr_texts) if 'advancing' in h), None)
-            dec_idx  = next((i for i, h in enumerate(hdr_texts) if 'declining' in h), None)
-            unch_idx = next((i for i, h in enumerate(hdr_texts) if 'unchanged' in h), None)
-            name_idx = 0
-            for data_row in rows[1:]:
-                cells = data_row.find_all(['th','td'])
-                if len(cells) < 2:
-                    continue
-                row_name = cells[name_idx].get_text(strip=True).lower()
-                def safe_int(cells, idx):
-                    if idx is None or idx >= len(cells):
-                        return None
-                    txt = cells[idx].get_text(strip=True).replace(',','')
-                    try: return int(txt)
-                    except: return None
-                adv  = safe_int(cells, adv_idx)
-                dec  = safe_int(cells, dec_idx)
-                unch = safe_int(cells, unch_idx)
-                for key, label, match in AD_INDICES:
-                    if match in row_name or label.lower() in row_name:
-                        ad_data[key] = {'label': label, 'adv': adv, 'dec': dec, 'unch': unch}
-            break
+    import re as _re6a
+    adv_m  = _re6a.search(r'Advancing\s*([\d.]+)%\s*\((\d+)\)', fv_text)
+    dec_m  = _re6a.search(r'Declining\s*\((\d+)\)\s*([\d.]+)%', fv_text)
+    nh_m   = _re6a.search(r'New High\s*([\d.]+)%\s*\((\d+)\)', fv_text)
+    nl_m   = _re6a.search(r'New Low\s*\((\d+)\)\s*([\d.]+)%', fv_text)
+    a50_m  = _re6a.search(r'Above\s*([\d.]+)%\s*\((\d+)\)\s*SMA50', fv_text)
+    a200_m = _re6a.search(r'Above\s*([\d.]+)%\s*\((\d+)\)\s*SMA200', fv_text)
 
-    ad_table_rows = ''
-    for key, label, _ in AD_INDICES:
-        d = ad_data.get(key, {})
-        adv  = d.get('adv')
-        dec  = d.get('dec')
-        unch = d.get('unch')
-        if adv and dec and dec > 0:
-            ratio = round(adv / dec, 2)
-            ratio_color = '#2ecc71' if ratio >= 1.0 else '#e74c3c'
-        else:
-            ratio = None
-            ratio_color = '#8b949e'
-        adv_str   = f"{adv:,}"   if adv   is not None else 'N/A'
-        dec_str   = f"{dec:,}"   if dec   is not None else 'N/A'
-        unch_str  = f"{unch:,}"  if unch  is not None else 'N/A'
-        ratio_str = f"{ratio:.2f}" if ratio is not None else 'N/A'
-        ad_table_rows += (
-            f'<tr style="border-bottom:1px solid #30363d;">'
-            f'<td style="padding:8px 10px;color:#e6edf3;font-weight:600;">{label}</td>'
-            f'<td style="padding:8px 10px;color:#2ecc71;text-align:right;">{adv_str}</td>'
-            f'<td style="padding:8px 10px;color:#e74c3c;text-align:right;">{dec_str}</td>'
-            f'<td style="padding:8px 10px;color:#8b949e;text-align:right;">{unch_str}</td>'
-            f'<td style="padding:8px 10px;color:{ratio_color};text-align:right;font-weight:700;">{ratio_str}</td>'
-            f'</tr>\n'
-        )
-        P[f'AD_{key}_ADV']   = adv_str
-        P[f'AD_{key}_DEC']   = dec_str
-        P[f'AD_{key}_UNCH']  = unch_str
-        P[f'AD_{key}_RATIO'] = ratio_str
-        P[f'AD_{key}_BADGE'] = ad_ratio_badge(ratio_str)
-        print(f"  {label}: Adv={adv_str} Dec={dec_str} Ratio={ratio_str}")
+    adv_n   = int(adv_m.group(2))   if adv_m  else 0
+    dec_n   = int(dec_m.group(1))   if dec_m  else 0
+    adv_pct = adv_m.group(1)        if adv_m  else 'N/A'
+    dec_pct = dec_m.group(2)        if dec_m  else 'N/A'
+    nh_n    = int(nh_m.group(2))    if nh_m   else 0
+    nl_n    = int(nl_m.group(1))    if nl_m   else 0
+    a50_pct = a50_m.group(1)        if a50_m  else 'N/A'
+    a200_pct= a200_m.group(1)       if a200_m else 'N/A'
 
-    # Alias for SP500 in regime box
-    P['AD_SP500_ADV']   = P.get('AD_SP500_ADV', 'N/A')
-    P['AD_SP500_DEC']   = P.get('AD_SP500_DEC', 'N/A')
-    P['AD_SP500_RATIO'] = P.get('AD_SP500_RATIO', 'N/A')
-    P['AD_SP500_BADGE'] = P.get('AD_SP500_BADGE', 'badge-neutral')
+    ratio   = round(adv_n / dec_n, 2) if dec_n > 0 else None
+    ratio_str   = f'{ratio:.2f}' if ratio else 'N/A'
+    ratio_color = '#2ecc71' if ratio and ratio >= 1.0 else '#e74c3c'
+
+    P['AD_SP500_ADV']   = f'{adv_n:,}'
+    P['AD_SP500_DEC']   = f'{dec_n:,}'
+    P['AD_SP500_RATIO'] = ratio_str
+    P['AD_SP500_BADGE'] = ad_ratio_badge(ratio_str)
 
     AD_TABLE_HTML = f'''<table style="width:100%;border-collapse:collapse;font-size:13px;">
 <thead><tr style="background:#0d1117;border-bottom:1px solid #30363d;">
-  <th style="padding:8px 10px;text-align:left;color:#8b949e;">Index</th>
-  <th style="padding:8px 10px;text-align:right;color:#2ecc71;">Advancing</th>
-  <th style="padding:8px 10px;text-align:right;color:#e74c3c;">Declining</th>
-  <th style="padding:8px 10px;text-align:right;color:#8b949e;">Unchanged</th>
-  <th style="padding:8px 10px;text-align:right;color:#f1c40f;">AD Ratio</th>
+  <th style="padding:8px 10px;text-align:left;color:#8b949e;">Metric</th>
+  <th style="padding:8px 10px;text-align:right;color:#2ecc71;">Advancing / Above</th>
+  <th style="padding:8px 10px;text-align:right;color:#e74c3c;">Declining / Below</th>
+  <th style="padding:8px 10px;text-align:right;color:#f1c40f;">Ratio / %</th>
 </tr></thead>
 <tbody>
-{ad_table_rows}</tbody></table>'''
+<tr style="border-bottom:1px solid #21262d;">
+  <td style="padding:8px 10px;color:#e6edf3;font-weight:600;">All US Stocks (Advancing vs Declining)</td>
+  <td style="padding:8px 10px;color:#2ecc71;text-align:right;">{adv_n:,} ({adv_pct}%)</td>
+  <td style="padding:8px 10px;color:#e74c3c;text-align:right;">{dec_n:,} ({dec_pct}%)</td>
+  <td style="padding:8px 10px;color:{ratio_color};text-align:right;font-weight:700;">{ratio_str}</td>
+</tr>
+<tr style="border-bottom:1px solid #21262d;">
+  <td style="padding:8px 10px;color:#e6edf3;">New 52-Week Highs vs Lows</td>
+  <td style="padding:8px 10px;color:#2ecc71;text-align:right;">{nh_n:,} New Highs</td>
+  <td style="padding:8px 10px;color:#e74c3c;text-align:right;">{nl_n:,} New Lows</td>
+  <td style="padding:8px 10px;color:#8b949e;text-align:right;">—</td>
+</tr>
+<tr style="border-bottom:1px solid #21262d;">
+  <td style="padding:8px 10px;color:#e6edf3;">% Stocks Above SMA50</td>
+  <td style="padding:8px 10px;color:#2ecc71;text-align:right;">{a50_pct}%</td>
+  <td style="padding:8px 10px;color:#e74c3c;text-align:right;">{100-float(a50_pct if a50_pct != "N/A" else 0):.1f}%</td>
+  <td style="padding:8px 10px;color:#8b949e;text-align:right;">—</td>
+</tr>
+<tr>
+  <td style="padding:8px 10px;color:#e6edf3;">% Stocks Above SMA200</td>
+  <td style="padding:8px 10px;color:#2ecc71;text-align:right;">{a200_pct}%</td>
+  <td style="padding:8px 10px;color:#e74c3c;text-align:right;">{100-float(a200_pct if a200_pct != "N/A" else 0):.1f}%</td>
+  <td style="padding:8px 10px;color:#8b949e;text-align:right;">—</td>
+</tr>
+</tbody></table>'''
     P['AD_RATIO_TABLE'] = AD_TABLE_HTML
-    print("  ✅ StockCharts A/D Ratio done")
+    print(f"  ✅ Finviz A/D: Adv={adv_n:,} ({adv_pct}%) Dec={dec_n:,} ({dec_pct}%) Ratio={ratio_str}")
+    print(f"  New Highs={nh_n} New Lows={nl_n} | Above 50MA={a50_pct}% | Above 200MA={a200_pct}%")
 
 except Exception as _e:
-    print(f"  WARNING Step 6A StockCharts A/D: {_e}")
+    print(f"  WARNING Step 6A Finviz A/D: {_e}")
     P['AD_RATIO_TABLE'] = '<p style="color:#8b949e;">A/D Ratio data unavailable</p>'
-    for key, _, __ in AD_INDICES:
-        P[f'AD_{key}_ADV']   = 'N/A'
-        P[f'AD_{key}_DEC']   = 'N/A'
-        P[f'AD_{key}_UNCH']  = 'N/A'
-        P[f'AD_{key}_RATIO'] = 'N/A'
-        P[f'AD_{key}_BADGE'] = 'badge-neutral'
     P['AD_SP500_ADV']   = 'N/A'
     P['AD_SP500_DEC']   = 'N/A'
     P['AD_SP500_RATIO'] = 'N/A'
