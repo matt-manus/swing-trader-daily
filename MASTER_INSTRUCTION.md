@@ -2,7 +2,14 @@
 
 這份文件總結了生成每日收市市場報告（EOD Market Summary）的完整工作流程、數據來源、格式要求以及所有必須遵守的原則。
 
-**⚠️ AI 代理重要指示：每次開始新任務前，必須首先閱讀此文件。絕不能依賴記憶，絕不能估算數據，絕不能在未經用戶確認的情況下更改來源。Accuracy over speed — always.**
+**⚠️ AI 代理重要指示：每次開始新任務前，必須依序閱讀以下 4 個核心文件（全部位於 Manus 項目共享目錄 `/home/ubuntu/projects/daily-market-summary-c59730ec/` 及 GitHub repo `swing-trader-daily` 根目錄）：**
+
+1. `MASTER_INSTRUCTION.md` — 本文件（核心原則與數據來源）
+2. `WORKFLOW.md` — 每日工作流程
+3. `Log.md` — 歷次 session 行動紀錄
+4. `evolution.md` — 學到的教訓與規則演進
+
+**絕不能依賴記憶，絕不能估算數據，絕不能在未經用戶確認的情況下更改來源。Accuracy over speed — always.**
 
 ---
 

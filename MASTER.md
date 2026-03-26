@@ -161,9 +161,16 @@ swing-trader-daily/
 
 ## How to Start a New Task
 
-When starting a new task for this project:
+When starting a new task for this project, read ALL 4 core files first (located in both `/home/ubuntu/projects/daily-market-summary-c59730ec/` and the repo root):
 
-1. Read this `MASTER.md` file first
+1. `MASTER_INSTRUCTION.md` — Core principles and data sources
+2. `WORKFLOW.md` — Daily workflow
+3. `Log.md` — Chronological session action log
+4. `evolution.md` — Lessons learned and rule updates
+
+Then:
+
+1. Read this `MASTER.md` file for technical implementation details
 2. Check the latest run status: https://github.com/matt-manus/swing-trader-daily/actions
 3. View the latest report: https://matt-manus.github.io/swing-trader-daily/
 4. Ask the user what specific change they want

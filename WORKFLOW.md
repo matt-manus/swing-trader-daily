@@ -1,8 +1,17 @@
 # Daily EOD Market Summary — Master Workflow Reference
 
-> **IMPORTANT FOR AI AGENT:** Read this file at the start of every new task before doing anything else.
+> **IMPORTANT FOR AI AGENT:** At the start of every new task, you MUST read ALL 4 core files in order before doing anything else.
+> These files are located in BOTH the Manus project shared directory (`/home/ubuntu/projects/daily-market-summary-c59730ec/`) AND the GitHub repo (`swing-trader-daily` root):
+>
+> 1. `MASTER_INSTRUCTION.md` — Core principles and data sources
+> 2. `WORKFLOW.md` — This file (daily workflow)
+> 3. `Log.md` — Chronological session action log
+> 4. `evolution.md` — Lessons learned and rule updates
+>
 > Do not rely on memory. Do not estimate. Do not change sources without user confirmation.
 > Accuracy over speed — always.
+>
+> **End of session:** Update `Log.md` with actions taken. Update `evolution.md` with any new lessons learned.
 
 ---
 
