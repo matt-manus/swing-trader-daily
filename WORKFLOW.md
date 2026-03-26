@@ -41,12 +41,13 @@ The report is built using `scripts/build_daily_report.py`, which takes the previ
 4. Only then start collecting data
 
 ### Data Collection Order
-1. Yahoo Finance (automated via yfinance)
+1. Yahoo Finance (automated via yfinance) — includes BTC-USD
 2. Fear & Greed Index (feargreedmeter.com)
 3. **NAAIM Exposure Index** (naaim.org Excel download — automated)
-6. StockCharts breadth screenshots
-8. Stockbee data + screenshot
-9. Finviz sector and industry data
+4. Barchart.com — exact % above MA values ($S5TW/$S5FI/$S5TH, $NDTW/$NDFI/$NDTH, $MMTW/$MMFI/$MMTH)
+5. StockCharts breadth screenshots (9 charts) + Step 6A AD Ratio from StockCharts Market Summary
+6. Stockbee data + screenshot (Step 6B)
+7. Finviz sector and industry data
 
 ### Building the Report
 1. Copy the most recent archive HTML as the base template
@@ -60,17 +61,20 @@ The report is built using `scripts/build_daily_report.py`, which takes the previ
 
 | Section | Source | URL | Method |
 |---------|--------|-----|--------|
-| Step 1 — Prices, MAs, RSI | Yahoo Finance | yfinance library | Automated |
+| Step 1 — Prices, MAs, RSI | Yahoo Finance | yfinance library | Automated — tickers: SPY, QQQ, IWM, DIA, VIX, GLD, USO, ^TNX, DX-Y.NYB, **BTC-USD** |
+| Step 1 — BTC | **Yahoo Finance** | `BTC-USD` via yfinance | Include BTC close price and daily % change in Macro Environment section |
 | Step 1 — USD Index | **DXY (not UUP)** | `DX-Y.NYB` via yfinance | Use DXY directly — UUP is an ETF with tracking error |
 | Step 1 — Fear & Greed | feargreedmeter.com | https://feargreedmeter.com | Scrape/screenshot |
 | Step 1 — Economic Calendar | forex.tradingcharts.com | https://forex.tradingcharts.com/economic_calendar/ | Manual check |
-| **Step 3 — NAAIM Exposure Index** | **naaim.org** | `https://naaim.org/programs/naaim-exposure-index/` | **Download Excel file (linked as “HERE” on page), parse latest row, show value + date. Updated every Wednesday.** |
+| **Step 3 — NAAIM Exposure Index** | **naaim.org** | `https://naaim.org/programs/naaim-exposure-index/` | **Download Excel file (linked as "HERE" on page), parse latest row, show value + date. Updated every Wednesday.** |
 | Step 3 — T2108 value | Stockbee | https://stockbee.blogspot.com/p/mm.html | Read actual value — no login needed |
 | Step 4A — Index vs MAs | Yahoo Finance | yfinance library | **SPY, QQQ, DIA, IWM only** — no SPX/NDX index. MA color: red if price < MA, green if price > MA. Signal badge must match actual position. |
-| Step 4B — % Above MAs | **StockCharts** | https://stockcharts.com/h-sc/ui?s=$SPXA20R | Screenshot — use $SPXA20R, $SPXA50R, $SPXA200R (Double the size of current screenshots) |
+| Step 4B — % Above MAs (exact values) | **Barchart.com** | S&P 500: `$S5TW` (20d), `$S5FI` (50d), `$S5TH` (200d); Nasdaq 100: `$NDTW` (20d), `$NDFI` (50d), `$NDTH` (200d); NYSE: `$MMTW` (20d), `$MMFI` (50d), `$MMTH` (200d) | Scrape exact % values from Barchart |
+| Step 4B — % Above MAs (screenshots) | **StockCharts** | https://stockcharts.com/h-sc/ui?s=$SPXA20R | Screenshot only — use $SPXA20R, $SPXA50R, $SPXA200R, $NDXA20R, $NDXA50R, $NDXA200R, $NYA20R, $NYA50R, $NYA200R (9 charts, double size) |
 | Step 4C — Sector ETF RSI | Yahoo Finance | yfinance library | **Sorted by RSI 14 descending** — must use **Wilder's SMMA** algorithm (not simple rolling mean). Use `pandas_ta` `ta.rsi()` or manual SMMA: `smma = (prev * 13 + val) / 14`. Simple rolling mean gives incorrect (lower) values vs Yahoo Finance/TradingView. |
 | Step 5A — Sector Performance | Finviz | https://finviz.com/groups.ashx?g=sector&o=-change | Data + screenshot |
 | Step 4D — Industry Performance | Finviz | https://finviz.com/groups.ashx?g=industry&o=-change | Data table — top 10 leaders with parent sector |
+| **Step 6A — Advance/Decline Ratio** | **StockCharts Market Summary** | https://stockcharts.com/docs/doku.php?id=market_summary | Scrape Advancing/Declining counts for S&P 500, Nasdaq 100, DJIA, Russell 2000. Calculate AD Ratio = Advancing ÷ Declining (2 decimal places). Present as table. |
 | Step 6B — Stockbee breadth | Stockbee | **https://stockbee.blogspot.com/p/mm.html** | Screenshot — must include T2108 column — no login needed — **must be taken AFTER 4:00 PM ET market close, not in the morning** |
 
 ---
@@ -82,7 +86,7 @@ The report is built using `scripts/build_daily_report.py`, which takes the previ
 5. **Step 3 NAAIM** — Download NAAIM Excel from naaim.org, parse latest row. Show value + date in Scorecard alongside VIX, Fear & Greed, T2108. Updated every Wednesday; on other days show most recent value with date label.
 6. **Step 7 Market Commentary** — After all data is collected, write Bull vs Bear commentary using ONLY data from the current report. Must include: Bearish Case (4–6 points), Bullish Case (3–5 points), and Bull vs Bear Scorecard table with final score and trading guidance. Total length 600–900 Chinese characters.
 7. **Step 4A** — No SPY daily chart
-8. **Step 4B** — Use StockCharts screenshots ($SPXA20R, $SPXA50R, $SPXA200R). No TradingView. No estimates. Double the size of current screenshots.
+8. **Step 4B** — Exact values from **Barchart** tickers ($S5TW/$S5FI/$S5TH for S&P 500, $NDTW/$NDFI/$NDTH for Nasdaq 100, $MMTW/$MMFI/$MMTH for NYSE). Screenshots from StockCharts ($SPXA20R, $SPXA50R, $SPXA200R, $NDXA20R, $NDXA50R, $NDXA200R, $NYA20R, $NYA50R, $NYA200R). No TradingView. No estimates. Double the size of current screenshots.
 9. **Step 4C** — Must include RSI 14 column. Must be sorted by RSI descending (not 1D%)
 11. **Step 6B** — Stockbee screenshot must include T2108. No login needed. URL: stockbee.blogspot.com/p/mm.html
 12. **Step 7 UFO Watchlist** — REMOVED. Do not include.
@@ -97,7 +101,7 @@ The report is built using `scripts/build_daily_report.py`, which takes the previ
 
 1. **Header** — Date, title, generated timestamp
 2. **Verdict Box** — Overall market verdict (Bullish/Neutral/Defensive/Bearish + level)
-4. **Step 1: Macro Environment** — Indices (SPY, QQQ, IWM, DIA), VIX, Gold (GLD), Oil (USO), 10Y Yield (^TNX), USD (UUP), Fear & Greed
+4. **Step 1: Macro Environment** — Indices (SPY, QQQ, IWM, DIA), VIX, Gold (GLD), Oil (USO), 10Y Yield (^TNX), USD/DXY, **BTC**, Fear & Greed
 6. **Step 3: Market Sentiment** — VIX scorecard, Fear & Greed, T2108, **NAAIM Exposure Index** scorecard, sentiment summary note
 7. **Step 4: Technical Analysis**
    - 4A: Index vs Moving Averages (**SPY, QQQ, DIA, IWM only** — 4 tickers, no SPX/NDX index. MA color must reflect actual position: red = below MA, green = above MA)
@@ -107,6 +111,7 @@ The report is built using `scripts/build_daily_report.py`, which takes the previ
 8. **Step 5: Sector & Industry Strength**
    - 5A: Sector Performance (Finviz heatmap screenshot + data table)
 9. **Step 6: Market Breadth**
+   - 6A: Advance/Decline Ratio — scrape Advancing/Declining counts from StockCharts Market Summary for S&P 500, Nasdaq 100, DJIA, Russell 2000. Calculate AD Ratio for each.
    - 6B: Stockbee Market Monitor (screenshot including T2108, up/down 4%+, 5d/10d ratios)
 10. **Step 7: Daily Market Commentary (Bull vs Bear)** — Written after all data is collected. Three fixed parts:
    - 🐻 **Bearish Case**: 4–6 data-backed reasons to be cautious (cite exact values from Steps 1–6)
@@ -161,7 +166,9 @@ Returns a URL like: `https://static.manus.im/file/manuscdn.com/XXXXXXXX.png`
 |---------|---------------|
 | Using stockbee.biz | Use stockbee.blogspot.com/p/mm.html |
 | Saying Stockbee needs login | It does NOT need login |
-| Using TradingView for Step 4B | Use StockCharts ($SPXA20R, $SPXA50R, $SPXA200R) |
+| Using TradingView for Step 4B | Use Barchart for exact values ($S5TW/$S5FI/$S5TH, $NDTW/$NDFI/$NDTH, $MMTW/$MMFI/$MMTH) and StockCharts for screenshots ($SPXA20R etc.) |
+| Skipping Step 6A AD Ratio | Always scrape Advancing/Declining from StockCharts Market Summary and calculate AD Ratio for S&P 500, Nasdaq 100, DJIA, Russell 2000 |
+| Omitting BTC from Step 1 | Always include BTC-USD price and daily % change in Macro Environment |
 | Estimating values with ~ | Always get exact values from source |
 | Rewriting the builder from scratch | Always use previous day's HTML as template |
 | Including Step 7 UFO | Step 7 is REMOVED |

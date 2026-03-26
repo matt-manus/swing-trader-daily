@@ -90,7 +90,8 @@
 - **時區換算（重要）：** HKT = UTC+8，ET（夏令時 EDT）= UTC-4。HKT 比 ET **快 12 小時**。正確換算：07:45 HKT = 19:45 ET（前一日）。**絕不能**寫成 "19:45 HKT / 07:45 ET"（方向相反）。報告生成時間通常係香港早上 6:45–7:45 HKT，對應美東時間前一日 18:45–19:45 ET。
 
 ### Step 1: 宏觀環境 (Macro Environment)
-- **來源：** `yfinance` (SPY, QQQ, IWM, DIA, VIX, GLD, USO, ^TNX, DX-Y.NYB)。
+- **來源：** `yfinance` (SPY, QQQ, IWM, DIA, VIX, GLD, USO, ^TNX, DX-Y.NYB, BTC-USD)。
+- **BTC：** 使用 `BTC-USD` via yfinance 抓取比特幣最新收市價及日漲跌幅。
 - **USD 指數：** 使用 **DXY（`DX-Y.NYB`）** 而非 UUP ETF。DXY 係美元指數本身，更直接、更標準；UUP 係 ETF，有追蹤誤差。
 - **Fear & Greed：** 來源為 https://feargreedmeter.com （抓取精確數值）。
 - **經濟日曆：** 來源為 https://forex.tradingcharts.com/economic_calendar/ （手動查看未來三天的重要數據）。
@@ -109,12 +110,16 @@
   - **只使用以下 4 個指數：SPY、QQQ、DIA（道瓊斯 ETF）、IWM**。不需要 SPX 或 NDX 指數本身。
   - **MA 顏色規則（必須嚴格執行）：** 若某指數收市價低於某條 MA，該欄位必須顯示**紅色**；若高於，顯示**綠色**。絕不能因為照搬模板而顯示錯誤顏色。Signal badge 亦必須根據實際 MA 位置自動判斷（ABOVE / BELOW / BREACHED）。
 - **4B % of Stocks Above MAs：**
-  - **正確來源：** **StockCharts.com**。絕對不能使用 TradingView 或 MarketInOut。
-  - **所需截圖（共 9 張）：** 
+  - **截圖來源：** **StockCharts.com**（截圖用）。絕對不能使用 TradingView 或 MarketInOut。
+  - **精確數值來源：** **Barchart.com**（抓取精確數值用），使用以下 Barchart 代碼：
+    - S&P 500: 20日線以上% → `$S5TW`；50日線以上% → `$S5FI`；200日線以上% → `$S5TH`
+    - Nasdaq 100: 20日線以上% → `$NDTW`；50日線以上% → `$NDFI`；200日線以上% → `$NDTH`
+    - NYSE / 全美市場: 20日線以上% → `$MMTW`；50日線以上% → `$MMFI`；200日線以上% → `$MMTH`
+  - **所需截圖（共 9 張，來自 StockCharts）：** 
     - S&P 500: $SPXA20R, $SPXA50R, $SPXA200R
     - Nasdaq 100: $NDXA20R, $NDXA50R, $NDXA200R
     - NYSE: $NYA20R, $NYA50R, $NYA200R
-  - **要求：** 必須顯示這 9 個指標的精確數值和截圖，不能有任何 "estimated" 標籤。**注意：截圖大小必須是原來的兩倍（Double the size of current screenshots）。**
+  - **要求：** 精確數值必須從 Barchart 抓取，截圖來自 StockCharts，不能有任何 "estimated" 標籤。**注意：截圖大小必須是原來的兩倍（Double the size of current screenshots）。**
 - **4C Sector ETF Rotation：** 
   - 必須包含 11 個板塊 ETF 和 SPY。
   - **必須增加 RSI 14 欄位**。
@@ -131,6 +136,17 @@
   - **刪除：** 不需要列出表現最差的 Laggards（Bottom 5）。
 
 ### Step 6: 市場廣度 (Market Breadth)
+
+- **6A Advance/Decline Ratio：**
+  - **來源：** StockCharts Market Summary 頁面（https://stockcharts.com/docs/doku.php?id=market_summary 或直接訪問 StockCharts 市場概覽頁面）。
+  - **抓取數據：** 從表格中抓取以下指數的 Advancing（上漲）及 Declining（下跌）家數：
+    - S&P 500
+    - Nasdaq 100
+    - Dow Jones Industrial Average
+    - Russell 2000
+  - **計算：** 為每個指數計算 AD Ratio = Advancing 家數 ÷ Declining 家數，結果保留兩位小數。
+  - **呈現：** 整理成清晰表格，欄位包括：指數名稱、Advancing、Declining、AD Ratio。
+
 - **6B Stockbee Market Monitor：**
   - **正確 URL：** **https://stockbee.blogspot.com/p/mm.html** （不需要登入，不是 `.biz`）。
   - **要求：** 截圖**必須包含 T2108 欄位**。
@@ -163,11 +179,13 @@
 
 - [ ] Stockbee 網址是否正確（`blogspot.com` 而非 `.biz`）？
 - [ ] 報告中是否含有任何 `~` 符號或 "estimated" 字眼（時間戳除外）？
-- [ ] Step 4B 是否使用了 StockCharts（$SPXA20R 等）的截圖，並且尺寸為兩倍大？
+- [ ] Step 4B 精確數值是否從 Barchart（$S5TW/$S5FI/$S5TH, $NDTW/$NDFI/$NDTH, $MMTW/$MMFI/$MMTH）抓取？截圖是否來自 StockCharts 且尺寸為兩倍大？
 - [ ] Step 4C 是否已按 RSI 14 排序？
+- [ ] Step 6A 是否已從 StockCharts Market Summary 抓取 S&P 500、Nasdaq 100、DJIA、Russell 2000 的 Advancing/Declining 家數並計算 AD Ratio？
 - [ ] Step 6B 的 Stockbee 截圖是否包含了 T2108 數據？
 - [ ] 是否已刪除 Step 7 UFO 和 Report Comparison？
 - [ ] Step 3 Scorecard 是否已包含 NAAIM Exposure Index 數值（並標明數據日期）？
+- [ ] Step 1 是否包含 BTC-USD 數據？
 - [ ] Step 1 USD 是否使用 DXY（`DX-Y.NYB`）而非 UUP？
 - [ ] Step 4A 是否只有 SPY/QQQ/DIA/IWM 四個指數？MA 顏色是否根據實際位置正確顯示（低於 MA = 紅色）？
 - [ ] Step 4C RSI 是否使用 Wilder's SMMA 算法計算？排序是否正確（由高至低）？

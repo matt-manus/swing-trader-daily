@@ -16,6 +16,17 @@ This document is the "brain" of the self-evolving system. It captures insights, 
 
 ---
 
+### 2026-03-26 (Rule Updates — Step 1 BTC, Step 4B Barchart, Step 6A AD Ratio)
+**Insight/Lesson Learned**: Three new data requirements were added to the daily report workflow: (1) BTC price in Step 1, (2) Barchart tickers as the authoritative source for exact % above MA values in Step 4B (StockCharts remains for screenshots only), and (3) a new Step 6A Advance/Decline Ratio table sourced from StockCharts Market Summary.
+**Triggering Event/Observation**: User explicitly requested these additions to improve data accuracy and breadth coverage.
+**Systemic Improvement/Rule Update**:
+- Step 1: Add `BTC-USD` to yfinance ticker list. Display BTC close price and daily % change in Macro Environment section.
+- Step 4B: Exact % values now come from **Barchart** tickers: S&P 500 → `$S5TW`/`$S5FI`/`$S5TH`; Nasdaq 100 → `$NDTW`/`$NDFI`/`$NDTH`; NYSE → `$MMTW`/`$MMFI`/`$MMTH`. StockCharts screenshots ($SPXA20R etc.) are retained for visual display only.
+- Step 6A (NEW): Before Step 6B, scrape Advancing/Declining counts for S&P 500, Nasdaq 100, DJIA, and Russell 2000 from StockCharts Market Summary page. Calculate AD Ratio = Advancing ÷ Declining (2 decimal places). Present as a table.
+**Status**: Implemented (2026-03-26)
+
+---
+
 ### 2026-03-26
 **Insight/Lesson Learned**: The project had drifted from the strict `self-evolving-system` skill structure by using `RULES_EVOLUTION.md` and missing a dedicated session `Log.md`. `MARKET_HISTORY.md` was acting as a data log, but not an agent action log.
 **Triggering Event/Observation**: User inquired about the location of `Log.md` and `evolution.md` as per the project skills.
